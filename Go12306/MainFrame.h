@@ -53,7 +53,14 @@ public:
 
 	LRESULT HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
+	void Notify(TNotifyUI& msg);
+	
+	void OnLClick(CControlUI *pControl);
+
 private:
+
+	int QueryTicket(CDuiString begPlace , CDuiString endPlace, CDuiString travelTime );
+
 	CButtonUI* m_pCloseBtn;
 	CButtonUI* m_pMaxBtn;
 	CButtonUI* m_pRestoreBtn;
@@ -62,4 +69,10 @@ private:
 	CMenuWnd* m_pMenu;
 	std::map<CDuiString, bool> m_MenuInfos;
 	CTrayIcon m_trayIcon;
+
+
+	COptionUI *m_pOptTicketQuery;
+	COptionUI *m_pOptOrderManage;
+	COptionUI *m_pOptUserManage;
+
 };

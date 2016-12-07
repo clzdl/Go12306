@@ -74,7 +74,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)$(Platform)\</OutDir>
+    <OutDir>$(SolutionDir)bin\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -105,12 +105,12 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>D:\opensource\DuiLib_Ultimate-master\DuiLib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\opensource\DuiLib_Ultimate-master\DuiLib;D:\opensource\poco-1.7.6-all\Foundation\include;D:\opensource\poco-1.7.6-all\NetSSL_OpenSSL\include;D:\opensource\poco-1.7.6-all\JSON\include;D:\opensource\poco-1.7.6-all\Net\include;D:\opensource\poco-1.7.6-all\Crypto\include;D:\opensource\openssl-1.0.2j\install-dir\include;D:\opensource\poco-1.7.6-all\Util\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>D:\opensource\DuiLib_Ultimate-master\Lib\DuiLib_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>D:\opensource\DuiLib_Ultimate-master\Lib\DuiLib_d.lib;D:\opensource\poco-1.7.6-all\lib64\PocoFoundationd.lib;D:\opensource\poco-1.7.6-all\lib64\PocoUtild.lib;D:\opensource\poco-1.7.6-all\lib64\PocoCryptod.lib;D:\opensource\poco-1.7.6-all\lib64\PocoNetSSLd.lib;D:\opensource\poco-1.7.6-all\lib64\PocoNetd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -154,7 +154,9 @@
     <ClInclude Include="Go12306.h" />
     <ClInclude Include="MainFrame.h" />
     <ClInclude Include="MsgWnd.h" />
+    <ClInclude Include="OthFunc.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="SkinFrame.h" />
     <ClInclude Include="SkinManager.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -163,6 +165,7 @@
     <ClCompile Include="Go12306.cpp" />
     <ClCompile Include="MainFrame.cpp" />
     <ClCompile Include="MsgWnd.cpp" />
+    <ClCompile Include="OthFunc.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

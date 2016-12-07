@@ -38,15 +38,15 @@
 		<VerticalLayout name="body" >
 			<HorizontalLayout name="tab_header" height="30" >
 				<Control />
-				<Option width="98" text="余票查询" name="basic_tab" style="colortab_style" selected="true" />
-				<Option width="98" text="订单管理" name="rich_tab" style="colortab_style" />
-				<Option width="98" text="用户信息" name="ex_tab" style="colortab_style" />
+				<Option  width="98" text="余票查询" name="ticket_query" style="colortab_style" selected="true" />
+				<Option  width="98" text="订单管理" name="order_manager" style="colortab_style" />
+				<Option  width="98" text="用户信息" name="user_manager" style="colortab_style" />
 				<Control />
 			</HorizontalLayout>
 
 			<AnimationTabLayout name="tab_switch" >
 				
-				<VerticalLayout name="ticket_query" inset="2,2,2,2"  >
+				<VerticalLayout name="ticket_query_pannel" inset="2,2,2,2"  >
 					<HorizontalLayout height="30" childpadding="4" bordersize="1,1,1,1" bordercolor="#F" >
               <Label text="始发地" textcolor="#FF000000" glowsize="0" font="font13" width="40"/>
               <Edit name="begPlace" tipvalue="始发地" style="edit_style" />
@@ -57,25 +57,20 @@
               <Label text="出发日" textcolor="#FF000000" glowsize="0" font="font13" width="40"/>
               <DateTime width="120" bordersize="1" bordercolor="#FF888888" textpadding="3"/>
 
-              <Button name="btnQuery" text="查询" textcolor="#FF000000" style="btn_style" width="60" textpadding="20,0,0,0" foreimage="dest='4,7,20,23' res='other/icon.png'" />
+              <Button name="btnTicketQuery" text="查询" textcolor="#FF000000" style="btn_style" width="60" textpadding="20,0,0,0" foreimage="dest='4,7,20,23' res='other/icon.png'" />
 					</HorizontalLayout>
 
           <HorizontalLayout height="30" childpadding="1" bordersize="1,1,1,1" bordercolor="#F" >
             <Label text="车次类型" textcolor="#FF000000" glowsize="0" font="font13" width="60"/>
-            <CheckBox text="全选" width="60"  align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
-            <CheckBox text="GC-高铁/城际" width="120"  align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
-            <CheckBox text="D-动车" width="80" align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
-            <CheckBox text="Z-直达" width="80" align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
-            <CheckBox text="T-特快" width="80" align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
-            <CheckBox text="K-快速" width="80" align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
-            <CheckBox text="其他" width="80" align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
+            <CheckBox name="train_all" text="全选" width="60"  align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
+            <CheckBox name="train_gc" text="GC-高铁/城际" width="120"  align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
+            <CheckBox name="train_d" text="D-动车" width="80" align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
+            <CheckBox name="train_z" text="Z-直达" width="80" align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
+            <CheckBox name="train_t" text="T-特快" width="80" align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
+            <CheckBox name="train_k" text="K-快速" width="80" align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
+            <CheckBox name="train_o" text="其他" width="80" align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
            
           </HorizontalLayout>
-
-
-
-
-
 
           <List name="listview"  vscrollbar="true" hscrollbar="true"  itemvalign="vcenter" scrollstepsize="100">
 						<ListHeader height="40">
@@ -114,11 +109,11 @@
 					
 				</VerticalLayout>
 				
-				<VerticalLayout name="order_manager" inset="2,2,2,2" vscrollbar="true">
+				<VerticalLayout name="order_manager_pannel" inset="2,2,2,2" vscrollbar="true">
 
 				</VerticalLayout>
 				
-				<VerticalLayout name="user_manager" inset="2,2,2,2" vscrollbar="true">
+				<VerticalLayout name="user_manager_pannel" inset="2,2,2,2" vscrollbar="true">
 
 				</VerticalLayout>
 
