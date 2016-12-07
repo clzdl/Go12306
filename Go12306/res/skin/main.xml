@@ -9,7 +9,9 @@
 	<Default name="HScrollBar" shared="true" value="height=&quot;8&quot; showbutton1=&quot;false&quot; showbutton2=&quot;false&quot; thumbnormalimage=&quot;file='common/hscrollbar.png' source='0,0,32,8' corner='4,0,4,0'&quot; thumbhotimage=&quot;file='common/hscrollbar.png' source='0,8,32,16' corner='4,0,4,0'&quot; thumbpushedimage=&quot;file='common/hscrollbar.png' source='0,16,32,24' corner='4,0,4,0'&quot; railnormalimage=&quot;&quot; railhotimage=&quot;&quot; railpushedimage=&quot;&quot; raildisabledimage=&quot;&quot; bknormalimage=&quot;file='common/hscrollbar.png' source='0,0,32,8' corner='4,0,4,0'&quot; bkhotimage=&quot;&quot; bkpushedimage=&quot;&quot; bkdisabledimage=&quot;&quot; "/>
 	<Style name="edit_style" value="textpadding=&quot;6,6,6,6&quot; bkcolor=&quot;#FF666666&quot; nativebkcolor=&quot;#FF666666&quot; bkimage=&quot;res='common/edit_bk.png' corner='6,6,6,6'&quot;" />
 
+ 
 	<VerticalLayout name="root"  bkcolor="#FFDCDCDC" height="564">
+    
 		<HorizontalLayout name="appbar" height="64" >
 			<HorizontalLayout name="apptitle" childpadding="6">
 				<Container width="64" height="64" bkimage="logo.png" />
@@ -29,8 +31,10 @@
 		  
 		</HorizontalLayout>
 
+    
 		<Label height="1" bkimage="common/hor_line.png"/>
 		
+    
 		<VerticalLayout name="body" >
 			<HorizontalLayout name="tab_header" height="30" >
 				<Control />
@@ -43,23 +47,37 @@
 			<AnimationTabLayout name="tab_switch" >
 				
 				<VerticalLayout name="ticket_query" inset="2,2,2,2"  >
-					<HorizontalLayout height="30" childpadding="12" bordersize="1,1,1,1" bordercolor="#0">
-						<Label text="始发地" textcolor="#FF000000" glowsize="0" font="font13" width="40"/>
-						<Edit name="begPlace" tipvalue="始发地" style="edit_style" />
-						
-						<Label text="目的地" textcolor="#FF000000" glowsize="0" font="font13" width="40"/>
-						<Edit name="endPlace" tipvalue="目的地" style="edit_style" />
-						
-						<Label text="出发日" textcolor="#FF000000" glowsize="0" font="font13" width="40"/>
-						<DateTime width="120" bordersize="1" bordercolor="#FF888888" textpadding="3"/>
-						
-						<Button name="btnQuery" text="查询" textcolor="#FF000000" style="btn_style" width="60" textpadding="20,0,0,0" foreimage="dest='4,7,20,23' res='other/icon.png'" />
-						
-					</HorizontalLayout>
-					
-					
+					<HorizontalLayout height="30" childpadding="4" bordersize="1,1,1,1" bordercolor="#F" >
+              <Label text="始发地" textcolor="#FF000000" glowsize="0" font="font13" width="40"/>
+              <Edit name="begPlace" tipvalue="始发地" style="edit_style" />
 
-					<List name="listview"  vscrollbar="true" hscrollbar="true"  itemvalign="vcenter" scrollstepsize="100">
+              <Label text="目的地" textcolor="#FF000000" glowsize="0" font="font13" width="40"/>
+              <Edit name="endPlace" tipvalue="目的地" style="edit_style" />
+
+              <Label text="出发日" textcolor="#FF000000" glowsize="0" font="font13" width="40"/>
+              <DateTime width="120" bordersize="1" bordercolor="#FF888888" textpadding="3"/>
+
+              <Button name="btnQuery" text="查询" textcolor="#FF000000" style="btn_style" width="60" textpadding="20,0,0,0" foreimage="dest='4,7,20,23' res='other/icon.png'" />
+					</HorizontalLayout>
+
+          <HorizontalLayout height="30" childpadding="1" bordersize="1,1,1,1" bordercolor="#F" >
+            <Label text="车次类型" textcolor="#FF000000" glowsize="0" font="font13" width="60"/>
+            <CheckBox text="全选" width="60"  align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
+            <CheckBox text="GC-高铁/城际" width="120"  align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
+            <CheckBox text="D-动车" width="80" align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
+            <CheckBox text="Z-直达" width="80" align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
+            <CheckBox text="T-特快" width="80" align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
+            <CheckBox text="K-快速" width="80" align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
+            <CheckBox text="其他" width="80" align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
+           
+          </HorizontalLayout>
+
+
+
+
+
+
+          <List name="listview"  vscrollbar="true" hscrollbar="true"  itemvalign="vcenter" scrollstepsize="100">
 						<ListHeader height="40">
 							<ListHeaderItem text="车次" width="60" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
 							<ListHeaderItem width="60" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" >
