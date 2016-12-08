@@ -2,34 +2,53 @@
 
 #include "OthFunc.h"
 
-std::wstring StringToWString(const std::string &str)
+
+std::wstring Utf8ToUnicode(const std::string &str)
 {
 	std::wstring wstr;
-	int nLen = (int)str.length();
-	wstr.resize(nLen, L' ');
 
-	int nResult = MultiByteToWideChar(CP_ACP, 0, (LPCSTR)str.c_str(), nLen, (LPWSTR)wstr.c_str(), nLen);
+	int iLen = MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)str.c_str(), -1, NULL, 0);
 
-	if (nResult == 0)
+	wchar_t *pwText;
+	pwText = new wchar_t[iLen]();
+	if (!pwText)
 	{
+		delete []pwText;
 		return _T("");
 	}
 
+	MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)str.c_str(), -1, pwText, iLen);
+	wstr.append(pwText);
+
+	delete[] pwText;
+
 	return wstr;
 }
+
+
+
 //wstring高字节不为0，返回FALSE
-std::string WStringToString(const std::wstring &wstr )
+std::string UnicodeToUtf8(const std::wstring &wstr )
 {
 	std::string str;
 	int nLen = (int)wstr.length();
 	str.resize(nLen, ' ');
 
-	int nResult = WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)wstr.c_str(), nLen, (LPSTR)str.c_str(), nLen, NULL, NULL);
-
-	if (nResult == 0)
+	int iLen = WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)wstr.c_str(), -1, NULL, 0, NULL, NULL);
+	
+	char *pmText;
+	pmText = new char[iLen ]();
+	if (!pmText)
 	{
+		delete []pmText;
 		return "";
 	}
 
+	WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)wstr.c_str(), -1, pmText, iLen, NULL, NULL);
+	str.append(pmText);
+
+	delete[] pmText;
+
 	return str;
 }
+

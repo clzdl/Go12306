@@ -6,40 +6,10 @@
 #include <sstream>
 #include "OthFunc.h"
 
-#include "Poco/Net/HTTPSClientSession.h"
-#include "Poco/Net/HTTPRequest.h"
-#include "Poco/Net/HTTPResponse.h"
-#include "Poco/Net/SecureStreamSocket.h"
-#include "Poco/Net/Context.h"
-#include "Poco/Net/Session.h"
-#include "Poco/Net/SSLManager.h"
-#include "Poco/Net/SSLException.h"
-#include "Poco/SharedPtr.h"
 
-#include "Poco/Net/SSLManager.h"
-#include "Poco/Net/KeyConsoleHandler.h"
-#include "Poco/Net/ConsoleCertificateHandler.h"
-#include "Poco/Net/InvalidCertificateHandler.h"
-#include "Poco/Net/AcceptCertificateHandler.h"
+#include "Client12306Manager.h"
 
-
-#include "Poco/StreamCopier.h"
-#include "Poco/Exception.h"
-
-
-using Poco::StreamCopier;
-using Poco::Net::Context;
-using Poco::Net::HTTPSClientSession;
-using Poco::Net::HTTPRequest;
-using Poco::Net::HTTPResponse;
-using Poco::SharedPtr;
-using Poco::Net::InvalidCertificateHandler;
-using Poco::Net::SSLManager;
-using Poco::Net::KeyConsoleHandler;
-using Poco::Net::ConsoleCertificateHandler;
-using Poco::Net::ConsoleCertificateHandler;
-
-
+#include "TicketModel.h"
 
 
 
@@ -323,37 +293,25 @@ void CMainFrame::OnLClick(CControlUI *pControl)
 }
 
 
-int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString travelTime)
+int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString travelTime )
 {
-	
-	CDuiString strDomain = _T("kyfw.12306.cn");
-	CDuiString strUrl = _T("/otn/leftTicket/queryX?leftTicketDTO.train_date=2016-12-12&leftTicketDTO.from_station=SJP&leftTicketDTO.to_station=BXP&purpose_codes=0X00");
+	std::vector<CTicketModel> vecTicket;
+
+	begPlace = _T("SJP");
+	endPlace = _T("BJP");
+	travelTime = _T("2016-12-12");
+
+	Client12306Manager::Instance()->QueryLeftTicket(UnicodeToUtf8(begPlace.GetData()) , 
+													UnicodeToUtf8(endPlace.GetData()) ,
+													UnicodeToUtf8(travelTime.GetData()) , vecTicket, _ADULT);
 
 
-	try
+
+	for (std::vector<CTicketModel>::iterator it = vecTicket.begin(); it != vecTicket.end(); ++it)
 	{
-
-		SharedPtr<InvalidCertificateHandler> ptrCert = new ConsoleCertificateHandler(false);
-		Context::Ptr ptrContext = new Context(Context::CLIENT_USE, "", "", "", Context::VERIFY_NONE, 9, true, "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
-		SSLManager::instance().initializeClient(0, ptrCert, ptrContext);
-
-		HTTPSClientSession s("kyfw.12306.cn", 443);
-		HTTPRequest request(HTTPRequest::HTTP_GET, "/otn/leftTicket/queryX?leftTicketDTO.train_date=2016-12-12&leftTicketDTO.from_station=SJP&leftTicketDTO.to_station=BXP&purpose_codes=0X00");
-		s.sendRequest(request);
-		HTTPResponse response;
-		std::istream& rs = s.receiveResponse(response);
-		std::ostringstream ostr;
-		StreamCopier::copyStream(rs, ostr);
-		DUI__Trace(_T("%s\n"), StringToWString(ostr.str()).c_str());
+		DUI__Trace(it->GetTrainNo());
+		
 	}
-	catch (Poco::Exception &e)
-	{
-		DUI__Trace(_T("%s\n"), StringToWString(e.displayText()).c_str());
-	}
-
-
-
-	
 		
 	return 0;
 }

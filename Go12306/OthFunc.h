@@ -2,6 +2,7 @@
 
 #include <string>
 
-std::wstring StringToWString(const std::string &str);
 
-std::string WStringToString(const std::wstring &wstr);
+std::wstring Utf8ToUnicode(const std::string &str);
+
+std::string UnicodeToUtf8(const std::wstring &wstr);

@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="头文件\model">
+      <UniqueIdentifier>{8a202a38-102c-43b3-9084-3a629d4d2200}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\model">
+      <UniqueIdentifier>{ad8bb4e5-f87f-46c0-bcdd-ec7272d9d581}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -45,6 +51,12 @@
     <ClInclude Include="OthFunc.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Client12306Manager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TicketModel.h">
+      <Filter>头文件\model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -61,6 +73,12 @@
     </ClCompile>
     <ClCompile Include="OthFunc.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Client12306Manager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TicketModel.cpp">
+      <Filter>源文件\model</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

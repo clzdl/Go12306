@@ -27,3 +27,5 @@
 using namespace DuiLib;
 
 
+#define		SUCCESS		0
+#define		FAIL		-1
