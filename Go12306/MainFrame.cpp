@@ -38,7 +38,7 @@ void CMainFrame::InitWindow()
 	m_pOptOrderManage = static_cast<COptionUI*>(m_pm.FindControl(_T("order_manager")));
 	m_pOptUserManage = static_cast<COptionUI*>(m_pm.FindControl(_T("user_manager")));
 
-
+	RefreshAllTrainCHeckBox(m_bAllTrainType);
 
 	// 注册托盘图标
 	m_trayIcon.CreateTrayIcon(m_hWnd, IDI_GO12306, _T("gogo 12306"));
@@ -230,33 +230,83 @@ void CMainFrame::Notify(TNotifyUI& msg)
 				pTabSwitch->SelectItem(2);
 			}
 		}
-		else if (name.CompareNoCase(_T("train_all")) == 0 )
+		else if (name.CompareNoCase(_T("train_all")) == 0)
 		{
-			CDuiString trainAll[] = {_T("train_gc"),_T("train_d"), _T("train_z"), _T("train_t"), _T("train_k"),_T("train_o") };
-			for (int i = 0; i < 6; ++i)
-			{
-				CCheckBoxUI *pCheckBoxUI =  static_cast<CCheckBoxUI*>(m_pm.FindControl(trainAll[i]));
-				pCheckBoxUI->SetCheck(!pCheckBoxUI->GetCheck());
-			}
+			m_bAllTrainType = !m_bAllTrainType;
+
+			RefreshAllTrainCHeckBox(m_bAllTrainType);
+
+			RefreshTicketListView();
+
 		}
 		else if (name.CompareNoCase(_T("train_gc")) == 0)
 		{
+
+			CCheckBoxUI *pCheckBoxUI = dynamic_cast<CCheckBoxUI*>(msg.pSender);
+
+			if (pCheckBoxUI->GetCheck())
+				m_setShowTrainType.insert(_GC);
+			else
+				m_setShowTrainType.erase(_GC);
+
+			RefreshTicketListView();
 		}
 		else if (name.CompareNoCase(_T("train_d")) == 0)
 		{
+			CCheckBoxUI *pCheckBoxUI = dynamic_cast<CCheckBoxUI*>(msg.pSender);
+
+			if (pCheckBoxUI->GetCheck())
+				m_setShowTrainType.insert(_D);
+			else
+				m_setShowTrainType.erase(_D);
+
+			RefreshTicketListView();
 		}
 		else if (name.CompareNoCase(_T("train_z")) == 0)
 		{
+			CCheckBoxUI *pCheckBoxUI = dynamic_cast<CCheckBoxUI*>(msg.pSender);
+
+			if (pCheckBoxUI->GetCheck())
+				m_setShowTrainType.insert(_Z);
+			else
+				m_setShowTrainType.erase(_Z);
+
+			RefreshTicketListView();
 		}
 		else if (name.CompareNoCase(_T("train_t")) == 0)
 		{
+			CCheckBoxUI *pCheckBoxUI = dynamic_cast<CCheckBoxUI*>(msg.pSender);
+
+			if (pCheckBoxUI->GetCheck())
+				m_setShowTrainType.insert(_T);
+			else
+				m_setShowTrainType.erase(_T);
+
+			RefreshTicketListView();
 		}
 		else if (name.CompareNoCase(_T("train_k")) == 0)
 		{
+			CCheckBoxUI *pCheckBoxUI = dynamic_cast<CCheckBoxUI*>(msg.pSender);
+
+			if (pCheckBoxUI->GetCheck())
+				m_setShowTrainType.insert(_K);
+			else
+				m_setShowTrainType.erase(_K);
+
+			RefreshTicketListView();
 		}
 		else if (name.CompareNoCase(_T("train_o")) == 0)
 		{
+			CCheckBoxUI *pCheckBoxUI = dynamic_cast<CCheckBoxUI*>(msg.pSender);
+
+			if (pCheckBoxUI->GetCheck())
+				m_setShowTrainType.insert(_O);
+			else
+				m_setShowTrainType.erase(_O);
+
+			RefreshTicketListView();
 		}
+		
 	}
 
 }
@@ -297,12 +347,13 @@ void CMainFrame::OnLClick(CControlUI *pControl)
 	
 	}
 	
+	
 }
 
 
 int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString travelTime )
 {
-	
+
 
 	begPlace = _T("SJP");
 	endPlace = _T("BJP");
@@ -313,32 +364,46 @@ int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString
 													UnicodeToUtf8(travelTime.GetData()) , m_vecTicket, _ADULT);
 
 
+	RefreshTicketListView();
+		
+	return 0;
+}
+
+
+int CMainFrame::RefreshTicketListView()
+{
 	CListUI* pTicketListView = static_cast<CListUI*>(m_pm.FindControl(_T("ticketListView")));
+
+	pTicketListView->RemoveAll();
+
 	CDuiString tmpString;
 	int iIndex = 0;
-	for (std::vector<CTicketModel>::iterator it = m_vecTicket.begin(); it != m_vecTicket.end(); ++it,++iIndex)
+	for (std::vector<CTicketModel>::iterator it = m_vecTicket.begin(); it != m_vecTicket.end(); ++it, ++iIndex)
 	{
 		DUI__Trace(it->GetTrainNo());
+
+		if (!IsShowTrain(it->GetStationTrainCode()))
+			continue;
 
 		///添加行
 		CListContainerElementUI* pListItem = new CListContainerElementUI();
 		pListItem->SetChildVAlign(DT_VCENTER);
 		pListItem->SetFixedHeight(40);
 		pListItem->SetManager(&m_pm, NULL, false);
-	
+
 		pTicketListView->Add(pListItem);
 
 		{
 			///车次
 			CLabelUI *pTxtUI = new CLabelUI();
-			pTxtUI->SetManager(&m_pm, NULL, false); 
-			pTxtUI->SetAttribute(_T("style"),_T("listitem_style"));
-			pTxtUI->SetFont(1);
+			pTxtUI->SetManager(&m_pm, NULL, false);
+			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
+			pTxtUI->SetFont(2);
 			pTxtUI->SetText(it->GetStationTrainCode());
 			pListItem->Add(pTxtUI);
 		}
 
-		
+
 		{///出发站/到达站
 			CVerticalLayoutUI *pStationVLayoutUI = new CVerticalLayoutUI();
 
@@ -375,7 +440,7 @@ int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString
 			CLabelUI *pTxtUI = new CLabelUI();
 			pTxtUI->SetManager(&m_pm, NULL, false);
 			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
-		
+
 			pTxtUI->SetText(it->GetStartTime());
 			pTimeVLayoutUI->Add(pTxtUI);
 
@@ -388,7 +453,7 @@ int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString
 
 			pListItem->Add(pTimeVLayoutUI);
 
-			
+
 		}
 		{///历时
 
@@ -413,7 +478,11 @@ int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString
 			CLabelUI *pTxtUI = new CLabelUI();
 			pTxtUI->SetManager(&m_pm, NULL, false);
 			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
-
+			if (it->GetSwzNum().Compare(_T("--")) && it->GetSwzNum().Compare(_T("无")))
+			{
+				pTxtUI->SetFont(2);
+				pTxtUI->SetTextColor(0xFF5F5F5F);
+			}
 			pTxtUI->SetText(it->GetSwzNum());
 			pListItem->Add(pTxtUI);
 		}
@@ -422,7 +491,11 @@ int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString
 			CLabelUI *pTxtUI = new CLabelUI();
 			pTxtUI->SetManager(&m_pm, NULL, false);
 			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
-
+			if (it->GetTzNum().Compare(_T("--")) && it->GetTzNum().Compare(_T("无")))
+			{
+				pTxtUI->SetFont(2);
+				pTxtUI->SetTextColor(0xFF00AA00);
+			}
 			pTxtUI->SetText(it->GetTzNum());
 			pListItem->Add(pTxtUI);
 		}
@@ -431,7 +504,11 @@ int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString
 			CLabelUI *pTxtUI = new CLabelUI();
 			pTxtUI->SetManager(&m_pm, NULL, false);
 			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
-
+			if (it->GetZyNum().Compare(_T("--")) && it->GetZyNum().Compare(_T("无")))
+			{
+				pTxtUI->SetFont(2);
+				pTxtUI->SetTextColor(0xFF00AA00);
+			}
 			pTxtUI->SetText(it->GetZyNum());
 			pListItem->Add(pTxtUI);
 		}
@@ -440,7 +517,11 @@ int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString
 			CLabelUI *pTxtUI = new CLabelUI();
 			pTxtUI->SetManager(&m_pm, NULL, false);
 			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
-
+			if (it->GetZeNum().Compare(_T("--")) && it->GetZeNum().Compare(_T("无")))
+			{
+				pTxtUI->SetFont(2);
+				pTxtUI->SetTextColor(0xFF00AA00);
+			}
 			pTxtUI->SetText(it->GetZeNum());
 			pListItem->Add(pTxtUI);
 		}
@@ -449,7 +530,11 @@ int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString
 			CLabelUI *pTxtUI = new CLabelUI();
 			pTxtUI->SetManager(&m_pm, NULL, false);
 			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
-
+			if (it->GetGrNum().Compare(_T("--")) && it->GetGrNum().Compare(_T("无")))
+			{
+				pTxtUI->SetFont(2);
+				pTxtUI->SetTextColor(0xFF00AA00);
+			}
 			pTxtUI->SetText(it->GetGrNum());
 			pListItem->Add(pTxtUI);
 		}
@@ -458,7 +543,11 @@ int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString
 			CLabelUI *pTxtUI = new CLabelUI();
 			pTxtUI->SetManager(&m_pm, NULL, false);
 			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
-
+			if (it->GetRwNum().Compare(_T("--")) && it->GetRwNum().Compare(_T("无")))
+			{
+				pTxtUI->SetFont(2);
+				pTxtUI->SetTextColor(0xFF00AA00);
+			}
 			pTxtUI->SetText(it->GetRwNum());
 			pListItem->Add(pTxtUI);
 		}
@@ -467,7 +556,11 @@ int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString
 			CLabelUI *pTxtUI = new CLabelUI();
 			pTxtUI->SetManager(&m_pm, NULL, false);
 			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
-
+			if (it->GetYwNum().Compare(_T("--")) && it->GetYzNum().Compare(_T("无")))
+			{
+				pTxtUI->SetFont(2);
+				pTxtUI->SetTextColor(0xFF00AA00);
+			}
 			pTxtUI->SetText(it->GetYwNum());
 			pListItem->Add(pTxtUI);
 		}
@@ -476,7 +569,11 @@ int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString
 			CLabelUI *pTxtUI = new CLabelUI();
 			pTxtUI->SetManager(&m_pm, NULL, false);
 			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
-
+			if (it->GetRzNum().Compare(_T("--")) && it->GetYzNum().Compare(_T("无")))
+			{
+				pTxtUI->SetFont(2);
+				pTxtUI->SetTextColor(0xFF00AA00);
+			}
 			pTxtUI->SetText(it->GetRzNum());
 			pListItem->Add(pTxtUI);
 		}
@@ -485,16 +582,24 @@ int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString
 			CLabelUI *pTxtUI = new CLabelUI();
 			pTxtUI->SetManager(&m_pm, NULL, false);
 			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
-
+			if (it->GetYzNum().Compare(_T("--")) && it->GetYzNum().Compare(_T("无")))
+			{
+				pTxtUI->SetFont(2);
+				pTxtUI->SetTextColor(0xFF00AA00);
+			}
 			pTxtUI->SetText(it->GetYzNum());
 			pListItem->Add(pTxtUI);
 		}
-		
+
 		{///无座
 			CLabelUI *pTxtUI = new CLabelUI();
 			pTxtUI->SetManager(&m_pm, NULL, false);
 			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
-
+			if (it->GetWzNum().Compare(_T("--")) && it->GetWzNum().Compare(_T("无")))
+			{
+				pTxtUI->SetFont(2);
+				pTxtUI->SetTextColor(0xFF00AA00);
+			}
 			pTxtUI->SetText(it->GetWzNum());
 			pListItem->Add(pTxtUI);
 		}
@@ -503,7 +608,11 @@ int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString
 			CLabelUI *pTxtUI = new CLabelUI();
 			pTxtUI->SetManager(&m_pm, NULL, false);
 			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
-
+			if (it->GetQtNum().Compare(_T("--")) && it->GetQtNum().Compare(_T("无")))
+			{
+				pTxtUI->SetFont(2);
+				pTxtUI->SetTextColor(0xFF00AA00);
+			}
 			pTxtUI->SetText(it->GetQtNum());
 			pListItem->Add(pTxtUI);
 		}
@@ -521,8 +630,8 @@ int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString
 				pBtnUI->SetAttribute(_T("style"), _T("btn_style"));
 				pBtnUI->SetFixedHeight(30);
 				pBtnUI->SetFixedWidth(50);
-				
-				
+
+
 				pBtnUI->SetUserData(strIndex);
 
 				pBtnUI->SetText(_T("预订"));
@@ -538,20 +647,66 @@ int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString
 				pTxtUI->SetText(_T("--"));
 				pListItem->Add(pTxtUI);
 			}
-		
+
 		}
 
 
 	}
-		
-	return 0;
+
+	return SUCCESS;
 }
 
 
-
-int CMainFrame::List_AddTextItem(CListUI *pList, CDuiString test)
+bool CMainFrame::IsShowTrain(CDuiString trainNo)
 {
-	
+	_TRAIN_TYPE tmpType;
+	switch (trainNo.GetAt(0))
+	{
+	case 'G':
+		tmpType = _GC;
+		break;
+	case 'D':
+		tmpType = _D;
+		break;
+	case 'Z':
+		tmpType = _Z;
+		break;
+	case 'T':
+		tmpType = _T;
+		break;
+	case 'K':
+		tmpType = _K;
+		break;
+	}
 
-	return SUCCESS;
+
+	std::set< _TRAIN_TYPE >::iterator it = m_setShowTrainType.find(tmpType);
+	if (it == m_setShowTrainType.end())
+		return false;
+	
+	
+	return true;
+}
+
+
+void CMainFrame::RefreshAllTrainCHeckBox(bool flag)
+{
+	CDuiString trainAll[] = { _T("train_gc"),_T("train_d"), _T("train_z"), _T("train_t"), _T("train_k"),_T("train_o") };
+	for (int i = 0; i < 6; ++i)
+	{
+		CCheckBoxUI *pCheckBoxUI = static_cast<CCheckBoxUI*>(m_pm.FindControl(trainAll[i]));
+		pCheckBoxUI->SetCheck(flag);
+	}
+
+	if (flag)
+	{
+		m_setShowTrainType.insert(_GC);
+		m_setShowTrainType.insert(_D);
+		m_setShowTrainType.insert(_Z);
+		m_setShowTrainType.insert(_K);
+		m_setShowTrainType.insert(_T);
+		m_setShowTrainType.insert(_O);
+	}
+	else
+		m_setShowTrainType.clear();
 }

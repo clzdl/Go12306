@@ -29,3 +29,14 @@ using namespace DuiLib;
 
 #define		SUCCESS		0
 #define		FAIL		-1
+
+
+typedef enum 
+{
+	_GC,			///高铁
+	_D,				///动车
+	_Z,				///直达
+	_T,				///特快
+	_K,				///普快
+	_O,				///其它
+} _TRAIN_TYPE;

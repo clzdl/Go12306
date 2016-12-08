@@ -2,7 +2,9 @@
 <Window size="800,572" sizebox="4,4,6,6" roundcorner="0,0" caption="0,0,0,64" layered="false" mininfo="400,300" showshadow="true" shadowimage="main/shadow.png" shadowsize="6" shadowcorner="8,8,8,8">
 	<Font shared="true" id="0" name="宋体" size="13" default="true"/>
 	<Font shared="true" id="1" name="宋体" size="12" bold="false" underline="true"/>
-	<Font shared="true" id="2" name="宋体" size="16" bold="false"/>
+	
+  <!-- 座位使用 -->
+  <Font shared="true" id="2" name="宋体" size="16" bold="true" underline="true"/>
 	<Font shared="true" id="3" name="宋体" size="28" bold="false"/>
 
 	<Default name="VScrollBar" shared="true" value="width=&quot;8&quot; showbutton1=&quot;false&quot; showbutton2=&quot;false&quot; thumbnormalimage=&quot;file='common/vscrollbar.png' source='0,60,8,100' corner='0,4,0,4'&quot; thumbhotimage=&quot;file='common/vscrollbar.png' source='8,60,16,100' corner='0,4,0,4'&quot; thumbpushedimage=&quot;file='common/vscrollbar.png' source='16,60,24,100' corner='0,4,0,4'&quot; railnormalimage=&quot;&quot; railhotimage=&quot;&quot; railpushedimage=&quot;&quot; raildisabledimage=&quot;&quot; bknormalimage=&quot;file='common/vscrollbar.png' source='0,0,8,60' corner='0,4,0,4'&quot; bkhotimage=&quot;&quot; bkpushedimage=&quot;&quot; bkdisabledimage=&quot;&quot; "/>
@@ -65,7 +67,7 @@
 
           <HorizontalLayout height="30" childpadding="1" bordersize="1,1,1,1" bordercolor="#F" >
             <Label text="车次类型" textcolor="#FF000000" glowsize="0" font="font13" width="60"/>
-            <CheckBox name="train_all" text="全选" width="60"  align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
+            <CheckBox name="train_all" selected="true" text="全选" width="60"  align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
             <CheckBox name="train_gc" text="GC-高铁/城际" width="120"  align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
             <CheckBox name="train_d" text="D-动车" width="80" align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
             <CheckBox name="train_z" text="Z-直达" width="80" align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>

@@ -1,11 +1,13 @@
 #pragma once
 #include "SkinManager.h"
-
+#include "TicketModel.h"
+#include <set>
 
 class CMainFrame : public WindowImplBase, public CWebBrowserEventHandler, public SkinChangedReceiver
 {
 public:
-	CMainFrame() {}
+	CMainFrame():m_bAllTrainType(true)
+	{}
 
 public:
 	CControlUI* CreateControl(LPCTSTR pstrClass);
@@ -64,7 +66,15 @@ private:
 
 	/*@action:
 	*/
-	int List_AddTextItem(CListUI *pList, CDuiString test);
+	int RefreshTicketListView();
+
+	/*@action: 是否需要显示
+	
+	*/
+	bool IsShowTrain(CDuiString trainNo);
+
+
+	void RefreshAllTrainCHeckBox(bool flag);
 
 	CButtonUI* m_pCloseBtn;
 	CButtonUI* m_pMaxBtn;
@@ -83,5 +93,11 @@ private:
 	static CDuiString m_transLiShi[];
 		 
 	std::vector<CTicketModel> m_vecTicket;
+
+
+	////显示车次类型
+	std::set< _TRAIN_TYPE > m_setShowTrainType;
+
+	bool m_bAllTrainType;
 
 };
