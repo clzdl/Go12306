@@ -11,7 +11,7 @@
 
 #include "TicketModel.h"
 
-
+CDuiString CMainFrame::m_transLiShi[] = { _T("当日到达"),_T("次日到达"),_T("两日到达"),_T("三日到达") };
 
 CControlUI* CMainFrame::CreateControl(LPCTSTR pstrClass)
 {
@@ -289,13 +289,20 @@ void CMainFrame::OnLClick(CControlUI *pControl)
 		// 动态添加后重新设置菜单的大小
 		m_pMenu->ResizeMenu();
 	}
+	else if (sName.CompareNoCase(_T("OrderTicketBtn")) == 0)
+	{
+		CMsgWnd::MessageBox(m_hWnd, _T(""), _T("aaaaa"));
+
+		CMsgWnd::MessageBox(m_hWnd, _T(""), pControl->GetUserData());
+	
+	}
 	
 }
 
 
 int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString travelTime )
 {
-	std::vector<CTicketModel> vecTicket;
+	
 
 	begPlace = _T("SJP");
 	endPlace = _T("BJP");
@@ -303,15 +310,248 @@ int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString
 
 	Client12306Manager::Instance()->QueryLeftTicket(UnicodeToUtf8(begPlace.GetData()) , 
 													UnicodeToUtf8(endPlace.GetData()) ,
-													UnicodeToUtf8(travelTime.GetData()) , vecTicket, _ADULT);
+													UnicodeToUtf8(travelTime.GetData()) , m_vecTicket, _ADULT);
 
 
-
-	for (std::vector<CTicketModel>::iterator it = vecTicket.begin(); it != vecTicket.end(); ++it)
+	CListUI* pTicketListView = static_cast<CListUI*>(m_pm.FindControl(_T("ticketListView")));
+	CDuiString tmpString;
+	int iIndex = 0;
+	for (std::vector<CTicketModel>::iterator it = m_vecTicket.begin(); it != m_vecTicket.end(); ++it,++iIndex)
 	{
 		DUI__Trace(it->GetTrainNo());
+
+		///添加行
+		CListContainerElementUI* pListItem = new CListContainerElementUI();
+		pListItem->SetChildVAlign(DT_VCENTER);
+		pListItem->SetFixedHeight(40);
+		pListItem->SetManager(&m_pm, NULL, false);
+	
+		pTicketListView->Add(pListItem);
+
+		{
+			///车次
+			CLabelUI *pTxtUI = new CLabelUI();
+			pTxtUI->SetManager(&m_pm, NULL, false); 
+			pTxtUI->SetAttribute(_T("style"),_T("listitem_style"));
+			pTxtUI->SetFont(1);
+			pTxtUI->SetText(it->GetStationTrainCode());
+			pListItem->Add(pTxtUI);
+		}
+
 		
+		{///出发站/到达站
+			CVerticalLayoutUI *pStationVLayoutUI = new CVerticalLayoutUI();
+
+			CLabelUI *pTxtUI = new CLabelUI();
+			pTxtUI->SetManager(&m_pm, NULL, false);
+			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
+			if (it->GetFromStationTelecode() == it->GetStartStationTelecode())
+				tmpString = _T("(始)");
+			else
+				tmpString = _T("(过)");
+
+			pTxtUI->SetText(tmpString + it->GetFromStationName());
+			pStationVLayoutUI->Add(pTxtUI);
+
+			///////
+
+			pTxtUI = new CLabelUI();
+			pTxtUI->SetManager(&m_pm, NULL, false);
+			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
+
+			if (it->GetToStationTelecode() == it->GetEndStationTelecode())
+				tmpString = _T("(终)");
+			else
+				tmpString = _T("(过)");
+
+			pTxtUI->SetText(tmpString + it->GetToStationName());
+			pStationVLayoutUI->Add(pTxtUI);
+
+			pListItem->Add(pStationVLayoutUI);
+		}
+
+		{///出发时间  到达时间
+			CVerticalLayoutUI *pTimeVLayoutUI = new CVerticalLayoutUI();
+			CLabelUI *pTxtUI = new CLabelUI();
+			pTxtUI->SetManager(&m_pm, NULL, false);
+			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
+		
+			pTxtUI->SetText(it->GetStartTime());
+			pTimeVLayoutUI->Add(pTxtUI);
+
+			pTxtUI = new CLabelUI();
+			pTxtUI->SetManager(&m_pm, NULL, false);
+			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
+
+			pTxtUI->SetText(it->GetArriveTime());
+			pTimeVLayoutUI->Add(pTxtUI);
+
+			pListItem->Add(pTimeVLayoutUI);
+
+			
+		}
+		{///历时
+
+			CVerticalLayoutUI *pLiShiVLayoutUI = new CVerticalLayoutUI();
+			CLabelUI *pTxtUI = new CLabelUI();
+			pTxtUI->SetManager(&m_pm, NULL, false);
+			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
+
+			pTxtUI->SetText(it->GetLiShi());
+			pLiShiVLayoutUI->Add(pTxtUI);
+
+			pTxtUI = new CLabelUI();
+			pTxtUI->SetManager(&m_pm, NULL, false);
+			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
+			pTxtUI->SetText(m_transLiShi[_wtoi(it->GetDayDifferent().GetData())]);
+			pLiShiVLayoutUI->Add(pTxtUI);
+
+			pListItem->Add(pLiShiVLayoutUI);
+		}
+
+		{///商务座
+			CLabelUI *pTxtUI = new CLabelUI();
+			pTxtUI->SetManager(&m_pm, NULL, false);
+			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
+
+			pTxtUI->SetText(it->GetSwzNum());
+			pListItem->Add(pTxtUI);
+		}
+
+		{///特等座
+			CLabelUI *pTxtUI = new CLabelUI();
+			pTxtUI->SetManager(&m_pm, NULL, false);
+			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
+
+			pTxtUI->SetText(it->GetTzNum());
+			pListItem->Add(pTxtUI);
+		}
+
+		{///一等座
+			CLabelUI *pTxtUI = new CLabelUI();
+			pTxtUI->SetManager(&m_pm, NULL, false);
+			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
+
+			pTxtUI->SetText(it->GetZyNum());
+			pListItem->Add(pTxtUI);
+		}
+
+		{///二等座
+			CLabelUI *pTxtUI = new CLabelUI();
+			pTxtUI->SetManager(&m_pm, NULL, false);
+			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
+
+			pTxtUI->SetText(it->GetZeNum());
+			pListItem->Add(pTxtUI);
+		}
+
+		{///高级软卧
+			CLabelUI *pTxtUI = new CLabelUI();
+			pTxtUI->SetManager(&m_pm, NULL, false);
+			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
+
+			pTxtUI->SetText(it->GetGrNum());
+			pListItem->Add(pTxtUI);
+		}
+
+		{///软卧
+			CLabelUI *pTxtUI = new CLabelUI();
+			pTxtUI->SetManager(&m_pm, NULL, false);
+			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
+
+			pTxtUI->SetText(it->GetRwNum());
+			pListItem->Add(pTxtUI);
+		}
+
+		{///硬卧
+			CLabelUI *pTxtUI = new CLabelUI();
+			pTxtUI->SetManager(&m_pm, NULL, false);
+			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
+
+			pTxtUI->SetText(it->GetYwNum());
+			pListItem->Add(pTxtUI);
+		}
+
+		{///软座
+			CLabelUI *pTxtUI = new CLabelUI();
+			pTxtUI->SetManager(&m_pm, NULL, false);
+			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
+
+			pTxtUI->SetText(it->GetRzNum());
+			pListItem->Add(pTxtUI);
+		}
+
+		{///硬座
+			CLabelUI *pTxtUI = new CLabelUI();
+			pTxtUI->SetManager(&m_pm, NULL, false);
+			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
+
+			pTxtUI->SetText(it->GetYzNum());
+			pListItem->Add(pTxtUI);
+		}
+		
+		{///无座
+			CLabelUI *pTxtUI = new CLabelUI();
+			pTxtUI->SetManager(&m_pm, NULL, false);
+			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
+
+			pTxtUI->SetText(it->GetWzNum());
+			pListItem->Add(pTxtUI);
+		}
+
+		{///其它
+			CLabelUI *pTxtUI = new CLabelUI();
+			pTxtUI->SetManager(&m_pm, NULL, false);
+			pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
+
+			pTxtUI->SetText(it->GetQtNum());
+			pListItem->Add(pTxtUI);
+		}
+
+		{///备注
+			if (it->GetBtnTextInfo() == _T("预订"))
+			{
+
+				CButtonUI *pBtnUI = new CButtonUI();
+				CDuiString strIndex;
+				strIndex.SmallFormat(_T("%d"), iIndex);
+
+				pBtnUI->SetName(_T("OrderTicketBtn"));
+				pBtnUI->SetManager(&m_pm, NULL, false);
+				pBtnUI->SetAttribute(_T("style"), _T("btn_style"));
+				pBtnUI->SetFixedHeight(30);
+				pBtnUI->SetFixedWidth(50);
+				
+				
+				pBtnUI->SetUserData(strIndex);
+
+				pBtnUI->SetText(_T("预订"));
+
+				pListItem->Add(pBtnUI);
+			}
+			else
+			{
+				CLabelUI *pTxtUI = new CLabelUI();
+				pTxtUI->SetManager(&m_pm, NULL, false);
+				pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
+
+				pTxtUI->SetText(_T("--"));
+				pListItem->Add(pTxtUI);
+			}
+		
+		}
+
+
 	}
 		
 	return 0;
+}
+
+
+
+int CMainFrame::List_AddTextItem(CListUI *pList, CDuiString test)
+{
+	
+
+	return SUCCESS;
 }

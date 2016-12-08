@@ -190,15 +190,17 @@ int Client12306Manager::JsonParseTicket(std::string jsonString, std::vector<CTic
 		DUI__Trace(Utf8ToUnicode(it->toString()).c_str());
 
 		JSON::Object::Ptr pItem = it->extract<JSON::Object::Ptr>();
+		
+		CTicketModel ticketModel;
 
 		Dynamic::Var tmpJObj;
 		////buttonTextInfo
 		tmpJObj = pItem->get("buttonTextInfo");
-		DUI__Trace(Utf8ToUnicode(tmpJObj.toString()).c_str());
+		ticketModel.SetBtnTextInfo(Utf8ToUnicode(tmpJObj.toString()).c_str());
 
 		/////secretStr
 		tmpJObj = pItem->get("secretStr");
-		DUI__Trace(Utf8ToUnicode(tmpJObj.toString()).c_str());
+		ticketModel.SetSecretStr(Utf8ToUnicode(tmpJObj.toString()).c_str());
 
 
 		////queryLeftNewDTO
@@ -206,7 +208,7 @@ int Client12306Manager::JsonParseTicket(std::string jsonString, std::vector<CTic
 
 		JSON::Object::Ptr pQueryDto = tmpJObj.extract<JSON::Object::Ptr>();
 
-		CTicketModel ticketModel;
+		
 		AssignJson2TicketObj(pQueryDto, ticketModel);
 		
 		vecTicket.emplace_back(ticketModel);

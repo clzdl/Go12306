@@ -8,7 +8,10 @@
 	<Default name="VScrollBar" shared="true" value="width=&quot;8&quot; showbutton1=&quot;false&quot; showbutton2=&quot;false&quot; thumbnormalimage=&quot;file='common/vscrollbar.png' source='0,60,8,100' corner='0,4,0,4'&quot; thumbhotimage=&quot;file='common/vscrollbar.png' source='8,60,16,100' corner='0,4,0,4'&quot; thumbpushedimage=&quot;file='common/vscrollbar.png' source='16,60,24,100' corner='0,4,0,4'&quot; railnormalimage=&quot;&quot; railhotimage=&quot;&quot; railpushedimage=&quot;&quot; raildisabledimage=&quot;&quot; bknormalimage=&quot;file='common/vscrollbar.png' source='0,0,8,60' corner='0,4,0,4'&quot; bkhotimage=&quot;&quot; bkpushedimage=&quot;&quot; bkdisabledimage=&quot;&quot; "/>
 	<Default name="HScrollBar" shared="true" value="height=&quot;8&quot; showbutton1=&quot;false&quot; showbutton2=&quot;false&quot; thumbnormalimage=&quot;file='common/hscrollbar.png' source='0,0,32,8' corner='4,0,4,0'&quot; thumbhotimage=&quot;file='common/hscrollbar.png' source='0,8,32,16' corner='4,0,4,0'&quot; thumbpushedimage=&quot;file='common/hscrollbar.png' source='0,16,32,24' corner='4,0,4,0'&quot; railnormalimage=&quot;&quot; railhotimage=&quot;&quot; railpushedimage=&quot;&quot; raildisabledimage=&quot;&quot; bknormalimage=&quot;file='common/hscrollbar.png' source='0,0,32,8' corner='4,0,4,0'&quot; bkhotimage=&quot;&quot; bkpushedimage=&quot;&quot; bkdisabledimage=&quot;&quot; "/>
 	<Style name="edit_style" value="textpadding=&quot;6,6,6,6&quot; bkcolor=&quot;#FF666666&quot; nativebkcolor=&quot;#FF666666&quot; bkimage=&quot;res='common/edit_bk.png' corner='6,6,6,6'&quot;" />
-
+  <Style name="btn_style" value="drag=&quot;true&quot; textpadding=&quot;6,0,6,0&quot; normalimage=&quot;res='common/button_normal.png' corner='4,4,4,4'&quot; hotimage=&quot;res='common/button_hover.png' corner='4,4,4,4'&quot; pushedimage=&quot;res='common/button_pushed.png' corner='4,4,4,4'&quot; focusedimage=&quot;res='common/button_pushed.png' corner='4,4,4,4'&quot; selectedimage=&quot;res='common/button_pushed.png' corner='4,4,4,4'&quot;"  />
+  
+  <Style name="listitem_style" value="align=&quot;center&quot;" />
+  
  
 	<VerticalLayout name="root"  bkcolor="#FFDCDCDC" height="564">
     
@@ -72,10 +75,10 @@
            
           </HorizontalLayout>
 
-          <List name="listview"  vscrollbar="true" hscrollbar="true"  itemvalign="vcenter" scrollstepsize="100">
+          <List name="ticketListView"  vscrollbar="true" hscrollbar="true"  itemvalign="vcenter" scrollstepsize="100" itemshowrowline="true" itemlinecolor="0x00FFFFFF">
 						<ListHeader height="40">
 							<ListHeaderItem text="车次" width="60" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
-							<ListHeaderItem width="60" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" >
+							<ListHeaderItem width="100" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" >
 								<VerticalLayout>
 									<Label text="出发站" textcolor="#FF000000" glowsize="0" font="font13" align="center"/>
 									<Label text="到达站" textcolor="#FF000000" glowsize="0" font="font13" align="center"/>

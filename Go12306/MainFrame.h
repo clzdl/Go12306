@@ -61,6 +61,11 @@ private:
 
 	int QueryTicket(CDuiString begPlace , CDuiString endPlace, CDuiString travelTime );
 
+
+	/*@action:
+	*/
+	int List_AddTextItem(CListUI *pList, CDuiString test);
+
 	CButtonUI* m_pCloseBtn;
 	CButtonUI* m_pMaxBtn;
 	CButtonUI* m_pRestoreBtn;
@@ -74,5 +79,9 @@ private:
 	COptionUI *m_pOptTicketQuery;
 	COptionUI *m_pOptOrderManage;
 	COptionUI *m_pOptUserManage;
+
+	static CDuiString m_transLiShi[];
+		 
+	std::vector<CTicketModel> m_vecTicket;
 
 };
