@@ -12,3 +12,6 @@ std::wstring Utf8ToUnicode(const std::string &str);
 */
 std::string UnicodeToUtf8(const std::wstring &wstr);
 
+/*@action:资源初始化
+*/
+void InitResource();

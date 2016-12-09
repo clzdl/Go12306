@@ -3,13 +3,23 @@
 #include "TicketModel.h"
 #include <set>
 
+#include "Poco/ThreadPool.h"
+#include "Poco/Thread.h"
+#include "Poco/Runnable.h"
+
+
+using Poco::Thread;
+using Poco::ThreadPool;
+using Poco::Runnable;
+
+
+
+class CWorker;
 class CMainFrame : public WindowImplBase, public CWebBrowserEventHandler, public SkinChangedReceiver
 {
-public:
-	CMainFrame():m_bAllTrainType(true)
-	{}
 
 public:
+	CMainFrame();
 	CControlUI* CreateControl(LPCTSTR pstrClass);
 
 	void InitWindow();
@@ -100,4 +110,45 @@ private:
 
 	bool m_bAllTrainType;
 
+	ThreadPool m_tpWorker;
+
+	CWorker *m_tWorker;
+};
+
+
+#include "ProgressDlg.h"
+class CWorker : public Runnable
+{
+public:
+	CWorker();
+	~CWorker();
+
+	void run();
+
+	void SetProgressDlg(CProgressDlg *v) {
+		m_progressDlg = v;
+	}
+
+	void SetVecTicket(std::vector<CTicketModel> *vecTicket)
+	{
+		m_vecTicket = vecTicket;
+	}
+
+	void SetQueryParam(CDuiString begPlace, CDuiString endPlace, CDuiString travelTime, _TICKET_TYPE ticketType)
+	{
+		m_strBegPlace = begPlace;
+		m_strEndPlace = endPlace;
+		m_strTravelTime = travelTime;
+		m_ticketType = ticketType;
+	}
+
+private:
+	CDuiString  m_strBegPlace;
+	CDuiString  m_strEndPlace;
+	CDuiString  m_strTravelTime;
+	_TICKET_TYPE m_ticketType;
+
+	std::vector<CTicketModel> *m_vecTicket;
+
+	CProgressDlg *m_progressDlg;
 };

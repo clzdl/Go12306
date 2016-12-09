@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Window caption="0,0,0,40" size="80,80" showshadow="true" shadowimage="main/shadow.png" shadowsize="6" shadowcorner="8,8,8,8">
+	<GifAnim name="ani_gif" bkimage="other/progress.gif" width="80"/>
+</Window>

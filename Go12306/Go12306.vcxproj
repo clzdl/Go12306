@@ -156,6 +156,7 @@
     <ClInclude Include="MainFrame.h" />
     <ClInclude Include="MsgWnd.h" />
     <ClInclude Include="OthFunc.h" />
+    <ClInclude Include="ProgressDlg.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SkinFrame.h" />
     <ClInclude Include="SkinManager.h" />
@@ -169,6 +170,7 @@
     <ClCompile Include="MainFrame.cpp" />
     <ClCompile Include="MsgWnd.cpp" />
     <ClCompile Include="OthFunc.cpp" />
+    <ClCompile Include="ProgressDlg.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

@@ -51,11 +51,7 @@ using namespace Poco::Dynamic;
 using namespace Poco;
 
 
-typedef enum
-{
-	_ADULT,
-	_STUDENT,
-} _TICKET_TYPE;
+
 
 class Client12306Manager
 {

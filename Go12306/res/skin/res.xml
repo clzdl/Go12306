@@ -6,4 +6,6 @@
 
   <Xml id="XML_MAIN" path="main.xml"/>
   <Xml id="XML_MSG" path="msg.xml"/>
+  
+  <Xml id="XML_PROGRESS_DLG" path="progressDlg.xml"/>
 </Res>

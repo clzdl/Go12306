@@ -8,10 +8,18 @@
 
 
 #include "Client12306Manager.h"
-
+#include "ProgressDlg.h"
 #include "TicketModel.h"
 
+
+
+
 CDuiString CMainFrame::m_transLiShi[] = { _T("当日到达"),_T("次日到达"),_T("两日到达"),_T("三日到达") };
+
+CMainFrame::CMainFrame()
+:m_bAllTrainType(true),
+ m_tWorker(new CWorker())
+{}
 
 CControlUI* CMainFrame::CreateControl(LPCTSTR pstrClass)
 {
@@ -39,6 +47,8 @@ void CMainFrame::InitWindow()
 	m_pOptUserManage = static_cast<COptionUI*>(m_pm.FindControl(_T("user_manager")));
 
 	RefreshAllTrainCHeckBox(m_bAllTrainType);
+
+	///
 
 	// 注册托盘图标
 	m_trayIcon.CreateTrayIcon(m_hWnd, IDI_GO12306, _T("gogo 12306"));
@@ -359,10 +369,15 @@ int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString
 	endPlace = _T("BJP");
 	travelTime = _T("2016-12-12");
 
-	Client12306Manager::Instance()->QueryLeftTicket(UnicodeToUtf8(begPlace.GetData()) , 
-													UnicodeToUtf8(endPlace.GetData()) ,
-													UnicodeToUtf8(travelTime.GetData()) , m_vecTicket, _ADULT);
+	CProgressDlg* pProgressDlg = CProgressDlg::CreateDlg(this->GetHWND());
+	
+	
 
+	m_tWorker->SetVecTicket(&m_vecTicket);
+	m_tWorker->SetProgressDlg(pProgressDlg);
+	m_tWorker->SetQueryParam(begPlace, endPlace, travelTime,_ADULT);
+	m_tpWorker.start(*m_tWorker);
+	pProgressDlg->ShowModal();
 
 	RefreshTicketListView();
 		
@@ -481,7 +496,7 @@ int CMainFrame::RefreshTicketListView()
 			if (it->GetSwzNum().Compare(_T("--")) && it->GetSwzNum().Compare(_T("无")))
 			{
 				pTxtUI->SetFont(2);
-				pTxtUI->SetTextColor(0xFF5F5F5F);
+				pTxtUI->SetTextColor(0xFF00AA00);
 			}
 			pTxtUI->SetText(it->GetSwzNum());
 			pListItem->Add(pTxtUI);
@@ -494,6 +509,7 @@ int CMainFrame::RefreshTicketListView()
 			if (it->GetTzNum().Compare(_T("--")) && it->GetTzNum().Compare(_T("无")))
 			{
 				pTxtUI->SetFont(2);
+
 				pTxtUI->SetTextColor(0xFF00AA00);
 			}
 			pTxtUI->SetText(it->GetTzNum());
@@ -643,8 +659,9 @@ int CMainFrame::RefreshTicketListView()
 				CLabelUI *pTxtUI = new CLabelUI();
 				pTxtUI->SetManager(&m_pm, NULL, false);
 				pTxtUI->SetAttribute(_T("style"), _T("listitem_style"));
-
-				pTxtUI->SetText(_T("--"));
+				pTxtUI->SetFont(2);
+				pTxtUI->SetTextColor(0xFFFFFFFF);
+				pTxtUI->SetText(it->GetBtnTextInfo());
 				pListItem->Add(pTxtUI);
 			}
 
@@ -709,4 +726,33 @@ void CMainFrame::RefreshAllTrainCHeckBox(bool flag)
 	}
 	else
 		m_setShowTrainType.clear();
+}
+
+
+
+///////////////////////
+CWorker::CWorker()
+{
+
+}
+CWorker::~CWorker()
+{
+
+}
+
+void CWorker::run()
+{
+	while (1)
+	{
+		m_vecTicket->clear();
+		Client12306Manager::Instance()->QueryLeftTicket(UnicodeToUtf8(m_strBegPlace.GetData()),
+														UnicodeToUtf8(m_strEndPlace.GetData()),
+														UnicodeToUtf8(m_strTravelTime.GetData()), 
+																		*m_vecTicket, m_ticketType);
+
+
+		m_progressDlg->Close(0);
+		break;
+
+	}
 }

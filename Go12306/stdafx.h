@@ -40,3 +40,10 @@ typedef enum
 	_K,				///ÆÕ¿ì
 	_O,				///ÆäËü
 } _TRAIN_TYPE;
+
+
+typedef enum
+{
+	_ADULT,
+	_STUDENT,
+} _TICKET_TYPE;
