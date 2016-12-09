@@ -10,6 +10,7 @@
 #include "Client12306Manager.h"
 #include "ProgressDlg.h"
 #include "TicketModel.h"
+#include "Login.h"
 
 
 
@@ -48,7 +49,23 @@ void CMainFrame::InitWindow()
 
 	RefreshAllTrainCHeckBox(m_bAllTrainType);
 
-	///
+	
+
+	CLoginWnd* pLogin = new CLoginWnd();
+	pLogin->Create(NULL, _T("LoginWnd"), WS_POPUP | WS_CLIPCHILDREN, WS_EX_TOOLWINDOW);
+	pLogin->CenterWindow();
+
+
+	switch (pLogin->ShowModal())
+	{
+	case MSGID_OK:
+		break;
+	case MSGID_CANCEL:
+		PostQuitMessage(0L);
+		break;
+
+	}
+	
 
 	// ×¢²áÍÐÅÌÍ¼±ê
 	m_trayIcon.CreateTrayIcon(m_hWnd, IDI_GO12306, _T("gogo 12306"));

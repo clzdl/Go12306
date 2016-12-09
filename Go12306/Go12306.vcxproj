@@ -153,6 +153,7 @@
   <ItemGroup>
     <ClInclude Include="Go12306.h" />
     <ClInclude Include="Client12306Manager.h" />
+    <ClInclude Include="Login.h" />
     <ClInclude Include="MainFrame.h" />
     <ClInclude Include="MsgWnd.h" />
     <ClInclude Include="OthFunc.h" />
@@ -167,6 +168,7 @@
   <ItemGroup>
     <ClCompile Include="Go12306.cpp" />
     <ClCompile Include="Client12306Manager.cpp" />
+    <ClCompile Include="Login.cpp" />
     <ClCompile Include="MainFrame.cpp" />
     <ClCompile Include="MsgWnd.cpp" />
     <ClCompile Include="OthFunc.cpp" />
