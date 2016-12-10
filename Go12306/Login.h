@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "Code12306Cert.h"
 #define MSGID_OK		1
 #define MSGID_CANCEL	0
 class CLoginWnd : public WindowImplBase
@@ -32,5 +32,8 @@ private:
 	CButtonUI* m_pRestoreBtn;
 	CButtonUI* m_pMinBtn;
 	CButtonUI* m_pMenuBtn;
+
+
+	CCode12306CertUI *m_code12306UI;
 };
 

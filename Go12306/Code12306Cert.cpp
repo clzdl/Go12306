@@ -112,7 +112,7 @@ void CCode12306CertUI::DoEvent(TEventUI& event)
 	}
 	else if (event.Type == UIEVENT_BUTTONUP)
 	{
-		std::vector<RECT>::iterator it = m_vecClickPoints.begin();
+		std::vector<CDuiRect>::iterator it = m_vecClickPoints.begin();
 		for (; it != m_vecClickPoints.end(); ++it)
 		{
 			if (PtInRect(&(*it), event.ptMouse))
@@ -152,12 +152,11 @@ void CCode12306CertUI::DoPaint(HDC hDC, const RECT& rcPaint)
 
 		CDuiRect rcCorner(0, 0, 0, 0);
 
-		CRenderEngine::DrawImage(hDC, pImage->hBitmap, rcClient , rcClient , rcBmpPart, rcCorner, pImage->bAlpha , 255);
+		CRenderEngine::DrawImage(hDC, pImage->hBitmap, rcClient , rcClient, rcBmpPart, rcCorner, pImage->bAlpha , 255);
 	
 
-		for (std::vector<RECT>::iterator it = m_vecClickPoints.begin(); it != m_vecClickPoints.end(); ++it)
+		for (std::vector<CDuiRect>::iterator it = m_vecClickPoints.begin(); it != m_vecClickPoints.end(); ++it)
 		{
-
 			CRenderEngine::DrawImageString(hDC, m_pManager, *it, *it, m_sNormalImage, NULL, m_instance);
 		}
 
@@ -166,6 +165,8 @@ void CCode12306CertUI::DoPaint(HDC hDC, const RECT& rcPaint)
 
 void CCode12306CertUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 {
+	CControlUI::SetAttribute( pstrName,  pstrValue);
+
 	if (_tcsicmp(pstrName, _T("normalimage")) == 0) 
 		SetNormalImage(pstrValue);
 	
@@ -175,4 +176,16 @@ void CCode12306CertUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 void CCode12306CertUI::DoInit()
 {
 	Client12306Manager::Instance()->QueryPassCode("login", m_ortImageBytes);
+}
+
+std::vector<CDuiPoint> CCode12306CertUI::GetSelectedPoint()
+{
+	std::vector<CDuiPoint> vecPoint;
+	RECT rect = GetPos();
+	for (std::vector<CDuiRect>::iterator it = m_vecClickPoints.begin(); it != m_vecClickPoints.end(); ++it)
+	{
+		vecPoint.push_back(CDuiPoint(it->left + 10 - rect.left, it->top + 10 - rect.top - 30 ));
+	}
+
+	return vecPoint;
 }

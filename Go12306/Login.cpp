@@ -57,14 +57,15 @@ void CLoginWnd::OnClick(TNotifyUI &msg)
 	}
 	else if (sName.CompareNoCase(_T("btnLogin")) == 0)
 	{
-		Close(MSGID_OK);
-
-		std::string bytes;
-		Client12306Manager::Instance()->QueryPassCode("login", bytes );
-		std::ofstream file("aaaa.jpg" , ios::binary);
-
-		file.write(bytes.c_str() , bytes.length());
 		
+		std::vector<CDuiPoint> vecPoint = m_code12306UI->GetSelectedPoint();
+
+		for (std::vector<CDuiPoint>::iterator it = vecPoint.begin(); it != vecPoint.end(); ++it)
+		{
+			DUI__Trace(_T("x:%d,y:%d") , it->x,it->y);
+		}
+		
+		Close(MSGID_OK);
 
 	}
 	else if (sName.CompareNoCase(_T("btnCancel")) == 0)
@@ -94,4 +95,6 @@ LRESULT CLoginWnd::OnSysCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& b
 void CLoginWnd::InitWindow()
 {
 	m_pCloseBtn = static_cast<CButtonUI*>(m_pm.FindControl(_T("closebtn")));
+
+	m_code12306UI = static_cast<CCode12306CertUI*>(m_pm.FindControl(_T("code12306Code")));
 }

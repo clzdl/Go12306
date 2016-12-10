@@ -23,12 +23,14 @@ public:
 
 	void SetNormalImage(CDuiString v) { m_sNormalImage = v; }
 
+	std::vector<CDuiPoint> GetSelectedPoint();
+
 private:
 
 	CDuiString m_sNormalImage;
 
 	std::string m_ortImageBytes;
 
-	std::vector<RECT> m_vecClickPoints;
+	std::vector<CDuiRect> m_vecClickPoints;
 
 };
