@@ -2,6 +2,8 @@
 
 #include "OthFunc.h"
 
+#include "Code12306Cert.h"
+
 
 std::wstring Utf8ToUnicode(const std::string &str)
 {
@@ -123,5 +125,6 @@ void InitResource()
 	break;
 	}
 
-
+	// ×¢²á¿Ø¼þ
+	REGIST_DUICONTROL(CCode12306CertUI);
 }

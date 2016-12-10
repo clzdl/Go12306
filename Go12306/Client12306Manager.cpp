@@ -104,6 +104,7 @@ std::string Client12306Manager::ExecGet(std::string service, std::map<string, st
 
 	std::istream& rs = m_sessHttpsClient.receiveResponse(response);
 
+
 	std::ostringstream ostr;
 	StreamCopier::copyStream(rs, ostr);
 
@@ -454,4 +455,36 @@ int Client12306Manager::AssignJson2TicketObj(JSON::Object::Ptr queryDto, CTicket
 		objTicket.SetSwzNum(Utf8ToUnicode(tmpJObj.toString()).c_str());
 
 	return SUCCESS;
+}
+
+
+int Client12306Manager::QueryPassCode(std::string moduleName , std::string &bytes)
+{
+	try
+	{
+
+		string strService = "/otn/passcodeNew/getPassCodeNew?";
+
+		///module
+		strService += "module=";
+		strService += moduleName;
+		strService += "&";
+
+		////rand
+		strService += "rand=";
+		strService += "sjrand";
+		strService += "&";
+
+		////value
+		strService += "0.06173759602765089";
+
+		bytes.clear();
+		bytes = ExecGet(strService);
+
+	}
+	catch (Poco::Exception &e)
+	{
+		DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
+		return FAIL;
+	}
 }

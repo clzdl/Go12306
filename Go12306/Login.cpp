@@ -2,6 +2,9 @@
 
 #include "stdafx.h"
 #include "Login.h"
+#include "Client12306Manager.h"
+
+#include <fstream>
 
 DUI_BEGIN_MESSAGE_MAP(CLoginWnd, WindowImplBase)
 DUI_ON_MSGTYPE(DUI_MSGTYPE_CLICK, OnClick)
@@ -55,6 +58,14 @@ void CLoginWnd::OnClick(TNotifyUI &msg)
 	else if (sName.CompareNoCase(_T("btnLogin")) == 0)
 	{
 		Close(MSGID_OK);
+
+		std::string bytes;
+		Client12306Manager::Instance()->QueryPassCode("login", bytes );
+		std::ofstream file("aaaa.jpg" , ios::binary);
+
+		file.write(bytes.c_str() , bytes.length());
+		
+
 	}
 	else if (sName.CompareNoCase(_T("btnCancel")) == 0)
 	{

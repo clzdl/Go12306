@@ -151,6 +151,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Code12306Cert.h" />
     <ClInclude Include="Go12306.h" />
     <ClInclude Include="Client12306Manager.h" />
     <ClInclude Include="Login.h" />
@@ -166,6 +167,7 @@
     <ClInclude Include="TicketModel.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Code12306Cert.cpp" />
     <ClCompile Include="Go12306.cpp" />
     <ClCompile Include="Client12306Manager.cpp" />
     <ClCompile Include="Login.cpp" />

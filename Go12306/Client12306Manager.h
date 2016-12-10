@@ -69,6 +69,11 @@ public:
 	*/
 	int QueryLeftTicket(std::string begPlace, std::string endPlace, std::string travelTime , std::vector<CTicketModel> &vecTicket, _TICKET_TYPE ticketType = _ADULT);
 	
+
+	/*@action:获取验证码
+	*/
+	int QueryPassCode(std::string moduleName, std::string &bytes);
+
 private:
 	/*@action: 执行 http 的get请求
 	*/
