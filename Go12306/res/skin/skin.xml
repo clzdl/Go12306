@@ -21,6 +21,7 @@
         <Button name="skin_image_btn" style="skinbtn_style" userdata="main/7.jpg" bkimage="skin/7.png"/>
         <Button name="skin_image_btn" style="skinbtn_style" userdata="main/8.jpg" bkimage="skin/8.png"/>
         <Button name="skin_image_btn" style="skinbtn_style" userdata="main/9.jpg" bkimage="skin/9.png"/>
+		<Button name="skin_image_btn" style="skinbtn_style" userdata="main/11.png" bkimage="skin/11.png"/>
       </TileLayout>
 
       <TileLayout name="skin_color" itemsize="22,22" padding="0,12" childpadding="6">

@@ -33,8 +33,6 @@ std::wstring Utf8ToUnicode(const std::string &str)
 std::string UnicodeToUtf8(const std::wstring &wstr )
 {
 	std::string str;
-	int nLen = (int)wstr.length();
-	str.resize(nLen, ' ');
 
 	int iLen = WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)wstr.c_str(), -1, NULL, 0, NULL, NULL);
 	
@@ -55,6 +53,37 @@ std::string UnicodeToUtf8(const std::wstring &wstr )
 }
 
 
+
+//wstring高字节不为0，返回FALSE
+std::wstring GbkToUnicode(const std::string &str)
+{
+	std::wstring wstr;
+
+	int iLen = MultiByteToWideChar(CP_ACP, 0, (LPCSTR)str.c_str(), -1, NULL, 0);
+
+	wchar_t *pwText;
+	pwText = new wchar_t[iLen]();
+	if (!pwText)
+	{
+		delete[]pwText;
+		return _T("");
+	}
+
+	MultiByteToWideChar(CP_ACP, 0, (LPCSTR)str.c_str(), -1, pwText, iLen);
+	wstr.append(pwText);
+
+	delete[] pwText;
+
+	return wstr;
+}
+
+
+std::string Gbk2Utf8(const std::string str)
+{
+	std::wstring strUnicode = GbkToUnicode(str);
+
+	return UnicodeToUtf8(strUnicode);
+}
 
 
 

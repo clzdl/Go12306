@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include "Login.h"
 #include "Client12306Manager.h"
+#include "OthFunc.h"
 
 #include <fstream>
 
@@ -64,6 +65,29 @@ void CLoginWnd::OnClick(TNotifyUI &msg)
 		{
 			DUI__Trace(_T("x:%d,y:%d") , it->x,it->y);
 		}
+		std::string response;
+		Client12306Manager::Instance()->AnsynValidPassCode(vecPoint, response);
+
+		CDuiString userName =  m_pEdtUserName->GetText();
+		CDuiString userPass = m_pEdtUserPass->GetText();
+
+		char randCode[128] = { 0 };
+		for (std::vector<CDuiPoint>::iterator it = vecPoint.begin(); it != vecPoint.end(); ++it)
+		{
+			if (it == vecPoint.begin())
+				sprintf(randCode, "%d,%d", it->x, it->y);
+			else
+				sprintf(randCode, "%s,%d,%d", randCode, it->x, it->y);
+		}
+
+		Client12306Manager::Instance()->AnsysLoginSugguest(UnicodeToUtf8(userName.GetData()),
+														UnicodeToUtf8(userPass.GetData()), randCode , response);
+
+		
+		Client12306Manager::Instance()->UserLogin(response);
+
+		Client12306Manager::Instance()->InitMy12306(response);
+		
 		
 		Close(MSGID_OK);
 
@@ -97,4 +121,7 @@ void CLoginWnd::InitWindow()
 	m_pCloseBtn = static_cast<CButtonUI*>(m_pm.FindControl(_T("closebtn")));
 
 	m_code12306UI = static_cast<CCode12306CertUI*>(m_pm.FindControl(_T("code12306Code")));
+
+	m_pEdtUserName = static_cast<CEditUI*>(m_pm.FindControl(_T("edtLoginName")));
+	m_pEdtUserPass = static_cast<CEditUI*>(m_pm.FindControl(_T("edtLoginPwd")));
 }

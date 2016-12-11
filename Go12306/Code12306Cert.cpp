@@ -2,85 +2,18 @@
 
 #include "stdafx.h"
 #include "Code12306Cert.h"
-
+#include <fstream>
 #include "Client12306Manager.h"
+#include "OthFunc.h"
+#include "ximage.h"
 
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "Utils/stb_image.h"
+#include "utils/stb_image.h"
 
 IMPLEMENT_DUICONTROL(CCode12306CertUI)
 
 
-
-static TImageInfo* LoadImage(std::string orgImgBytes)
-{
-	LPBYTE pImage = NULL;
-	int x, y, n;
-	pImage = stbi_load_from_memory((const unsigned char*)orgImgBytes.c_str(), orgImgBytes.length(), &x, &y, &n, 4);
-
-	if (!pImage) {
-		//::MessageBox(0, _T("½âÎöÍ¼Æ¬Ê§°Ü"), _T("×¥BUG"), MB_OK);
-		return NULL;
-	}
-
-
-	BITMAPINFO bmi;
-	::ZeroMemory(&bmi, sizeof(BITMAPINFO));
-	bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-	bmi.bmiHeader.biWidth = x;
-	bmi.bmiHeader.biHeight = -y;
-	bmi.bmiHeader.biPlanes = 1;
-	bmi.bmiHeader.biBitCount = 32;
-	bmi.bmiHeader.biCompression = BI_RGB;
-	bmi.bmiHeader.biSizeImage = x * y * 4;
-
-	bool bAlphaChannel = false;
-	LPBYTE pDest = NULL;
-	HBITMAP hBitmap = ::CreateDIBSection(NULL, &bmi, DIB_RGB_COLORS, (void**)&pDest, NULL, 0);
-	if (!hBitmap) {
-		//::MessageBox(0, _T("CreateDIBSectionÊ§°Ü"), _T("×¥BUG"), MB_OK);
-		return NULL;
-	}
-
-	for (int i = 0; i < x * y; i++)
-	{
-		pDest[i * 4 + 3] = pImage[i * 4 + 3];
-		if (pDest[i * 4 + 3] < 255)
-		{
-			pDest[i * 4] = (BYTE)(DWORD(pImage[i * 4 + 2])*pImage[i * 4 + 3] / 255);
-			pDest[i * 4 + 1] = (BYTE)(DWORD(pImage[i * 4 + 1])*pImage[i * 4 + 3] / 255);
-			pDest[i * 4 + 2] = (BYTE)(DWORD(pImage[i * 4])*pImage[i * 4 + 3] / 255);
-			bAlphaChannel = true;
-		}
-		else
-		{
-			pDest[i * 4] = pImage[i * 4 + 2];
-			pDest[i * 4 + 1] = pImage[i * 4 + 1];
-			pDest[i * 4 + 2] = pImage[i * 4];
-		}
-
-		/*if (*(DWORD*)(&pDest[i * 4]) == mask) {
-			pDest[i * 4] = (BYTE)0;
-			pDest[i * 4 + 1] = (BYTE)0;
-			pDest[i * 4 + 2] = (BYTE)0;
-			pDest[i * 4 + 3] = (BYTE)0;
-			bAlphaChannel = true;
-		}*/
-	}
-
-	stbi_image_free(pImage);
-
-	TImageInfo* data = new TImageInfo;
-	data->pBits = NULL;
-	data->pSrcBits = NULL;
-	data->hBitmap = hBitmap;
-	data->nX = x;
-	data->nY = y;
-	data->bAlpha = bAlphaChannel;
-
-	return data;
-}
 
 CCode12306CertUI::CCode12306CertUI()
 {
@@ -112,6 +45,12 @@ void CCode12306CertUI::DoEvent(TEventUI& event)
 	}
 	else if (event.Type == UIEVENT_BUTTONUP)
 	{
+		RECT  clientRect = GetPos();
+		if (event.ptMouse.y - clientRect.top <= 30)
+			return;
+
+
+
 		std::vector<CDuiRect>::iterator it = m_vecClickPoints.begin();
 		for (; it != m_vecClickPoints.end(); ++it)
 		{
@@ -137,30 +76,23 @@ void CCode12306CertUI::DoEvent(TEventUI& event)
 
 void CCode12306CertUI::DoPaint(HDC hDC, const RECT& rcPaint)
 {
+	if (m_ortImageBytes.empty())
+		return;
 	
-	if(!m_ortImageBytes.empty())
+
+	RECT rcClient;
+	rcClient = GetClientPos();
+
+	CxImage jpg((unsigned char*)m_ortImageBytes.c_str(), m_ortImageBytes.length(), CXIMAGE_FORMAT_JPG);
+
+	jpg.Draw(hDC, rcClient);
+
+	for (std::vector<CDuiRect>::iterator it = m_vecClickPoints.begin(); it != m_vecClickPoints.end(); ++it)
 	{
-		RECT rcClient;
-		rcClient = GetClientPos();
-
-
-	
-
-		TImageInfo *pImage = LoadImage(m_ortImageBytes);
-
-		CDuiRect rcBmpPart(0, 0, pImage->nX, pImage->nY);
-
-		CDuiRect rcCorner(0, 0, 0, 0);
-
-		CRenderEngine::DrawImage(hDC, pImage->hBitmap, rcClient , rcClient, rcBmpPart, rcCorner, pImage->bAlpha , 255);
-	
-
-		for (std::vector<CDuiRect>::iterator it = m_vecClickPoints.begin(); it != m_vecClickPoints.end(); ++it)
-		{
-			CRenderEngine::DrawImageString(hDC, m_pManager, *it, *it, m_sNormalImage, NULL, m_instance);
-		}
-
+		CRenderEngine::DrawImageString(hDC, m_pManager, *it, *it, m_sNormalImage, NULL, m_instance);
 	}
+
+	
 }
 
 void CCode12306CertUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
@@ -176,6 +108,7 @@ void CCode12306CertUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 void CCode12306CertUI::DoInit()
 {
 	Client12306Manager::Instance()->QueryPassCode("login", m_ortImageBytes);
+
 }
 
 std::vector<CDuiPoint> CCode12306CertUI::GetSelectedPoint()
@@ -189,3 +122,4 @@ std::vector<CDuiPoint> CCode12306CertUI::GetSelectedPoint()
 
 	return vecPoint;
 }
+

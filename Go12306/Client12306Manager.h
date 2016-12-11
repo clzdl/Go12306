@@ -5,12 +5,16 @@
 #include "Poco/Net/HTTPSClientSession.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
+#include "Poco/Net/HTTPCookie.h"
+#include "Poco/Net/NameValueCollection.h"
 #include "Poco/Net/SecureStreamSocket.h"
 #include "Poco/Net/Context.h"
 #include "Poco/Net/Session.h"
 #include "Poco/Net/SSLManager.h"
 #include "Poco/Net/SSLException.h"
 #include "Poco/SharedPtr.h"
+
+
 
 #include "Poco/Net/SSLManager.h"
 #include "Poco/Net/KeyConsoleHandler.h"
@@ -28,7 +32,7 @@
 #include "Poco/Dynamic/Var.h"
 #include "Poco/JSON/Query.h"
 #include "Poco/JSON/PrintHandler.h"
-
+#include "Poco/URI.h"
 
 #include "TicketModel.h"
 
@@ -37,13 +41,15 @@ using Poco::Net::Context;
 using Poco::Net::HTTPSClientSession;
 using Poco::Net::HTTPRequest;
 using Poco::Net::HTTPResponse;
+using Poco::Net::HTTPCookie;
+using Poco::Net::NameValueCollection;
 using Poco::SharedPtr;
 using Poco::Net::InvalidCertificateHandler;
 using Poco::Net::SSLManager;
 using Poco::Net::KeyConsoleHandler;
 using Poco::Net::ConsoleCertificateHandler;
 using Poco::Net::ConsoleCertificateHandler;
-
+using Poco::URI;
 
 
 
@@ -74,14 +80,31 @@ public:
 	*/
 	int QueryPassCode(std::string moduleName, std::string &bytes);
 
+	/*@action: 异步校验验证码
+	*/
+	int AnsynValidPassCode(std::vector<CDuiPoint> &selPoints, std::string &res);
+
+	/*@action: 异步的登录
+	*/
+	int AnsysLoginSugguest(std::string userName , std::string userPass , std::string randCode, std::string res );
+
+	/*@action:  用户登录
+	*/
+	int UserLogin(std::string &res);
+
+	/*@action:  用户初始化
+	*/
+	int InitMy12306(std::string &res);
 private:
 	/*@action: 执行 http 的get请求
 	*/
-	std::string ExecPost(std::string service, std::map<string, string> *param = NULL);
+	std::string ExecPost(std::string service, std::map<string, string> *param = NULL,std::map<string,string> *header=NULL);
 
 	/*@action: 执行 http 的post请求
 	*/
-	std::string ExecGet(std::string service, std::map<string, string> *param = NULL);
+	std::string ExecGet(std::string service, std::map<string, string> *param = NULL, std::map<string, string> *header = NULL);
+
+
 
 	/*@action: 解析 返回的json串
 	*@parameter:
@@ -109,6 +132,7 @@ private:
 
 	static Client12306Manager *m_objInstance;
 
-
+	
+	NameValueCollection m_cookieCollection;
 	HTTPSClientSession m_sessHttpsClient;
 };

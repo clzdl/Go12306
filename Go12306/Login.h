@@ -34,6 +34,10 @@ private:
 	CButtonUI* m_pMenuBtn;
 
 
+	CEditUI* m_pEdtUserName;
+	CEditUI* m_pEdtUserPass;
+
+
 	CCode12306CertUI *m_code12306UI;
 };
 

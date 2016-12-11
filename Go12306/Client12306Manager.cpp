@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "Client12306Manager.h"
 #include <sstream>
+#include <fstream>
 #include "OthFunc.h"
 
 
@@ -46,7 +47,86 @@ Client12306Manager& Client12306Manager::operator =(const Client12306Manager &hcm
 }
 
 
-std::string Client12306Manager::ExecPost(std::string service, std::map<string, string> *param)
+std::string Client12306Manager::ExecPost(std::string service, std::map<string, string> *param, std::map<string, string> *header)
+{
+	
+
+	HTTPRequest request(HTTPRequest::HTTP_POST, service);
+
+	std::stringstream body;
+	if (param && !(param->empty()))
+	{
+		
+		for (std::map<string, string>::iterator it = param->begin(); it != param->end(); ++it)
+		{
+
+
+			if (it != param->begin())
+				body << "&";
+
+			std::string enStr;
+			URI::encode(it->second, "@,", enStr);
+
+			body << it->first << "=" << enStr;
+		}
+
+		
+	}
+
+	std::string utf8Body =  Gbk2Utf8(body.str());
+
+	request.setContentLength(utf8Body.length());
+	if (!m_cookieCollection.empty())
+		request.setCookies(m_cookieCollection);
+
+	if (header)
+	{
+		for (std::map<string, string>::iterator it = header->begin(); it != header->end(); ++it)
+		{
+			request.set(it->first, it->second);
+		}
+	}
+
+	request.setKeepAlive(true);
+
+
+	{
+		std::stringstream ss;
+		request.write(ss);
+
+		DUI__Trace(_T(" %s "), Utf8ToUnicode(ss.str()).c_str());
+
+		DUI__Trace(_T(" %s "), Utf8ToUnicode(utf8Body).c_str());
+	}
+
+	std::ostream &os = m_sessHttpsClient.sendRequest(request);
+	
+
+	os << utf8Body;
+	
+
+
+	HTTPResponse response;
+
+	std::istream& rs = m_sessHttpsClient.receiveResponse(response);
+	
+	
+
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+
+	{
+		std::stringstream ss;
+		response.write(ss);
+
+		DUI__Trace(_T(" %s "), Utf8ToUnicode(ss.str()).c_str());
+		DUI__Trace(_T(" %s "), Utf8ToUnicode(ostr.str()).c_str());
+	}
+
+	return ostr.str();
+}
+
+std::string Client12306Manager::ExecGet(std::string service, std::map<string, string> *param,std::map<string, string> *header)
 {
 	if (param && !param->empty())
 	{
@@ -65,52 +145,72 @@ std::string Client12306Manager::ExecPost(std::string service, std::map<string, s
 
 	}
 
-	HTTPRequest request(HTTPRequest::HTTP_POST, service);
+	
 
+
+	HTTPRequest request(HTTPRequest::HTTP_GET, service);
+
+	if (!m_cookieCollection.empty())
+		request.setCookies(m_cookieCollection);
+
+
+	request.setKeepAlive(true);
+
+	if (header)
+	{
+		for (std::map<string, string>::iterator it = header->begin(); it != header->end(); ++it)
+		{
+			request.set(it->first, it->second);
+		}
+	}
+	{
+		std::stringstream ss;
+		request.write(ss);
+
+		DUI__Trace(_T(" %s "), Utf8ToUnicode(ss.str()).c_str());
+	}
 	m_sessHttpsClient.sendRequest(request);
 	HTTPResponse response;
 
+
+
 	std::istream& rs = m_sessHttpsClient.receiveResponse(response);
-
-	std::ostringstream ostr;
-	StreamCopier::copyStream(rs, ostr);
-
-	return ostr.str();
-}
-
-std::string Client12306Manager::ExecGet(std::string service, std::map<string, string> *param)
-{
-	if (param && !param->empty())
+	
 	{
-		service += "?";
-		int i = 0;
-		for (std::map<string, string>::iterator it = param->begin(); it != param->end(); ++it,++i)
+		std::stringstream ss;
+		response.write(ss);
+
+		DUI__Trace(_T(" %s "), Utf8ToUnicode(ss.str()).c_str());
+	}
+
+	if (m_cookieCollection.empty())
+	{
+		std::vector<HTTPCookie> cookies;
+		response.getCookies(cookies);
+
+		for (std::vector<HTTPCookie>::iterator it = cookies.begin(); it != cookies.end(); ++it)
 		{
-			if (i > 0)
-				service += "&";
-
-
-			service += it->first;
-			service += "=";
-			service += it->second;
+			m_cookieCollection.add(it->getName(), it->getValue());
 		}
 
 	}
-	HTTPRequest request(HTTPRequest::HTTP_GET, service);
-
-
-	m_sessHttpsClient.sendRequest(request);
-	HTTPResponse response;
-
-	std::istream& rs = m_sessHttpsClient.receiveResponse(response);
-
 
 	std::ostringstream ostr;
 	StreamCopier::copyStream(rs, ostr);
+
+
+	{
+		std::stringstream ss;
+		response.write(ss);
+
+		DUI__Trace(_T(" %s "), Utf8ToUnicode(ss.str()).c_str());
+		DUI__Trace(_T(" %s "), Utf8ToUnicode(ostr.str()).c_str());
+	}
 
 	return ostr.str();
 	
 }
+
 
 
 int Client12306Manager::QueryLeftTicket(std::string begPlace, std::string endPlace, std::string travelTime , std::vector<CTicketModel> &vecTicket, _TICKET_TYPE ticketType)
@@ -473,13 +573,134 @@ int Client12306Manager::QueryPassCode(std::string moduleName , std::string &byte
 		////rand
 		strService += "rand=";
 		strService += "sjrand";
-		strService += "&";
+		//strService += "&";
 
-		////value
-		strService += "0.06173759602765089";
+		//////value
+		//strService += "0.06173759602765039";
 
-		bytes.clear();
 		bytes = ExecGet(strService);
+
+	
+	}
+	catch (Poco::Exception &e)
+	{
+		DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
+		return FAIL;
+	}
+	return SUCCESS;
+}
+
+
+int Client12306Manager::AnsynValidPassCode(std::vector<CDuiPoint> &selPoints , std::string &res)
+{
+	try
+	{
+
+		string strService = "/otn/passcodeNew/checkRandCodeAnsyn";
+		std::map<string, string> param;
+
+		param["rand"] = "sjrand";
+
+		char randCode[128] = { 0 };
+		for (std::vector<CDuiPoint>::iterator it = selPoints.begin(); it != selPoints.end(); ++it)
+		{
+			if(it == selPoints.begin())
+				sprintf(randCode , "%d,%d" , it->x , it->y);
+			else
+				sprintf(randCode, "%s,%d,%d", randCode, it->x, it->y);
+		}
+		param["randCode"] = randCode;
+
+		res = ExecPost(strService , &param);
+
+	}
+	catch (Poco::Exception &e)
+	{
+		DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
+		return FAIL;
+	}
+}
+
+
+int Client12306Manager::AnsysLoginSugguest(std::string userName, std::string userPass, std::string randCode , std::string res)
+{
+	try
+	{
+
+		string strService = "/otn/login/loginAysnSuggest";
+		std::map<string, string> param;
+
+		param["loginUserDTO.user_name"] = userName;
+		param["userDTO.password"] = userPass;
+		param["randCode"] = randCode;
+
+		std::map<string, string> header;
+		header["Accept"] = "*/*";
+		header["Accept-Encoding"] = "gzip, deflate, br";
+		header["Accept-Language"] = "zh-CN,zh;q=0.8";
+		header["Content-Type"] = "application/x-www-form-urlencoded;charset=UTF-8";
+		header["Origin"] = "https://kyfw.12306.cn";
+		header["X-Requested-With"] = "XMLHttpRequest";
+	
+
+		res = ExecPost(strService, &param , &header);
+
+	}
+	catch (Poco::Exception &e)
+	{
+		DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
+		return FAIL;
+	}
+
+}
+
+int Client12306Manager::UserLogin(std::string &res)
+{
+	try
+	{
+
+		string strService = "/otn/login/userLogin";
+		std::map<string, string> param;
+
+		param["_json_att"] = "";
+		
+		std::map<string, string> header;
+		
+
+		header["Accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8";
+		header["Accept-Encoding"] = "gzip, deflate, br";
+		header["Accept-Language"] = "zh-CN,zh;q=0.8";
+		header["Content-Type"] = "application/x-www-form-urlencoded";
+		header["Origin"] = "https://kyfw.12306.cn";
+
+		res = ExecPost(strService, &param);
+
+	}
+	catch (Poco::Exception &e)
+	{
+		DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
+		return FAIL;
+	}
+}
+
+int Client12306Manager::InitMy12306(std::string &res)
+{
+	try
+	{
+
+		string strService = "/otn/index/initMy12306";
+		std::map<string, string> header;
+		header["Referer"] = "https://kyfw.12306.cn/otn/login/init";
+
+
+		header["Accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8";
+		header["Accept-Encoding"] = "gzip, deflate, br";
+		header["Accept-Language"] = "zh-CN,zh;q=0.8";
+		header["Content-Type"] = "application/x-www-form-urlencoded";
+		header["Upgrade-Insecure-Requests"] = "1";
+		header["User-Agent"] = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.101 Safari/537.36";
+	
+		res = ExecGet(strService , NULL , &header);
 
 	}
 	catch (Poco::Exception &e)

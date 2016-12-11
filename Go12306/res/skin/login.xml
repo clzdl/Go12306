@@ -4,7 +4,7 @@
   <Font id="1" name="微软雅黑" size="14"/>
 
   <VerticalLayout bkcolor="#FF555566">
-    <HorizontalLayout name="appbar" height="30" inset="6,-1" bkcolor="#FF202223">
+    <HorizontalLayout name="appbar" height="30" inset="6,-1" bkcolor="#FF202223" >
 	  <Label name="MessageTitle" valign="vcenter" text="用户登录" textcolor="#FFFFFFFF" font="1" />
       <Button name="closebtn" width="39" height="20" tooltip="关闭" normalimage="file='sysbtn/btn_close_normal.png'" hotimage="file='sysbtn/btn_close_highlight.png'" pushedimage="file='sysbtn/btn_close_down.png'"/>
     </HorizontalLayout>
@@ -22,7 +22,9 @@
 	
 	<HorizontalLayout  height="210" inset="10,10,10,10">
 		<Label name="txtLoginName"  width="60" valign="vcenter" text="验证码" textcolor="#FFFFFFFF" font="1" />
+
 		<Code12306Cert name="code12306Code" width="293" height="190" normalimage="file='sysbtn/btn_close_highlight.png'" tooltip="右键点击切换验证码"/>
+
 		<Control />
 	</HorizontalLayout>
 	

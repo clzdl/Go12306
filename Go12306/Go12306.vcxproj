@@ -105,12 +105,12 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>D:\opensource\DuiLib_Ultimate-master\DuiLib;D:\opensource\poco-1.7.6-all\Foundation\include;D:\opensource\poco-1.7.6-all\NetSSL_OpenSSL\include;D:\opensource\poco-1.7.6-all\JSON\include;D:\opensource\poco-1.7.6-all\Net\include;D:\opensource\poco-1.7.6-all\Crypto\include;D:\opensource\openssl-1.0.2j\install-dir\include;D:\opensource\poco-1.7.6-all\Util\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\opensource\DuiLib_Ultimate-master\DuiLib;D:\opensource\poco-1.7.6-all\Foundation\include;D:\opensource\poco-1.7.6-all\NetSSL_OpenSSL\include;D:\opensource\poco-1.7.6-all\JSON\include;D:\opensource\poco-1.7.6-all\Net\include;D:\opensource\poco-1.7.6-all\Crypto\include;D:\opensource\openssl-1.0.2j\install-dir\include;D:\opensource\poco-1.7.6-all\Util\include;D:\opensource\cximage600_full\CxImage</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>D:\opensource\DuiLib_Ultimate-master\Lib\DuiLib_d.lib;D:\opensource\poco-1.7.6-all\lib64\PocoFoundationd.lib;D:\opensource\poco-1.7.6-all\lib64\PocoUtild.lib;D:\opensource\poco-1.7.6-all\lib64\PocoCryptod.lib;D:\opensource\poco-1.7.6-all\lib64\PocoNetSSLd.lib;D:\opensource\poco-1.7.6-all\lib64\PocoNetd.lib;D:\opensource\poco-1.7.6-all\lib64\PocoJSONd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>D:\opensource\DuiLib_Ultimate-master\Lib\DuiLib_d.lib;D:\opensource\poco-1.7.6-all\lib64\PocoFoundationd.lib;D:\opensource\poco-1.7.6-all\lib64\PocoUtild.lib;D:\opensource\poco-1.7.6-all\lib64\PocoCryptod.lib;D:\opensource\poco-1.7.6-all\lib64\PocoNetSSLd.lib;D:\opensource\poco-1.7.6-all\lib64\PocoNetd.lib;D:\opensource\poco-1.7.6-all\lib64\PocoJSONd.lib;D:\opensource\cximage600_full\jpeg\Debug\Jpeg.lib;D:\opensource\cximage600_full\mng\Debug\mng.lib;D:\opensource\cximage600_full\png\Debug\png.lib;D:\opensource\cximage600_full\tiff\Debug\Tiff.lib;D:\opensource\cximage600_full\raw\Debug\libdcr.lib;D:\opensource\cximage600_full\jasper\Debug\jasper.lib;D:\opensource\cximage600_full\zlib\Debug\zlib.lib;D:\opensource\cximage600_full\CxImage\Debug\cximage.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
