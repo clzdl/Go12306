@@ -75,6 +75,10 @@ public:
 	*/
 	int QueryLeftTicket(std::string begPlace, std::string endPlace, std::string travelTime , std::vector<CTicketModel> &vecTicket, _TICKET_TYPE ticketType = _ADULT);
 	
+	/*@action:初始化登录
+	*/
+	int LoginInit( );
+
 
 	/*@action:获取验证码
 	*/

@@ -32,6 +32,7 @@ Client12306Manager *Client12306Manager::Instance()
 Client12306Manager::Client12306Manager()
 {
 	m_sessHttpsClient.setHost(m_strDomain);
+	m_sessHttpsClient.setKeepAlive(true);
 }
 Client12306Manager::~Client12306Manager()
 {
@@ -51,7 +52,7 @@ std::string Client12306Manager::ExecPost(std::string service, std::map<string, s
 {
 	
 
-	HTTPRequest request(HTTPRequest::HTTP_POST, service);
+	HTTPRequest request(HTTPRequest::HTTP_POST, service , Net::HTTPMessage::HTTP_1_1);
 
 	std::stringstream body;
 	if (param && !(param->empty()))
@@ -148,7 +149,7 @@ std::string Client12306Manager::ExecGet(std::string service, std::map<string, st
 	
 
 
-	HTTPRequest request(HTTPRequest::HTTP_GET, service);
+	HTTPRequest request(HTTPRequest::HTTP_GET, service, Net::HTTPMessage::HTTP_1_1);
 
 	if (!m_cookieCollection.empty())
 		request.setCookies(m_cookieCollection);
@@ -556,7 +557,36 @@ int Client12306Manager::AssignJson2TicketObj(JSON::Object::Ptr queryDto, CTicket
 
 	return SUCCESS;
 }
+int Client12306Manager::LoginInit()
+{
+	try
+	{
 
+		string strService = "/otn/login/init";
+
+
+		std::map<string, string> header;
+		header["Accept"] = "*/*";
+		header["Accept-Encoding"] = "gzip, deflate, br";
+		header["Accept-Language"] = "zh-CN,zh;q=0.8";
+		header["Content-Type"] = "application/x-www-form-urlencoded;charset=UTF-8";
+		header["Origin"] = "https://kyfw.12306.cn";
+		header["X-Requested-With"] = "XMLHttpRequest";
+		header["User-Agent"] = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.101 Safari/537.36";
+		header["Referer"] = "https://kyfw.12306.cn/otn/login/init";
+		header["Host"] = "kyfw.12306.cn";
+
+		ExecGet(strService, NULL, &header);
+
+
+	}
+	catch (Poco::Exception &e)
+	{
+		DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
+		return FAIL;
+	}
+	return SUCCESS;
+}
 
 int Client12306Manager::QueryPassCode(std::string moduleName , std::string &bytes)
 {
@@ -578,7 +608,18 @@ int Client12306Manager::QueryPassCode(std::string moduleName , std::string &byte
 		//////value
 		//strService += "0.06173759602765039";
 
-		bytes = ExecGet(strService);
+		std::map<string, string> header;
+		header["Accept"] = "*/*";
+		header["Accept-Encoding"] = "gzip, deflate, br";
+		header["Accept-Language"] = "zh-CN,zh;q=0.8";
+		header["Content-Type"] = "application/x-www-form-urlencoded;charset=UTF-8";
+		header["Origin"] = "https://kyfw.12306.cn";
+		header["X-Requested-With"] = "XMLHttpRequest";
+		header["User-Agent"] = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.101 Safari/537.36";
+		header["Referer"] = "https://kyfw.12306.cn/otn/login/init";
+		header["Host"] = "kyfw.12306.cn";
+
+		bytes = ExecGet(strService , NULL , &header);
 
 	
 	}
@@ -611,7 +652,18 @@ int Client12306Manager::AnsynValidPassCode(std::vector<CDuiPoint> &selPoints , s
 		}
 		param["randCode"] = randCode;
 
-		res = ExecPost(strService , &param);
+		std::map<string, string> header;
+		header["Accept"] = "*/*";
+		header["Accept-Encoding"] = "gzip, deflate, br";
+		header["Accept-Language"] = "zh-CN,zh;q=0.8";
+		header["Content-Type"] = "application/x-www-form-urlencoded;charset=UTF-8";
+		header["Origin"] = "https://kyfw.12306.cn";
+		header["X-Requested-With"] = "XMLHttpRequest";
+		header["User-Agent"] = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.101 Safari/537.36";
+		header["Referer"] = "https://kyfw.12306.cn/otn/login/init";
+		header["Host"] = "kyfw.12306.cn";
+
+		res = ExecPost(strService , &param, &header);
 
 	}
 	catch (Poco::Exception &e)
@@ -641,6 +693,9 @@ int Client12306Manager::AnsysLoginSugguest(std::string userName, std::string use
 		header["Content-Type"] = "application/x-www-form-urlencoded;charset=UTF-8";
 		header["Origin"] = "https://kyfw.12306.cn";
 		header["X-Requested-With"] = "XMLHttpRequest";
+		header["User-Agent"] = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.101 Safari/537.36";
+		header["Referer"] = "https://kyfw.12306.cn/otn/login/init";
+		header["Host"] = "kyfw.12306.cn";
 	
 
 		res = ExecPost(strService, &param , &header);
