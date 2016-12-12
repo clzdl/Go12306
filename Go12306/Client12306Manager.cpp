@@ -658,10 +658,54 @@ int Client12306Manager::AnsynValidPassCode(std::vector<CDuiPoint> &selPoints , s
 		DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
 		return FAIL;
 	}
+
+	return SUCCESS;
+}
+
+int Client12306Manager::AnsynValidPassCode(std::vector<CDuiPoint> &selPoints, bool &flag)
+{
+	std::string response;
+	
+	flag = false;
+
+	do
+	{
+		if (SUCCESS != AnsynValidPassCode(selPoints, response))
+			break;
+
+
+		JSON::Parser parser;
+		Dynamic::Var result;
+
+		result = parser.parse(response);
+
+		JSON::Object::Ptr pObj = result.extract<JSON::Object::Ptr>();
+
+		Dynamic::Var jStatus = pObj->get("status");
+
+		if (jStatus.toString() != "true")
+			break;
+		
+
+		Dynamic::Var jData = pObj->get("data");
+
+		JSON::Object::Ptr pMsg = jData.extract<JSON::Object::Ptr>();
+
+		if (pMsg->get("msg").toString() != "true" && 
+					pMsg->get("msg").toString() != "TRUE")
+			break;
+
+
+		flag = true;
+
+
+	} while (false);
+
+	return SUCCESS;
 }
 
 
-int Client12306Manager::AnsysLoginSugguest(std::string userName, std::string userPass, std::string randCode , std::string res)
+int Client12306Manager::AnsysLoginSugguest(std::string userName, std::string userPass, std::string randCode , std::string &res)
 {
 	try
 	{
@@ -683,9 +727,76 @@ int Client12306Manager::AnsysLoginSugguest(std::string userName, std::string use
 	catch (Poco::Exception &e)
 	{
 		DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
+
+		m_strLastErrInfo = e.displayText();
+
 		return FAIL;
 	}
 
+	return SUCCESS;
+}
+
+int Client12306Manager::AnsysLoginSugguest(std::string userName, std::string userPass, std::string randCode, bool &flag)
+{
+	std::string response;
+	flag = false;
+	do
+	{
+		if (SUCCESS != AnsysLoginSugguest(userName, userPass, randCode, response))
+			break;
+
+		//response = Utf8ToGbk(response);
+
+		JSON::Parser parser;
+		Dynamic::Var result;
+
+		result = parser.parse(response);
+
+		JSON::Object::Ptr pObj = result.extract<JSON::Object::Ptr>();
+
+		Dynamic::Var jStatus = pObj->get("status");
+
+		if (jStatus.toString() != "true")
+			break;
+
+
+		Dynamic::Var jData = pObj->get("data");
+
+		JSON::Object::Ptr pData = jData.extract<JSON::Object::Ptr>();
+
+
+		if (!pData->has("loginCheck"))
+		{
+			///获取message array
+			JSON::Array::Ptr jMsg = pObj->getArray("messages");
+
+			Dynamic::Var msg = jMsg->get(0);
+			
+			m_strLastErrInfo = msg.toString();
+		
+			break;
+		}
+
+
+		if (pData->get("loginCheck").toString() != "Y" &&
+						pData->get("loginCheck").toString() != "y")
+		{
+			///获取message array
+			JSON::Array::Ptr jMsg = pObj->getArray("messages");
+
+			Dynamic::Var msg = jMsg->get(0);
+
+			m_strLastErrInfo = msg.toString();
+
+			break;
+		}
+
+
+		flag = true;
+
+	} while (false);
+
+	return SUCCESS;
 }
 
 int Client12306Manager::UserLogin(std::string &res)
@@ -709,6 +820,8 @@ int Client12306Manager::UserLogin(std::string &res)
 		DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
 		return FAIL;
 	}
+
+	return SUCCESS;
 }
 
 int Client12306Manager::InitMy12306(std::string &res)
@@ -722,10 +835,14 @@ int Client12306Manager::InitMy12306(std::string &res)
 
 		res = ExecGet(strService , NULL , &header);
 
+		DUI__Trace(_T("%ld"), res.length());
+		
 	}
 	catch (Poco::Exception &e)
 	{
-		DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
+		DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
 		return FAIL;
 	}
+
+	return SUCCESS;
 }

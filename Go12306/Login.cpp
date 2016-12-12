@@ -4,7 +4,7 @@
 #include "Login.h"
 #include "Client12306Manager.h"
 #include "OthFunc.h"
-
+#include "MsgWnd.h"
 #include <fstream>
 
 DUI_BEGIN_MESSAGE_MAP(CLoginWnd, WindowImplBase)
@@ -61,18 +61,40 @@ void CLoginWnd::OnClick(TNotifyUI &msg)
 		///校验验证码
 		std::vector<CDuiPoint> vecPoint = m_code12306UI->GetSelectedPoint();
 
+		CDuiString userName = m_pEdtUserName->GetText();
+		CDuiString userPass = m_pEdtUserPass->GetText();
+
+		if (userName.IsEmpty() || userPass.IsEmpty())
+		{
+			CMsgWnd::MessageBox(GetHWND(), _T("提示"), _T("用户名或密码不能为空!"));
+			return;
+		}
+
+		if (vecPoint.empty())
+		{
+			CMsgWnd::MessageBox(GetHWND(), _T("提示"), _T("请选择验证码!"));
+			return;
+		}
+
+		
+
 		for (std::vector<CDuiPoint>::iterator it = vecPoint.begin(); it != vecPoint.end(); ++it)
 		{
 			DUI__Trace(_T("x:%d,y:%d") , it->x,it->y);
 		}
-		std::string response;
-		Client12306Manager::Instance()->AnsynValidPassCode(vecPoint, response);
+		bool flag = false;
+		Client12306Manager::Instance()->AnsynValidPassCode(vecPoint, flag);
 
+		if (!flag)
+		{
+			m_code12306UI->Refresh();
+			CMsgWnd::MessageBox(GetHWND(), _T("提示"), _T("验证码错误") );
+			return;
+		}
 
 		///校验用户登录
-		CDuiString userName =  m_pEdtUserName->GetText();
-		CDuiString userPass = m_pEdtUserPass->GetText();
-
+		std::string response;
+	
 		char randCode[128] = { 0 };
 		for (std::vector<CDuiPoint>::iterator it = vecPoint.begin(); it != vecPoint.end(); ++it)
 		{
@@ -82,15 +104,38 @@ void CLoginWnd::OnClick(TNotifyUI &msg)
 				sprintf(randCode, "%s,%d,%d", randCode, it->x, it->y);
 		}
 
+		flag = false;
 		Client12306Manager::Instance()->AnsysLoginSugguest(UnicodeToUtf8(userName.GetData()),
-														UnicodeToUtf8(userPass.GetData()), randCode , response);
+														UnicodeToUtf8(userPass.GetData()), randCode , flag);
+
+		if (!flag)
+		{
+			m_code12306UI->Refresh();
+			CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode( Client12306Manager::Instance()->GetLastErrInfo()).c_str());
+			return;
+
+		}
 
 		///用户登录
-		Client12306Manager::Instance()->UserLogin(response);
+		if(SUCCESS != Client12306Manager::Instance()->UserLogin(response))
+		{
+			m_code12306UI->Refresh();
+			CMsgWnd::MessageBox(GetHWND(), _T("提示"), _T("登录失败"));
+			return;
+
+		}
 
 		///初始化登录首页
-		Client12306Manager::Instance()->InitMy12306(response);
-		
+		if (SUCCESS != Client12306Manager::Instance()->InitMy12306(response))
+		{
+			m_code12306UI->Refresh();
+			CMsgWnd::MessageBox(GetHWND(), _T("提示"), _T("登录失败"));
+			return;
+
+		}
+
+
+		CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(  response).c_str());
 		
 		Close(MSGID_OK);
 

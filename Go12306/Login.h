@@ -27,6 +27,8 @@ public:
 	LRESULT HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
 private:
+
+
 	CButtonUI* m_pCloseBtn;
 	CButtonUI* m_pMaxBtn;
 	CButtonUI* m_pRestoreBtn;

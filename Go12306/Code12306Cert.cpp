@@ -123,3 +123,10 @@ std::vector<CDuiPoint> CCode12306CertUI::GetSelectedPoint()
 	return vecPoint;
 }
 
+void CCode12306CertUI::Refresh()
+{
+	Client12306Manager::Instance()->QueryPassCode("login", m_ortImageBytes);
+	m_vecClickPoints.clear();
+	Invalidate();
+}
+

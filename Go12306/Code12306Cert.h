@@ -25,6 +25,8 @@ public:
 
 	std::vector<CDuiPoint> GetSelectedPoint();
 
+	void Refresh();
+
 private:
 
 	CDuiString m_sNormalImage;

@@ -84,13 +84,18 @@ public:
 	*/
 	int QueryPassCode(std::string moduleName, std::string &bytes);
 
+	
+
 	/*@action: 异步校验验证码
 	*/
-	int AnsynValidPassCode(std::vector<CDuiPoint> &selPoints, std::string &res);
+	int AnsynValidPassCode(std::vector<CDuiPoint> &selPoints, bool &flag);
+
+
 
 	/*@action: 异步的登录
 	*/
-	int AnsysLoginSugguest(std::string userName , std::string userPass , std::string randCode, std::string res );
+	int AnsysLoginSugguest(std::string userName, std::string userPass, std::string randCode, bool &flag);
+
 
 	/*@action:  用户登录
 	*/
@@ -99,6 +104,9 @@ public:
 	/*@action:  用户初始化
 	*/
 	int InitMy12306(std::string &res);
+
+
+	std::string GetLastErrInfo() { return m_strLastErrInfo; }
 private:
 	/*@action: 执行 http 的get请求
 	*/
@@ -108,7 +116,14 @@ private:
 	*/
 	std::string ExecGet(std::string service, std::map<string, string> *param = NULL, std::map<string, string> *header = NULL);
 
+	/*@action: 异步校验验证码
+	*/
+	int AnsynValidPassCode(std::vector<CDuiPoint> &selPoints, std::string &res);
 
+
+	/*@action: 异步的登录
+	*/
+	int AnsysLoginSugguest(std::string userName, std::string userPass, std::string randCode, std::string &res);
 
 	/*@action: 解析 返回的json串
 	*@parameter:
@@ -141,4 +156,6 @@ private:
 	HTTPSClientSession m_sessHttpsClient;
 
 	std::map<string, string> m_headerDefault;
+
+	std::string m_strLastErrInfo;
 };

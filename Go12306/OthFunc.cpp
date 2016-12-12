@@ -52,6 +52,28 @@ std::string UnicodeToUtf8(const std::wstring &wstr )
 	return str;
 }
 
+std::string UnicodeToGbk(const std::wstring &wstr)
+{
+	std::string str;
+
+	int iLen = WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)wstr.c_str(), -1, NULL, 0, NULL, NULL);
+
+	char *pmText;
+	pmText = new char[iLen]();
+	if (!pmText)
+	{
+		delete[]pmText;
+		return "";
+	}
+
+	WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)wstr.c_str(), -1, pmText, iLen, NULL, NULL);
+	str.append(pmText);
+
+	delete[] pmText;
+
+	return str;
+}
+
 
 
 //wstring高字节不为0，返回FALSE
@@ -85,6 +107,13 @@ std::string Gbk2Utf8(const std::string str)
 	return UnicodeToUtf8(strUnicode);
 }
 
+
+std::string Utf8ToGbk(const std::string str)
+{
+	std::wstring strUnicode = Utf8ToUnicode(str);
+
+	return UnicodeToGbk(strUnicode);
+}
 
 
 void InitResource()
@@ -157,3 +186,5 @@ void InitResource()
 	// 注册控件
 	REGIST_DUICONTROL(CCode12306CertUI);
 }
+
+
