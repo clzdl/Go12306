@@ -139,4 +139,6 @@ private:
 	
 	NameValueCollection m_cookieCollection;
 	HTTPSClientSession m_sessHttpsClient;
+
+	std::map<string, string> m_headerDefault;
 };

@@ -58,7 +58,7 @@ void CLoginWnd::OnClick(TNotifyUI &msg)
 	}
 	else if (sName.CompareNoCase(_T("btnLogin")) == 0)
 	{
-		
+		///校验验证码
 		std::vector<CDuiPoint> vecPoint = m_code12306UI->GetSelectedPoint();
 
 		for (std::vector<CDuiPoint>::iterator it = vecPoint.begin(); it != vecPoint.end(); ++it)
@@ -68,6 +68,8 @@ void CLoginWnd::OnClick(TNotifyUI &msg)
 		std::string response;
 		Client12306Manager::Instance()->AnsynValidPassCode(vecPoint, response);
 
+
+		///校验用户登录
 		CDuiString userName =  m_pEdtUserName->GetText();
 		CDuiString userPass = m_pEdtUserPass->GetText();
 
@@ -83,9 +85,10 @@ void CLoginWnd::OnClick(TNotifyUI &msg)
 		Client12306Manager::Instance()->AnsysLoginSugguest(UnicodeToUtf8(userName.GetData()),
 														UnicodeToUtf8(userPass.GetData()), randCode , response);
 
-		
+		///用户登录
 		Client12306Manager::Instance()->UserLogin(response);
 
+		///初始化登录首页
 		Client12306Manager::Instance()->InitMy12306(response);
 		
 		

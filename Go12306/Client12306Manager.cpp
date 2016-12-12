@@ -33,6 +33,17 @@ Client12306Manager::Client12306Manager()
 {
 	m_sessHttpsClient.setHost(m_strDomain);
 	m_sessHttpsClient.setKeepAlive(true);
+
+	m_headerDefault["Accept"] = "*/*";
+	m_headerDefault["Accept-Encoding"] = "gzip, deflate, br";
+	m_headerDefault["Accept-Language"] = "zh-CN,zh;q=0.8";
+	m_headerDefault["Content-Type"] = "application/x-www-form-urlencoded;charset=UTF-8";
+	m_headerDefault["Origin"] = "https://kyfw.12306.cn";
+	m_headerDefault["X-Requested-With"] = "XMLHttpRequest";
+	m_headerDefault["User-Agent"] = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.101 Safari/537.36";
+	m_headerDefault["Host"] = "kyfw.12306.cn";
+
+
 }
 Client12306Manager::~Client12306Manager()
 {
@@ -50,8 +61,6 @@ Client12306Manager& Client12306Manager::operator =(const Client12306Manager &hcm
 
 std::string Client12306Manager::ExecPost(std::string service, std::map<string, string> *param, std::map<string, string> *header)
 {
-	
-
 	HTTPRequest request(HTTPRequest::HTTP_POST, service , Net::HTTPMessage::HTTP_1_1);
 
 	std::stringstream body;
@@ -60,7 +69,6 @@ std::string Client12306Manager::ExecPost(std::string service, std::map<string, s
 		
 		for (std::map<string, string>::iterator it = param->begin(); it != param->end(); ++it)
 		{
-
 
 			if (it != param->begin())
 				body << "&";
@@ -80,8 +88,14 @@ std::string Client12306Manager::ExecPost(std::string service, std::map<string, s
 	if (!m_cookieCollection.empty())
 		request.setCookies(m_cookieCollection);
 
+
+	///增加默认全局默认header
+	for (std::map<string, string>::iterator it = m_headerDefault.begin(); it != m_headerDefault.end(); ++it)
+		request.set(it->first, it->second);
+	
+	
 	if (header)
-	{
+	{///增加特殊header
 		for (std::map<string, string>::iterator it = header->begin(); it != header->end(); ++it)
 		{
 			request.set(it->first, it->second);
@@ -90,28 +104,23 @@ std::string Client12306Manager::ExecPost(std::string service, std::map<string, s
 
 	request.setKeepAlive(true);
 
-
 	{
 		std::stringstream ss;
 		request.write(ss);
 
+		///请求头
 		DUI__Trace(_T(" %s "), Utf8ToUnicode(ss.str()).c_str());
-
+		///请求体
 		DUI__Trace(_T(" %s "), Utf8ToUnicode(utf8Body).c_str());
 	}
 
 	std::ostream &os = m_sessHttpsClient.sendRequest(request);
-	
 
 	os << utf8Body;
-	
-
 
 	HTTPResponse response;
 
 	std::istream& rs = m_sessHttpsClient.receiveResponse(response);
-	
-	
 
 	std::ostringstream ostr;
 	StreamCopier::copyStream(rs, ostr);
@@ -120,7 +129,10 @@ std::string Client12306Manager::ExecPost(std::string service, std::map<string, s
 		std::stringstream ss;
 		response.write(ss);
 
+		///输出相应头
 		DUI__Trace(_T(" %s "), Utf8ToUnicode(ss.str()).c_str());
+		
+		///输出相应体
 		DUI__Trace(_T(" %s "), Utf8ToUnicode(ostr.str()).c_str());
 	}
 
@@ -138,16 +150,12 @@ std::string Client12306Manager::ExecGet(std::string service, std::map<string, st
 			if (i > 0)
 				service += "&";
 
-
 			service += it->first;
 			service += "=";
 			service += it->second;
 		}
 
 	}
-
-	
-
 
 	HTTPRequest request(HTTPRequest::HTTP_GET, service, Net::HTTPMessage::HTTP_1_1);
 
@@ -157,8 +165,14 @@ std::string Client12306Manager::ExecGet(std::string service, std::map<string, st
 
 	request.setKeepAlive(true);
 
+
+	///增加默认全局默认header
+	for (std::map<string, string>::iterator it = m_headerDefault.begin(); it != m_headerDefault.end(); ++it)
+		request.set(it->first, it->second);
+
 	if (header)
 	{
+		///增加特殊header
 		for (std::map<string, string>::iterator it = header->begin(); it != header->end(); ++it)
 		{
 			request.set(it->first, it->second);
@@ -168,22 +182,15 @@ std::string Client12306Manager::ExecGet(std::string service, std::map<string, st
 		std::stringstream ss;
 		request.write(ss);
 
+		///请求头
 		DUI__Trace(_T(" %s "), Utf8ToUnicode(ss.str()).c_str());
 	}
+
 	m_sessHttpsClient.sendRequest(request);
 	HTTPResponse response;
 
-
-
 	std::istream& rs = m_sessHttpsClient.receiveResponse(response);
 	
-	{
-		std::stringstream ss;
-		response.write(ss);
-
-		DUI__Trace(_T(" %s "), Utf8ToUnicode(ss.str()).c_str());
-	}
-
 	if (m_cookieCollection.empty())
 	{
 		std::vector<HTTPCookie> cookies;
@@ -199,12 +206,14 @@ std::string Client12306Manager::ExecGet(std::string service, std::map<string, st
 	std::ostringstream ostr;
 	StreamCopier::copyStream(rs, ostr);
 
-
 	{
 		std::stringstream ss;
 		response.write(ss);
 
+		///输出相应头
 		DUI__Trace(_T(" %s "), Utf8ToUnicode(ss.str()).c_str());
+
+		///输出相应体
 		DUI__Trace(_T(" %s "), Utf8ToUnicode(ostr.str()).c_str());
 	}
 
@@ -566,15 +575,7 @@ int Client12306Manager::LoginInit()
 
 
 		std::map<string, string> header;
-		header["Accept"] = "*/*";
-		header["Accept-Encoding"] = "gzip, deflate, br";
-		header["Accept-Language"] = "zh-CN,zh;q=0.8";
-		header["Content-Type"] = "application/x-www-form-urlencoded;charset=UTF-8";
-		header["Origin"] = "https://kyfw.12306.cn";
-		header["X-Requested-With"] = "XMLHttpRequest";
-		header["User-Agent"] = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.101 Safari/537.36";
 		header["Referer"] = "https://kyfw.12306.cn/otn/login/init";
-		header["Host"] = "kyfw.12306.cn";
 
 		ExecGet(strService, NULL, &header);
 
@@ -609,15 +610,8 @@ int Client12306Manager::QueryPassCode(std::string moduleName , std::string &byte
 		//strService += "0.06173759602765039";
 
 		std::map<string, string> header;
-		header["Accept"] = "*/*";
-		header["Accept-Encoding"] = "gzip, deflate, br";
-		header["Accept-Language"] = "zh-CN,zh;q=0.8";
-		header["Content-Type"] = "application/x-www-form-urlencoded;charset=UTF-8";
-		header["Origin"] = "https://kyfw.12306.cn";
-		header["X-Requested-With"] = "XMLHttpRequest";
-		header["User-Agent"] = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.101 Safari/537.36";
 		header["Referer"] = "https://kyfw.12306.cn/otn/login/init";
-		header["Host"] = "kyfw.12306.cn";
+	
 
 		bytes = ExecGet(strService , NULL , &header);
 
@@ -653,15 +647,8 @@ int Client12306Manager::AnsynValidPassCode(std::vector<CDuiPoint> &selPoints , s
 		param["randCode"] = randCode;
 
 		std::map<string, string> header;
-		header["Accept"] = "*/*";
-		header["Accept-Encoding"] = "gzip, deflate, br";
-		header["Accept-Language"] = "zh-CN,zh;q=0.8";
-		header["Content-Type"] = "application/x-www-form-urlencoded;charset=UTF-8";
-		header["Origin"] = "https://kyfw.12306.cn";
-		header["X-Requested-With"] = "XMLHttpRequest";
-		header["User-Agent"] = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.101 Safari/537.36";
 		header["Referer"] = "https://kyfw.12306.cn/otn/login/init";
-		header["Host"] = "kyfw.12306.cn";
+		
 
 		res = ExecPost(strService , &param, &header);
 
@@ -687,15 +674,7 @@ int Client12306Manager::AnsysLoginSugguest(std::string userName, std::string use
 		param["randCode"] = randCode;
 
 		std::map<string, string> header;
-		header["Accept"] = "*/*";
-		header["Accept-Encoding"] = "gzip, deflate, br";
-		header["Accept-Language"] = "zh-CN,zh;q=0.8";
-		header["Content-Type"] = "application/x-www-form-urlencoded;charset=UTF-8";
-		header["Origin"] = "https://kyfw.12306.cn";
-		header["X-Requested-With"] = "XMLHttpRequest";
-		header["User-Agent"] = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.101 Safari/537.36";
 		header["Referer"] = "https://kyfw.12306.cn/otn/login/init";
-		header["Host"] = "kyfw.12306.cn";
 	
 
 		res = ExecPost(strService, &param , &header);
@@ -720,15 +699,9 @@ int Client12306Manager::UserLogin(std::string &res)
 		param["_json_att"] = "";
 		
 		std::map<string, string> header;
-		
+		header["Referer"] = "https://kyfw.12306.cn/otn/login/init";
 
-		header["Accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8";
-		header["Accept-Encoding"] = "gzip, deflate, br";
-		header["Accept-Language"] = "zh-CN,zh;q=0.8";
-		header["Content-Type"] = "application/x-www-form-urlencoded";
-		header["Origin"] = "https://kyfw.12306.cn";
-
-		res = ExecPost(strService, &param);
+		res = ExecPost(strService, &param,&header);
 
 	}
 	catch (Poco::Exception &e)
@@ -747,14 +720,6 @@ int Client12306Manager::InitMy12306(std::string &res)
 		std::map<string, string> header;
 		header["Referer"] = "https://kyfw.12306.cn/otn/login/init";
 
-
-		header["Accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8";
-		header["Accept-Encoding"] = "gzip, deflate, br";
-		header["Accept-Language"] = "zh-CN,zh;q=0.8";
-		header["Content-Type"] = "application/x-www-form-urlencoded";
-		header["Upgrade-Insecure-Requests"] = "1";
-		header["User-Agent"] = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.101 Safari/537.36";
-	
 		res = ExecGet(strService , NULL , &header);
 
 	}
