@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Window >
+	
+
+				
+	<VerticalLayout name="ticket_query_pannel" inset="2,2,2,2"  >
+		<HorizontalLayout height="30" childpadding="4" bordersize="1,1,1,1" bordercolor="#F" >
+			<Label text="始发地" textcolor="#FF000000" glowsize="0" font="font13" width="40"/>
+			<Edit name="begPlace" tipvalue="始发地" style="edit_style" />
+
+			<Label text="目的地" textcolor="#FF000000" glowsize="0" font="font13" width="40"/>
+			<Edit name="endPlace" tipvalue="目的地" style="edit_style" />
+
+			<Label text="出发日" textcolor="#FF000000" glowsize="0" font="font13" width="40"/>
+			<DateTime width="120" bordersize="1" bordercolor="#FF888888" textpadding="3"/>
+
+			<Button name="btnTicketQuery" text="查询" textcolor="#FF000000" style="btn_style" width="60" textpadding="20,0,0,0" foreimage="dest='4,7,20,23' res='other/icon.png'" />
+		</HorizontalLayout>
+
+		<HorizontalLayout height="30" childpadding="1" bordersize="1,1,1,1" bordercolor="#F" >
+			<Label text="车次类型" textcolor="#FF000000" glowsize="0" font="font13" width="60"/>
+			<CheckBox name="train_all" selected="true" text="全选" width="60"  align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
+			<CheckBox name="train_gc" text="GC-高铁/城际" width="120"  align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
+			<CheckBox name="train_d" text="D-动车" width="80" align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
+			<CheckBox name="train_z" text="Z-直达" width="80" align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
+			<CheckBox name="train_t" text="T-特快" width="80" align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
+			<CheckBox name="train_k" text="K-快速" width="80" align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
+			<CheckBox name="train_o" text="其他" width="80" align="left" textpadding="24,0,0,0" normalimage="file='unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
+
+		</HorizontalLayout>
+
+		<List name="ticketListView"  vscrollbar="true" hscrollbar="true"  itemvalign="vcenter" scrollstepsize="100" itemshowrowline="true" itemlinecolor="0x00FFFFFF">
+			<ListHeader height="40">
+				<ListHeaderItem text="车次" width="60" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+				<ListHeaderItem width="100" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" >
+					<VerticalLayout>
+						<Label text="出发站" textcolor="#FF000000" glowsize="0" font="font13" align="center"/>
+						<Label text="到达站" textcolor="#FF000000" glowsize="0" font="font13" align="center"/>
+					</VerticalLayout>
+					
+				</ListHeaderItem>
+				
+				<ListHeaderItem width="80" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center">
+					<VerticalLayout>
+						<Label text="出发时间" textcolor="#FF000000" glowsize="0" font="font13" align="center"/>
+						<Label text="到达时间" textcolor="#FF000000" glowsize="0" font="font13" align="center"/>
+					</VerticalLayout>
+				</ListHeaderItem>
+				
+				<ListHeaderItem text="历时" width="60" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+				<ListHeaderItem text="商务座" width="70" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+				<ListHeaderItem text="特等座" width="70" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+				<ListHeaderItem text="一等座" width="70" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+				<ListHeaderItem text="二等座" width="70" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+				<ListHeaderItem text="高级软卧" width="80" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+				<ListHeaderItem text="软卧" width="60" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+				<ListHeaderItem text="硬卧" width="60" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+				<ListHeaderItem text="软座" width="60" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+				<ListHeaderItem text="硬座" width="60" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+				<ListHeaderItem text="无座" width="60" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+				<ListHeaderItem text="其它" width="60" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+				<ListHeaderItem text="备注" width="100" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+
+			</ListHeader>
+
+		</List>
+
+
+
+	</VerticalLayout>
+	
+</Window>
