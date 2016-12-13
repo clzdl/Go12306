@@ -833,9 +833,11 @@ int Client12306Manager::InitMy12306(std::string &res)
 		std::map<string, string> header;
 		header["Referer"] = "https://kyfw.12306.cn/otn/login/init";
 
-		res = ExecGet(strService , NULL , &header);
+		std::string response = ExecGet(strService , NULL , &header);
 
-		DUI__Trace(_T("%ld"), res.length());
+		Gunzip((Byte*)const_cast<char*>(response.c_str()), response.length(), res);
+
+		DUI__Trace(_T("%s"), Utf8ToUnicode(res).c_str());
 		
 	}
 	catch (Poco::Exception &e)

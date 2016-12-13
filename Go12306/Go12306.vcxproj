@@ -105,7 +105,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>D:\opensource\DuiLib_Ultimate-master\DuiLib;D:\opensource\poco-1.7.6-all\Foundation\include;D:\opensource\poco-1.7.6-all\NetSSL_OpenSSL\include;D:\opensource\poco-1.7.6-all\JSON\include;D:\opensource\poco-1.7.6-all\Net\include;D:\opensource\poco-1.7.6-all\Crypto\include;D:\opensource\openssl-1.0.2j\install-dir\include;D:\opensource\poco-1.7.6-all\Util\include;D:\opensource\cximage600_full\CxImage</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\opensource\DuiLib_Ultimate-master\DuiLib;D:\opensource\poco-1.7.6-all\Foundation\include;D:\opensource\poco-1.7.6-all\NetSSL_OpenSSL\include;D:\opensource\poco-1.7.6-all\JSON\include;D:\opensource\poco-1.7.6-all\Net\include;D:\opensource\poco-1.7.6-all\Crypto\include;D:\opensource\openssl-1.0.2j\install-dir\include;D:\opensource\poco-1.7.6-all\Util\include;D:\opensource\cximage600_full\CxImage;D:\opensource\cximage600_full\zlib</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

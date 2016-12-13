@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "zlib.h"
 
 /*@action: utf8编码的多字节串，转换成unicode串
  *
@@ -37,3 +38,11 @@ std::string Utf8ToGbk(const std::string str);
 /*@action:资源初始化
 */
 void InitResource();
+
+/*@action: 压缩输出成gzip格式流
+*/
+int gzcompress(Bytef *data, uLong ndata, Bytef *zdata, uLong *nzdata);
+
+/*@action: 解压 gzip的压缩流  
+*/
+int Gunzip(Byte *zdata, uLong nzdata , std::string &gunZipString);

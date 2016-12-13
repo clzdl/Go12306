@@ -133,9 +133,6 @@ void CLoginWnd::OnClick(TNotifyUI &msg)
 			return;
 
 		}
-
-
-		CMsgWnd::MessageBox(GetHWND(), _T("ÌבÊ¾"), Utf8ToUnicode(  response).c_str());
 		
 		Close(MSGID_OK);
 
