@@ -56,11 +56,13 @@
 				
 				</VerticalLayout>
 				
-				<VerticalLayout name="order_manager_pannel" inset="2,2,2,2" vscrollbar="true">
-
+				<VerticalLayout name="order_manager_pannel" inset="2,2,2,2" >
+          
+          <Include source="order_manager_pannel.xml"/> 
+          
 				</VerticalLayout>
 				
-				<VerticalLayout name="user_manager_pannel" inset="2,2,2,2" vscrollbar="true">
+				<VerticalLayout name="user_manager_pannel" inset="2,2,2,2" >
 
 				</VerticalLayout>
 

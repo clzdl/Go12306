@@ -78,6 +78,10 @@ private:
 	*/
 	int RefreshTicketListView();
 
+	/*@action:
+	*/
+	int RefreshOrderListView();
+
 	/*@action: 是否需要显示
 	
 	*/

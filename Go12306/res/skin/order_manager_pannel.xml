@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Window>
+	
+	<List name="orderListView"  vscrollbar="true" hscrollbar="true"  itemvalign="vcenter" scrollstepsize="100" >
+		<!-- 
+		<ListContainerElement height = "100">
+			<VerticalLayout  hscrollbar="true" bordersize="1,1,1,1" bordercolor="#F" inset="2,2,2,2" >
+				<HorizontalLayout   height="20" bkcolor="#FFB4EEB4" inset="2,2,2,2">
+					<CheckBox text ="" width="20" normalimage="file='common/scrollbar.bmp' source='0,90,15,105' dest='0,0,20,20'" selectedimage="file='common/scrollbar.bmp' source='0,109,15,124' dest='0,0,20,20'"/>
+					<Label text="订单日期:" width="80" align="left"  />
+					<Label text="2016-12-12" width="100" align="left" font="2"/>
+					<Label text="订单编号:" width="80" align="left"  />
+					<Label text="OX20161212010101" width="180" align="left"  font="2"/>
+					<Label text="chengliang" width="150" align="left"  font="2"/>
+					<Label text="北京西" width="60" align="left" font="2"/>
+					<Label text="=>" width="20" align="left" />
+					<Label text="石家庄" width="60" align="left" font="2" />
+					<Label text="乘车日期:" width="100" align="right" font="2" />
+					<Label text="2016-12-19" width="100" align="left" font="2" />
+				</HorizontalLayout>
+				
+				<Label height="2" bkimage="common/hor_line.png"/>
+				
+				<List vscrollbar="true" hscrollbar="true" itemvalign="vcenter">
+					<ListHeader height="20">
+						<ListHeaderItem text="车次信息" width="150" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+						<ListHeaderItem text="席位信息" width="150" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+						<ListHeaderItem text="旅客信息" width="150" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+						<ListHeaderItem text="票款金额" width="100" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+						<ListHeaderItem text="车票状态" width="100" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+						<ListHeaderItem text="操作" width="150" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+					</ListHeader>
+				</List>
+				
+			</VerticalLayout>
+				
+		</ListContainerElement>
+		
+		
+		<ListContainerElement height = "100">
+			<VerticalLayout  hscrollbar="true" bordersize="1,1,1,1" bordercolor="#F" inset="2,2,2,2" >
+				<HorizontalLayout   height="20" bkcolor="#FFB4EEB4" inset="2,2,2,2">
+					<CheckBox text ="" width="20" normalimage="file='common/scrollbar.bmp' source='0,90,15,105' dest='0,0,20,20'" selectedimage="file='common/scrollbar.bmp' source='0,109,15,124' dest='0,0,20,20'"/>
+					<Label text="订单日期:" width="80" align="left"  />
+					<Label text="2016-12-12" width="100" align="left" font="2"/>
+					<Label text="订单编号:" width="180" align="left"  />
+					<Label text="OX20161212010101" width="150" align="left"  font="2"/>
+					<Label text="chengliang" width="150" align="left"  font="2"/>
+					<Label text="北京西" width="60" align="left" font="2"/>
+					<Label text="=>" width="20" align="left" />
+					<Label text="石家庄" width="60" align="left" font="2" />
+					<Label text="乘车日期:" width="100" align="right" font="2" />
+					<Label text="2016-12-19" width="100" align="left" font="2" />
+				</HorizontalLayout>
+				
+				<Label height="2" bkimage="common/hor_line.png"/>
+				
+				<List vscrollbar="true" hscrollbar="true" itemvalign="vcenter">
+					<ListHeader height="20">
+						<ListHeaderItem text="车次信息" width="150" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+						<ListHeaderItem text="席位信息" width="150" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+						<ListHeaderItem text="旅客信息" width="150" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+						<ListHeaderItem text="票款金额" width="100" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+						<ListHeaderItem text="车票状态" width="100" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+						<ListHeaderItem text="操作" width="150" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+					</ListHeader>
+				</List>
+				
+			</VerticalLayout>
+				
+		</ListContainerElement>
+		-->
+	</List>  
+
+
+</Window>
