@@ -66,6 +66,12 @@
     <ClInclude Include="Code12306Cert.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="OrderManagerUI.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TicketManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -96,6 +102,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Code12306Cert.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="OrderManagerUI.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TicketManager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

@@ -13,7 +13,8 @@ using Poco::ThreadPool;
 using Poco::Runnable;
 
 
-
+class COrderManagerUI;
+class CTicketManager;
 class CWorker;
 class CMainFrame : public WindowImplBase, public CWebBrowserEventHandler, public SkinChangedReceiver
 {
@@ -69,6 +70,8 @@ public:
 	
 	void OnLClick(CControlUI *pControl);
 
+	CPaintManagerUI* GetPaintManagerUI() { return &m_pm; }
+
 private:
 
 	int QueryTicket(CDuiString begPlace , CDuiString endPlace, CDuiString travelTime );
@@ -78,9 +81,6 @@ private:
 	*/
 	int RefreshTicketListView();
 
-	/*@action:
-	*/
-	int RefreshOrderListView();
 
 	/*@action: 是否需要显示
 	
@@ -104,7 +104,7 @@ private:
 	COptionUI *m_pOptOrderManage;
 	COptionUI *m_pOptUserManage;
 
-	static CDuiString m_transLiShi[];
+	
 		 
 	std::vector<CTicketModel> m_vecTicket;
 
@@ -117,6 +117,9 @@ private:
 	ThreadPool m_tpWorker;
 
 	CWorker *m_tWorker;
+
+	COrderManagerUI *m_pOrderManagerUI;
+	CTicketManager *m_pTicketManagerUI;
 };
 
 
@@ -155,4 +158,6 @@ private:
 	std::vector<CTicketModel> *m_vecTicket;
 
 	CProgressDlg *m_progressDlg;
+
+	
 };

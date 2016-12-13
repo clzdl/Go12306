@@ -256,9 +256,11 @@ int Client12306Manager::QueryLeftTicket(std::string begPlace, std::string endPla
 		}
 		
 
-		std::string strRes = ExecGet(strService);
+		std::string strOrgRes = ExecGet(strService);
+		std::string strGunString;
+		Gunzip((byte*)const_cast<char*>(strOrgRes.c_str()), strOrgRes.length() , strGunString);
 
-		JsonParseTicket(strRes, vecTicket);
+		JsonParseTicket(strGunString, vecTicket);
 		
 
 	}
