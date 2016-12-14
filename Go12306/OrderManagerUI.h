@@ -1,7 +1,7 @@
 #pragma once
 
 
-
+#include "OrderModel.h"
 class CMainFrame;
 class COrderManagerUI
 {
@@ -10,7 +10,7 @@ public:
 
 	/*@action:更新订单列表
 	*/
-	int	RefreshOrderListView();
+	int	RefreshOrderListView(std::map<string, COrderModel> &objMap);
 
 	/*@action: 更新具体订单信息
 	*/
@@ -19,14 +19,14 @@ public:
 private:
 
 
-	CHorizontalLayoutUI* CreateDetailListHeader(CDuiString lstTicketListName);
+	CHorizontalLayoutUI* CreateDetailListHeader(CDuiString lstTicketListName , COrderModel &orderModel);
 
 
-	CListUI* CreateTicketList(CDuiString lstTicketListName);
+	CListUI* CreateTicketList(CDuiString lstTicketListName, COrderModel &orderModel);
 
 	CListHeaderUI* CreateTicketListHeader();
 
-	CListContainerElementUI* CreateListContainerEleUI();
+	CListContainerElementUI* CreateListContainerEleUI(COrderModel &orderModel , COrderTicketModel &orderTicketModel);
 
 	CMainFrame *m_mainFrame;
 

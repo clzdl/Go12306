@@ -1012,7 +1012,7 @@ int Client12306Manager::JsonParseOrder(std::string jsonString, std::map<std::str
 		for (int i = 0; i < cnt; ++i)
 		{
 
-			Dynamic::Var pOrderDTOData = jOrderDTODataList->get(0);
+			Dynamic::Var pOrderDTOData = jOrderDTODataList->get(i);
 
 			DUI__Trace(Utf8ToUnicode(pOrderDTOData.toString()).c_str());
 
@@ -1052,10 +1052,12 @@ int Client12306Manager::AssignJson2OrderObj(JSON::Object::Ptr jOrderDTOData, COr
 		objOrder.SetPassengerName(Utf8ToUnicode(jArrayPassengerNames->get(0).toString()).c_str());
 
 		///³Ë³µÕ¾
-		objOrder.SetFromStation(Utf8ToUnicode(jOrderDTOData->get("from_station_name_page").toString()).c_str());
+		JSON::Array::Ptr jArrayFromStation = jOrderDTOData->getArray("from_station_name_page");
+		objOrder.SetFromStation(Utf8ToUnicode(jArrayFromStation->get(0).toString()).c_str());
 
 		///ÏÂ³µÕ¾
-		objOrder.SetToStateion(Utf8ToUnicode(jOrderDTOData->get("to_station_name_page").toString()).c_str());
+		JSON::Array::Ptr jArrayToStation = jOrderDTOData->getArray("to_station_name_page");
+		objOrder.SetToStateion(Utf8ToUnicode(jArrayToStation->get(0).toString()).c_str());
 
 		///·¢³µÊ±¼ä
 		objOrder.SetTravelDate(Utf8ToUnicode(jOrderDTOData->get("start_train_date_page").toString()).c_str());
@@ -1137,5 +1139,101 @@ int Client12306Manager::AssignJson2OrderTicketObj(JSON::Object::Ptr jOrderTicket
 		m_strLastErrInfo = e.displayText();
 		return FAIL;
 	}
+
+	return SUCCESS;
+}
+
+
+int Client12306Manager::Query12306StationName()
+{
+	int iRetFlag = SUCCESS;
+	try
+	{
+
+		string strService = "/otn/resources/js/framework/station_name.js";
+
+		std::string response = ExecGet(strService);
+	
+
+		ParseStationString(response);
+
+		for (std::map<std::string, CStation>::iterator it = m_mapStation.begin(); it != m_mapStation.end(); ++it)
+		{
+			DUI__Trace(_T("%s,%s,%s,%s"), Utf8ToUnicode(it->second.GetStationCode()).c_str(),
+											Utf8ToUnicode(it->second.GetShortName()).c_str(),
+											Utf8ToUnicode(it->second.GetPinYinName()).c_str(),
+											Utf8ToUnicode(it->second.GetChinaName()).c_str());
+		}
+
+	}
+	catch (Poco::Exception &e)
+	{
+		DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
+		return FAIL;
+	}
+
+	return iRetFlag;
+}
+
+int Client12306Manager::ParseStationString(std::string res)
+{
+	int begPos = res.find("@")+1;
+
+	int endPos = 0;
+	while ((endPos = res.find("@", begPos )) != string::npos)
+	{
+		std::string info = res.substr(begPos, endPos - begPos );
+		CStation station;
+		//////Æ´ÒôËõÐ´
+		int iBeg = 0;
+		int iEnd = 0;
+		iEnd = info.find("|");
+		station.SetShortName(info.substr(iBeg,iEnd - iBeg ));
+
+		///ºº×Ö
+		iBeg = iEnd + 1;
+		iEnd = info.find("|" , iBeg);
+		station.SetChinaName(info.substr(iBeg,iEnd - iBeg));
+
+		///Õ¾µã±àÂë
+		iBeg = iEnd + 1;
+		iEnd = info.find("|", iBeg);
+		station.SetStationCode(info.substr(iBeg,iEnd - iBeg));
+
+		///ºº×ÖÆ´Òô
+		iBeg = iEnd + 1;
+		iEnd = info.find("|", iBeg);
+		station.SetPinYinName(info.substr(iBeg,iEnd - iBeg));
+
+		m_mapStation.insert(std::pair<std::string, CStation>(station.GetStationCode(), station));
+
+		begPos = endPos + 1;
+	}
+
+	std::string info = res.substr(begPos);
+	CStation station;
+	//////Æ´ÒôËõÐ´
+	int iBeg = 0;
+	int iEnd = 0;
+	iEnd = info.find("|");
+	station.SetShortName(info.substr(iBeg,iEnd - iBeg ));
+
+	///ºº×Ö
+	iBeg = iEnd + 1;
+	iEnd = info.find("|", iBeg);
+	station.SetChinaName(info.substr(iBeg,iEnd - iBeg ));
+
+	///Õ¾µã±àÂë
+	iBeg = iEnd + 1;
+	iEnd = info.find("|", iBeg);
+	station.SetStationCode(info.substr(iBeg,iEnd - iBeg ));
+
+	///ºº×ÖÆ´Òô
+	iBeg = iEnd + 1;
+	iEnd = info.find("|", iBeg);
+	station.SetPinYinName(info.substr(iBeg,iEnd - iBeg ));
+
+	m_mapStation.insert(std::pair<std::string, CStation>(station.GetStationCode(), station));
+
 	return SUCCESS;
 }

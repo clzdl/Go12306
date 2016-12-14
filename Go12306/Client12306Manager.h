@@ -57,7 +57,30 @@ using Poco::URI;
 using namespace Poco::Dynamic;
 using namespace Poco;
 
+class CStation
+{
+public:
+	CStation() {}
+	~CStation() {}
 
+	void SetShortName(std::string v) { m_strShortName = v; }
+	void SetChinaName(std::string v) { m_strChinaName = v; }
+	void SetPinYinName(std::string v) { m_strPinYinName = v; }
+	void SetStationCode(std::string v) { m_strStationCode = v; }
+
+	std::string GetShortName() { return  m_strShortName ; }
+	std::string GetChinaName() { return m_strChinaName; }
+	std::string GetPinYinName() { return m_strPinYinName; }
+	std::string GetStationCode() { return m_strStationCode; }
+
+private:
+	std::string m_strShortName;   ///Æ´ÒôËõÐ´
+	std::string m_strChinaName;		///ºº×Ö
+	std::string m_strPinYinName;   ///ºº×ÖÆ´Òô
+	std::string m_strStationCode;   ///Õ¾µã±àÂë
+
+
+};
 
 
 class Client12306Manager
@@ -110,7 +133,9 @@ public:
 	*/
 	int QueryMyOrder(std::string startDate , std::string endDate , std::string seqTrainName , std::map<string, COrderModel> &mapOrder);
 
-
+	/*@action:  ²éÑ¯Õ¾µãÐÂ
+	*/
+	int Query12306StationName();
 
 	std::string GetLastErrInfo() { return m_strLastErrInfo; }
 private:
@@ -168,6 +193,10 @@ private:
 	int AssignJson2OrderTicketObj(JSON::Object::Ptr jOrderTicketDTOData, COrderTicketModel &objOrderTicket);
 
 
+	/*@action: 
+	*/
+	int ParseStationString(std::string res);
+
 
 
 	Client12306Manager();
@@ -191,4 +220,8 @@ private:
 	std::map<string, string> m_headerDefault;
 
 	std::string m_strLastErrInfo;
+
+	///Õ¾µã»º´æ
+	std::map<std::string, CStation> m_mapStation;
+
 };

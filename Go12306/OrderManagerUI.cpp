@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "OrderManagerUI.h"
 #include "MainFrame.h"
+#include "OrderModel.h"
 
 
 COrderManagerUI::COrderManagerUI(CMainFrame *mainFrame)
@@ -10,15 +11,19 @@ COrderManagerUI::COrderManagerUI(CMainFrame *mainFrame)
 }
 
 
-int COrderManagerUI::RefreshOrderListView()
+int COrderManagerUI::RefreshOrderListView(std::map<string, COrderModel> &objMap)
 {
 	m_pOderListView->RemoveAll();
 
-
+	
 	{
-		for (int i = 0; i < 40; ++i)
+		int i = 0;
+		for (std::map<string, COrderModel>::iterator it = objMap.begin(); it != objMap.end(); ++it,++i)
 		{
 			CDuiString  btnChkName;
+
+			COrderModel &orderModel = it->second;
+
 			btnChkName.Format(_T("ORDER_TICKET_%d"), i);
 
 			///添加行
@@ -39,7 +44,7 @@ int COrderManagerUI::RefreshOrderListView()
 
 			{
 				////列表头
-				tmpVLayout->Add(CreateDetailListHeader(btnChkName));
+				tmpVLayout->Add(CreateDetailListHeader(btnChkName , orderModel));
 
 				CLabelUI *txtSpeLine = new CLabelUI();
 				txtSpeLine->SetAttribute(_T("height"), _T("2"));
@@ -47,7 +52,7 @@ int COrderManagerUI::RefreshOrderListView()
 				tmpVLayout->Add(txtSpeLine);
 
 				////列表块
-				tmpVLayout->Add(CreateTicketList(btnChkName));
+				tmpVLayout->Add(CreateTicketList(btnChkName,orderModel));
 
 			}
 		}
@@ -75,7 +80,7 @@ int COrderManagerUI::RefreshOrderDetailList(CListUI *dListUI , bool check)
 }
 
 
-CHorizontalLayoutUI* COrderManagerUI::CreateDetailListHeader(CDuiString lstTicketListName)
+CHorizontalLayoutUI* COrderManagerUI::CreateDetailListHeader(CDuiString lstTicketListName ,COrderModel &orderModel)
 {
 	CHorizontalLayoutUI* tmpHLayout = new CHorizontalLayoutUI();
 	tmpHLayout->SetAttribute(_T("height"), _T("20"));
@@ -103,7 +108,7 @@ CHorizontalLayoutUI* COrderManagerUI::CreateDetailListHeader(CDuiString lstTicke
 
 		/////订单日期内容
 		CLabelUI *txtOrderDateCont = new CLabelUI();
-		txtOrderDateCont->SetText(_T("2012-12-12"));
+		txtOrderDateCont->SetText(orderModel.GetOrderDate());
 		txtOrderDateCont->SetAttribute(_T("width"), _T("100"));
 		txtOrderDateCont->SetAttribute(_T("align"), _T("left"));
 		txtOrderDateCont->SetAttribute(_T("font"), _T("2"));
@@ -119,7 +124,7 @@ CHorizontalLayoutUI* COrderManagerUI::CreateDetailListHeader(CDuiString lstTicke
 
 		/////订单编号内容
 		CLabelUI *txtOrderNoCont = new CLabelUI();
-		txtOrderNoCont->SetText(_T("OX201212121631001"));
+		txtOrderNoCont->SetText(orderModel.GetOrderNo());
 		txtOrderNoCont->SetAttribute(_T("width"), _T("180"));
 		txtOrderNoCont->SetAttribute(_T("align"), _T("left"));
 		txtOrderNoCont->SetAttribute(_T("font"), _T("2"));
@@ -128,7 +133,7 @@ CHorizontalLayoutUI* COrderManagerUI::CreateDetailListHeader(CDuiString lstTicke
 
 		/////订票人
 		CLabelUI *txtOrderMen = new CLabelUI();
-		txtOrderMen->SetText(_T("chengliang"));
+		txtOrderMen->SetText(orderModel.GetPassengerName());
 		txtOrderMen->SetAttribute(_T("width"), _T("150"));
 		txtOrderMen->SetAttribute(_T("align"), _T("left"));
 		txtOrderMen->SetAttribute(_T("font"), _T("2"));
@@ -136,7 +141,7 @@ CHorizontalLayoutUI* COrderManagerUI::CreateDetailListHeader(CDuiString lstTicke
 
 		/////始发站
 		CLabelUI *txtBegStation = new CLabelUI();
-		txtBegStation->SetText(_T("北京西"));
+		txtBegStation->SetText(orderModel.GetFromStation());
 		txtBegStation->SetAttribute(_T("width"), _T("60"));
 		txtBegStation->SetAttribute(_T("align"), _T("left"));
 		txtBegStation->SetAttribute(_T("font"), _T("2"));
@@ -154,7 +159,7 @@ CHorizontalLayoutUI* COrderManagerUI::CreateDetailListHeader(CDuiString lstTicke
 
 		/////结束站
 		CLabelUI *txtEndStation = new CLabelUI();
-		txtEndStation->SetText(_T("石家庄"));
+		txtEndStation->SetText(orderModel.GetToStateion());
 		txtEndStation->SetAttribute(_T("width"), _T("60"));
 		txtEndStation->SetAttribute(_T("align"), _T("left"));
 		txtEndStation->SetAttribute(_T("font"), _T("2"));
@@ -170,7 +175,7 @@ CHorizontalLayoutUI* COrderManagerUI::CreateDetailListHeader(CDuiString lstTicke
 
 		/////乘车日期内容
 		CLabelUI *txtTravelDateCont = new CLabelUI();
-		txtTravelDateCont->SetText(_T("2016-12-12"));
+		txtTravelDateCont->SetText(orderModel.GetTravelDate());
 		txtTravelDateCont->SetAttribute(_T("width"), _T("100"));
 		txtTravelDateCont->SetAttribute(_T("align"), _T("left"));
 		txtTravelDateCont->SetAttribute(_T("font"), _T("2"));
@@ -180,7 +185,7 @@ CHorizontalLayoutUI* COrderManagerUI::CreateDetailListHeader(CDuiString lstTicke
 	return tmpHLayout;
 }
 
-CListUI* COrderManagerUI::CreateTicketList(CDuiString lstTicketListName)
+CListUI* COrderManagerUI::CreateTicketList(CDuiString lstTicketListName, COrderModel &orderModel)
 {
 	////
 	CListUI *lstTickUI = new CListUI();
@@ -203,7 +208,14 @@ CListUI* COrderManagerUI::CreateTicketList(CDuiString lstTicketListName)
 	lstTickUI->SetVisible(false);
 	
 	lstTickUI->Add(CreateTicketListHeader());
-	lstTickUI->Add(CreateListContainerEleUI());
+
+	std::vector<COrderTicketModel>& vecOrderTicket = orderModel.GetOrderTicket();
+
+	for (std::vector<COrderTicketModel>::iterator it = vecOrderTicket.begin(); it != vecOrderTicket.end(); ++it)
+	{
+
+		lstTickUI->Add(CreateListContainerEleUI(orderModel , *it));
+	}
 
 	return lstTickUI;
 }
@@ -286,7 +298,7 @@ CListHeaderUI* COrderManagerUI::CreateTicketListHeader()
 	return headUI;
 }
 
-CListContainerElementUI* COrderManagerUI::CreateListContainerEleUI()
+CListContainerElementUI* COrderManagerUI::CreateListContainerEleUI(COrderModel &orderModel, COrderTicketModel &orderTicketModel)
 {
 	CListContainerElementUI* pListItem = new CListContainerElementUI();
 	pListItem->SetChildVAlign(DT_VCENTER);
@@ -300,7 +312,7 @@ CListContainerElementUI* COrderManagerUI::CreateListContainerEleUI()
 		CLabelUI *trainLeaveTime = new CLabelUI();
 		trainLeaveTime->SetFont(4);
 		trainLeaveTime->SetAttribute(_T("align") , _T("center"));
-		trainLeaveTime->SetText(_T("2016-12-19 05:33开"));
+		trainLeaveTime->SetText(orderModel.GetTravelDate());
 		
 		trainVLayout->Add(trainLeaveTime);
 
@@ -309,7 +321,9 @@ CListContainerElementUI* COrderManagerUI::CreateListContainerEleUI()
 		CLabelUI *trainInfo = new CLabelUI();
 		trainInfo->SetFont(4);
 		trainInfo->SetTextColor(0xFF00AA00);
-		trainInfo->SetText(_T("D904 石家庄-北京西"));
+		//trainInfo->SetText(_T("D904 石家庄-北京西"));
+		///todo
+		trainInfo->SetText(orderModel.GetTrainCode() + _T(" ") + orderModel.GetFromStation() +_T("-") + orderModel.GetToStateion());
 		trainInfo->SetAttribute(_T("align"), _T("center"));
 		trainVLayout->Add(trainInfo);
 
@@ -325,7 +339,7 @@ CListContainerElementUI* COrderManagerUI::CreateListContainerEleUI()
 
 		CLabelUI *trainRoomInfo = new CLabelUI();
 		trainRoomInfo->SetFont(4);
-		trainRoomInfo->SetText(_T("01车厢"));
+		trainRoomInfo->SetText(orderTicketModel.GetCoachName());
 		trainRoomInfo->SetAttribute(_T("align"), _T("center"));
 		seatVLayout->Add(trainRoomInfo);
 
@@ -333,7 +347,7 @@ CListContainerElementUI* COrderManagerUI::CreateListContainerEleUI()
 
 		CLabelUI *seatInfo = new CLabelUI();
 		seatInfo->SetFont(4);
-		seatInfo->SetText(_T("02D号"));
+		seatInfo->SetText(orderTicketModel.GetSeatName());
 		seatInfo->SetAttribute(_T("align"), _T("center"));
 		seatVLayout->Add(seatInfo);
 
@@ -341,7 +355,7 @@ CListContainerElementUI* COrderManagerUI::CreateListContainerEleUI()
 
 		CLabelUI *seatCategory = new CLabelUI();
 		seatCategory->SetFont(1);
-		seatCategory->SetText(_T("二等座"));
+		seatCategory->SetText(orderTicketModel.GetSeatTypeName());
 		seatCategory->SetAttribute(_T("align"), _T("center"));
 		seatVLayout->Add(seatCategory);
 
@@ -358,7 +372,7 @@ CListContainerElementUI* COrderManagerUI::CreateListContainerEleUI()
 
 		CLabelUI *travelPerson = new CLabelUI();
 		travelPerson->SetFont(4);
-		travelPerson->SetText(_T("成亮"));
+		travelPerson->SetText(orderTicketModel.GetPassengerPersonName());
 		travelPerson->SetTextColor(0xFF00AA00);
 		travelPerson->SetAttribute(_T("align"), _T("center"));
 		travelPersonVLayout->Add(travelPerson);
@@ -367,7 +381,7 @@ CListContainerElementUI* COrderManagerUI::CreateListContainerEleUI()
 
 		CLabelUI *travelCardType = new CLabelUI();
 		travelCardType->SetFont(1);
-		travelCardType->SetText(_T("二代身份证"));
+		travelCardType->SetText(orderTicketModel.GetPassengerIDTypeName());
 
 		travelCardType->SetAttribute(_T("align"), _T("center"));
 		travelPersonVLayout->Add(travelCardType);
@@ -384,7 +398,7 @@ CListContainerElementUI* COrderManagerUI::CreateListContainerEleUI()
 
 		CLabelUI *ticketType = new CLabelUI();
 		ticketType->SetFont(1);
-		ticketType->SetText(_T("成人票"));
+		ticketType->SetText(orderTicketModel.GetTicketTypeName());
 		ticketType->SetAttribute(_T("align"), _T("center"));
 		ticketFeeVLayout->Add(ticketType);
 
@@ -392,7 +406,7 @@ CListContainerElementUI* COrderManagerUI::CreateListContainerEleUI()
 
 		CLabelUI *ticketFee = new CLabelUI();
 		ticketFee->SetFont(1);
-		ticketFee->SetText(_T("86.5元"));
+		ticketFee->SetText(orderTicketModel.GetTicketPrice());
 		ticketFee->SetAttribute(_T("align"), _T("center"));
 		ticketFeeVLayout->Add(ticketFee);
 
@@ -406,7 +420,7 @@ CListContainerElementUI* COrderManagerUI::CreateListContainerEleUI()
 
 		CLabelUI *ticketStatus = new CLabelUI();
 		ticketStatus->SetFont(2);
-		ticketStatus->SetText(_T("已支付"));
+		ticketStatus->SetText(orderTicketModel.GetTicketPayStatus());
 		ticketStatus->SetTextColor(0xFF00AA00);
 		ticketStatus->SetAttribute(_T("align"), _T("center"));
 		pListItem->Add(ticketStatus);

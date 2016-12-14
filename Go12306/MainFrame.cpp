@@ -19,6 +19,7 @@
 
 
 
+
 CMainFrame::CMainFrame()
 :m_bAllTrainType(true),
  m_tWorker(new CTicketWorker(this)),
@@ -54,9 +55,11 @@ void CMainFrame::InitWindow()
 
 	Client12306Manager::Instance()->LoginInit();
 
+	Client12306Manager::Instance()->Query12306StationName();
+
 	m_pOrderManagerUI = new COrderManagerUI(this);
 
-	m_pOrderManagerUI->RefreshOrderListView();
+	
 
 	m_pTicketManagerUI = new CTicketManager(this);
 
@@ -231,8 +234,12 @@ LRESULT CMainFrame::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam,
 		bHandled = TRUE;
 		if ((int)wParam != SUCCESS)
 		{
-			CMsgWnd::MessageBox(GetHWND() ,_T("提示"), Utf8ToUnicode( Client12306Manager::Instance()->GetLastErrInfo()).c_str());
+			CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
 		}
+		else
+			RefreshMyOrderListView();
+
+
 
 		return 0;
 	}
@@ -243,8 +250,9 @@ LRESULT CMainFrame::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam,
 		{
 			CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
 		}
+		else
+			RefreshTicketListView();
 
-		RefreshTicketListView();
 		return 0;
 
 	}
@@ -539,15 +547,23 @@ int CMainFrame::QueryMyOrder()
 	
 	m_pProgressDlg = CProgressDlg::CreateDlg(this->GetHWND());
 
-	std::map<string, COrderModel> mapMyOrder;
 
-	m_tOrderWorker->SetMapOrder(&mapMyOrder);
+	m_tOrderWorker->SetMapOrder(&m_mapMyOrder);
 	m_tOrderWorker->SetQueryParam(begDate, endDate, seqTrainName);
 	m_tpWorker.start(*m_tOrderWorker);
 
 	m_pProgressDlg->ShowModal();
 
 	
+
+	return SUCCESS;
+}
+
+
+int CMainFrame::RefreshMyOrderListView()
+{
+
+	m_pOrderManagerUI->RefreshOrderListView(m_mapMyOrder);
 
 	return SUCCESS;
 }

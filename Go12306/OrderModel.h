@@ -72,6 +72,7 @@ public:
 
 	void Add(COrderTicketModel &otm);
 
+	std::vector<COrderTicketModel>& GetOrderTicket() {return m_vecOrderTicket;}
 private:
 
 	CDuiString m_strOrderNo;   ////sequence_no

@@ -1,6 +1,7 @@
 #pragma once
 #include "SkinManager.h"
 #include "TicketModel.h"
+#include "OrderModel.h"
 #include <set>
 
 #include "Poco/ThreadPool.h"
@@ -83,7 +84,7 @@ private:
 	int QueryMyOrder();
 
 
-	/*@action:
+	/*@action: 刷新余票列表
 	*/
 	int RefreshTicketListView();
 
@@ -93,8 +94,14 @@ private:
 	*/
 	bool IsShowTrain(CDuiString trainNo);
 
-
+	/*@action: 刷新车票类型
+	*/
 	void RefreshAllTrainCHeckBox(bool flag);
+	 
+	/*@action: 刷新我的订单
+	*/
+	int RefreshMyOrderListView();
+
 
 	CButtonUI* m_pCloseBtn;
 	CButtonUI* m_pMaxBtn;
@@ -113,7 +120,7 @@ private:
 	
 		 
 	std::vector<CTicketModel> m_vecTicket;
-
+	std::map<string, COrderModel> m_mapMyOrder;
 
 	////显示车次类型
 	std::set< _TRAIN_TYPE > m_setShowTrainType;
