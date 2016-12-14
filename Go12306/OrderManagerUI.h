@@ -26,6 +26,8 @@ private:
 
 	CListHeaderUI* CreateTicketListHeader();
 
+	CListContainerElementUI* CreateListContainerEleUI();
+
 	CMainFrame *m_mainFrame;
 
 

@@ -15,7 +15,10 @@ using Poco::Runnable;
 
 class COrderManagerUI;
 class CTicketManager;
-class CWorker;
+class CTicketWorker;
+class COrderWorker;
+class CProgressDlg;
+
 class CMainFrame : public WindowImplBase, public CWebBrowserEventHandler, public SkinChangedReceiver
 {
 
@@ -77,6 +80,9 @@ private:
 	int QueryTicket(CDuiString begPlace , CDuiString endPlace, CDuiString travelTime );
 
 
+	int QueryMyOrder();
+
+
 	/*@action:
 	*/
 	int RefreshTicketListView();
@@ -116,25 +122,29 @@ private:
 
 	ThreadPool m_tpWorker;
 
-	CWorker *m_tWorker;
+	CTicketWorker *m_tWorker;
+
+	COrderWorker *m_tOrderWorker;
 
 	COrderManagerUI *m_pOrderManagerUI;
 	CTicketManager *m_pTicketManagerUI;
+
+	CProgressDlg* m_pProgressDlg;
 };
 
 
 #include "ProgressDlg.h"
-class CWorker : public Runnable
+
+////ticket worker
+class CTicketWorker : public Runnable
 {
 public:
-	CWorker();
-	~CWorker();
+	CTicketWorker(CMainFrame *mainFrame);
+	~CTicketWorker();
 
 	void run();
 
-	void SetProgressDlg(CProgressDlg *v) {
-		m_progressDlg = v;
-	}
+	
 
 	void SetVecTicket(std::vector<CTicketModel> *vecTicket)
 	{
@@ -157,7 +167,44 @@ private:
 
 	std::vector<CTicketModel> *m_vecTicket;
 
-	CProgressDlg *m_progressDlg;
+	CMainFrame *m_mainFrame;
 
 	
+};
+
+
+#include "OrderModel.h"
+////myorder worker
+class COrderWorker : public Runnable
+{
+public:
+	COrderWorker(CMainFrame *mainFrame);
+	~COrderWorker();
+
+	void run();
+
+
+	void SetMapOrder(std::map<string, COrderModel>  *mapTicket)
+	{
+		m_mapTicket = mapTicket;
+	}
+
+
+	void SetQueryParam(CDuiString begDate, CDuiString endDate, CDuiString seqTrainName)
+	{
+		m_strBegDate = begDate;
+		m_strEndDate = endDate;
+		m_strSeqTrainName = seqTrainName;
+	}
+
+private:
+	CDuiString  m_strBegDate;
+	CDuiString  m_strEndDate;
+	CDuiString  m_strSeqTrainName;
+
+	std::map<string,COrderModel> *m_mapTicket;
+
+	CMainFrame *m_mainFrame;
+
+
 };

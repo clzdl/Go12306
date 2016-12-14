@@ -35,6 +35,7 @@
 #include "Poco/URI.h"
 
 #include "TicketModel.h"
+#include "OrderModel.h"
 
 using Poco::StreamCopier;
 using Poco::Net::Context;
@@ -105,9 +106,16 @@ public:
 	*/
 	int InitMy12306(std::string &res);
 
+	/*@action: 查询用户订单
+	*/
+	int QueryMyOrder(std::string startDate , std::string endDate , std::string seqTrainName , std::map<string, COrderModel> &mapOrder);
+
+
 
 	std::string GetLastErrInfo() { return m_strLastErrInfo; }
 private:
+
+
 	/*@action: 执行 http 的get请求
 	*/
 	std::string ExecPost(std::string service, std::map<string, string> *param = NULL,std::map<string,string> *header=NULL);
@@ -133,9 +141,34 @@ private:
 	*/
 	int JsonParseTicket(std::string jsonString , std::vector<CTicketModel> &vecTicket);
 
-	/*@
+	/*@action: 
 	*/
 	int AssignJson2TicketObj(JSON::Object::Ptr queryDto, CTicketModel &objTicket);
+
+
+	/*@action: 查询余票前的log请求
+	*/
+	int QueryTicketLog(std::string begPlace, std::string endPlace, std::string travelTime,bool &flag, _TICKET_TYPE ticketType = _ADULT);
+
+	/*@action: 解析 返回的json串
+	*@parameter:
+	*	jsonString:入参，需要解析的json串
+	*	mapOrder:出参，订单信息
+	*@return: 0-success;-1-fail
+	*/
+	int JsonParseOrder(std::string jsonString, std::map<std::string, COrderModel> &mapOrder);
+
+
+	/*@action:
+	*/
+	int AssignJson2OrderObj(JSON::Object::Ptr jOrderDTOData, COrderModel &objOrder);
+
+	/*@action:
+	*/
+	int AssignJson2OrderTicketObj(JSON::Object::Ptr jOrderTicketDTOData, COrderTicketModel &objOrderTicket);
+
+
+
 
 	Client12306Manager();
 

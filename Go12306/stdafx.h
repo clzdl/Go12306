@@ -31,6 +31,13 @@ using namespace DuiLib;
 #define		FAIL		-1
 
 
+///////////
+#define WM_PROGRESS_CLOSE		WM_APP+100
+
+#define WM_ORDER_QUERY			WM_APP+101
+#define WM_TICKET_QUERY			WM_APP+102
+
+
 typedef enum 
 {
 	_GC,			///¸ßÌú

@@ -158,6 +158,7 @@
     <ClInclude Include="MainFrame.h" />
     <ClInclude Include="MsgWnd.h" />
     <ClInclude Include="OrderManagerUI.h" />
+    <ClInclude Include="OrderModel.h" />
     <ClInclude Include="OthFunc.h" />
     <ClInclude Include="ProgressDlg.h" />
     <ClInclude Include="Resource.h" />
@@ -176,6 +177,7 @@
     <ClCompile Include="MainFrame.cpp" />
     <ClCompile Include="MsgWnd.cpp" />
     <ClCompile Include="OrderManagerUI.cpp" />
+    <ClCompile Include="OrderModel.cpp" />
     <ClCompile Include="OthFunc.cpp" />
     <ClCompile Include="ProgressDlg.cpp" />
     <ClCompile Include="stdafx.cpp">

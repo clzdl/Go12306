@@ -72,6 +72,9 @@
     <ClInclude Include="TicketManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="OrderModel.h">
+      <Filter>头文件\model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -109,6 +112,9 @@
     </ClCompile>
     <ClCompile Include="TicketManager.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="OrderModel.cpp">
+      <Filter>源文件\model</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

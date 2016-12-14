@@ -21,7 +21,8 @@
 
 CMainFrame::CMainFrame()
 :m_bAllTrainType(true),
- m_tWorker(new CWorker()),
+ m_tWorker(new CTicketWorker(this)),
+ m_tOrderWorker(new COrderWorker(this)),
  m_pOrderManagerUI(NULL),
  m_pTicketManagerUI(NULL)
 {}
@@ -51,7 +52,7 @@ void CMainFrame::InitWindow()
 	m_pOptOrderManage = static_cast<COptionUI*>(m_pm.FindControl(_T("order_manager")));
 	m_pOptUserManage = static_cast<COptionUI*>(m_pm.FindControl(_T("user_manager")));
 
-	
+	Client12306Manager::Instance()->LoginInit();
 
 	m_pOrderManagerUI = new COrderManagerUI(this);
 
@@ -75,6 +76,7 @@ void CMainFrame::InitWindow()
 		break;
 
 	}
+	
 	
 
 	// 注册托盘图标
@@ -211,6 +213,40 @@ LRESULT CMainFrame::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam,
 			// 动态添加后重新设置菜单的大小
 			m_pMenu->ResizeMenu();
 		}
+	}
+	else if (uMsg == WM_PROGRESS_CLOSE)
+	{
+		bHandled = TRUE;
+		if (m_pProgressDlg)
+		{
+			m_pProgressDlg->Close();
+
+			m_pProgressDlg = NULL;
+		}
+		return 0;
+
+	}
+	else if (uMsg == WM_ORDER_QUERY)
+	{
+		bHandled = TRUE;
+		if ((int)wParam != SUCCESS)
+		{
+			CMsgWnd::MessageBox(GetHWND() ,_T("提示"), Utf8ToUnicode( Client12306Manager::Instance()->GetLastErrInfo()).c_str());
+		}
+
+		return 0;
+	}
+	else if (uMsg == WM_TICKET_QUERY)
+	{
+		bHandled = TRUE; 
+		if ((int)wParam != SUCCESS)
+		{
+			CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
+		}
+
+		RefreshTicketListView();
+		return 0;
+
 	}
 	
 	bHandled = FALSE;
@@ -369,6 +405,11 @@ void CMainFrame::OnLClick(CControlUI *pControl)
 		QueryTicket(_T("") , _T("") ,  _T(""));
 
 	}
+	else if (sName.CompareNoCase(_T("btnOrderQuery")) == 0)
+	{
+		QueryMyOrder();
+
+	}
 	else if (sName.CompareNoCase(_T("menubtn")) == 0)
 	{
 		if (m_pMenu != NULL) {
@@ -386,13 +427,8 @@ void CMainFrame::OnLClick(CControlUI *pControl)
 		// 动态添加后重新设置菜单的大小
 		m_pMenu->ResizeMenu();
 	}
-	else if (sName.CompareNoCase(_T("OrderTicketBtn")) == 0)
-	{
-		CMsgWnd::MessageBox(m_hWnd, _T(""), _T("aaaaa"));
-
-		CMsgWnd::MessageBox(m_hWnd, _T(""), pControl->GetUserData());
 	
-	}
+	
 	
 	
 }
@@ -404,19 +440,17 @@ int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString
 
 	begPlace = _T("SJP");
 	endPlace = _T("BJP");
-	travelTime = _T("2016-12-14");
+	travelTime = _T("2016-12-15");
 
-	CProgressDlg* pProgressDlg = CProgressDlg::CreateDlg(this->GetHWND());
+	m_pProgressDlg = CProgressDlg::CreateDlg(this->GetHWND());
 	
 	
 
 	m_tWorker->SetVecTicket(&m_vecTicket);
-	m_tWorker->SetProgressDlg(pProgressDlg);
 	m_tWorker->SetQueryParam(begPlace, endPlace, travelTime,_ADULT);
 	m_tpWorker.start(*m_tWorker);
-	pProgressDlg->ShowModal();
+	m_pProgressDlg->ShowModal();
 
-	RefreshTicketListView();
 		
 	return 0;
 }
@@ -496,31 +530,92 @@ void CMainFrame::RefreshAllTrainCHeckBox(bool flag)
 		m_setShowTrainType.clear();
 }
 
+int CMainFrame::QueryMyOrder()
+{
+	CDuiString begDate = _T("2016-12-01");
+	CDuiString endDate = _T("2016-12-14");
+	CDuiString seqTrainName = _T("");
 
+	
+	m_pProgressDlg = CProgressDlg::CreateDlg(this->GetHWND());
+
+	std::map<string, COrderModel> mapMyOrder;
+
+	m_tOrderWorker->SetMapOrder(&mapMyOrder);
+	m_tOrderWorker->SetQueryParam(begDate, endDate, seqTrainName);
+	m_tpWorker.start(*m_tOrderWorker);
+
+	m_pProgressDlg->ShowModal();
+
+	
+
+	return SUCCESS;
+}
 
 ///////////////////////
-CWorker::CWorker()
+CTicketWorker::CTicketWorker(CMainFrame *mainFrame)
+	:m_mainFrame(mainFrame)
 {
 
 }
-CWorker::~CWorker()
+CTicketWorker::~CTicketWorker()
 {
 
 }
 
-void CWorker::run()
+void CTicketWorker::run()
 {
 	while (1)
 	{
 		m_vecTicket->clear();
-		Client12306Manager::Instance()->QueryLeftTicket(UnicodeToUtf8(m_strBegPlace.GetData()),
+
+
+		int iRetFlag = Client12306Manager::Instance()->QueryLeftTicket(UnicodeToUtf8(m_strBegPlace.GetData()),
 														UnicodeToUtf8(m_strEndPlace.GetData()),
 														UnicodeToUtf8(m_strTravelTime.GetData()), 
 																		*m_vecTicket, m_ticketType);
 
 
-		m_progressDlg->Close(0);
+		SendMessage(m_mainFrame->GetHWND(), WM_PROGRESS_CLOSE, NULL, NULL);
+		SendMessage(m_mainFrame->GetHWND(), WM_TICKET_QUERY, iRetFlag, NULL);
+
 		break;
 
 	}
 }
+
+
+///////////////////////
+COrderWorker::COrderWorker(CMainFrame *mainFrame)
+	:m_mainFrame(mainFrame)
+{
+
+}
+COrderWorker::~COrderWorker()
+{
+
+}
+
+void COrderWorker::run()
+{
+	while (1)
+	{
+		
+
+		
+		int iRetFlag = Client12306Manager::Instance()->QueryMyOrder(UnicodeToUtf8(m_strBegDate.GetData()),
+			UnicodeToUtf8(m_strEndDate.GetData()),
+			UnicodeToUtf8(m_strSeqTrainName.GetData()) , *m_mapTicket);
+
+
+		SendMessage(m_mainFrame->GetHWND(), WM_PROGRESS_CLOSE, NULL, NULL);
+
+		
+		SendMessage(m_mainFrame->GetHWND(), WM_ORDER_QUERY, iRetFlag, NULL);
+
+		break;
+
+	}
+}
+
+

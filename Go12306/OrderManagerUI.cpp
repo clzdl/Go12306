@@ -16,7 +16,7 @@ int COrderManagerUI::RefreshOrderListView()
 
 
 	{
-		for (int i = 0; i < 2; ++i)
+		for (int i = 0; i < 40; ++i)
 		{
 			CDuiString  btnChkName;
 			btnChkName.Format(_T("ORDER_TICKET_%d"), i);
@@ -25,38 +25,35 @@ int COrderManagerUI::RefreshOrderListView()
 			CListContainerElementUI* pListItem = new CListContainerElementUI();
 			pListItem->SetChildVAlign(DT_VCENTER);
 			pListItem->SetFixedHeight(20);
-			pListItem->SetManager(m_mainFrame->GetPaintManagerUI(), NULL, false);
+		
 
 			m_pOderListView->Add(pListItem);
 
-
-
 			///
 			CVerticalLayoutUI* tmpVLayout = new CVerticalLayoutUI();
-			tmpVLayout->SetAttribute(_T("hscrollbar"), _T("true"));
+
 			tmpVLayout->SetAttribute(_T("bordersize"), _T("1,1,1,1"));
 			tmpVLayout->SetAttribute(_T("bordercolor"), _T("#F"));
 			tmpVLayout->SetAttribute(_T("inset"), _T("2,2,2,2"));
-
 			pListItem->Add(tmpVLayout);
 
 			{
-				
+				////列表头
 				tmpVLayout->Add(CreateDetailListHeader(btnChkName));
 
 				CLabelUI *txtSpeLine = new CLabelUI();
 				txtSpeLine->SetAttribute(_T("height"), _T("2"));
 				txtSpeLine->SetAttribute(_T("bkimage"), _T("common/hor_line.png"));
-
 				tmpVLayout->Add(txtSpeLine);
 
-				
+				////列表块
 				tmpVLayout->Add(CreateTicketList(btnChkName));
 
 			}
 		}
 	}
 
+	//m_pOderListView->SetManager(m_mainFrame->GetPaintManagerUI(), NULL, false);
 	return SUCCESS;
 }
 
@@ -65,7 +62,7 @@ int COrderManagerUI::RefreshOrderDetailList(CListUI *dListUI , bool check)
 	if (check)
 	{
 		dListUI->SetVisible(true);
-		dListUI->GetParent()->GetParent()->SetFixedHeight(100);
+		dListUI->GetParent()->GetParent()->SetFixedHeight(120);
 	}
 	else
 	{
@@ -84,7 +81,6 @@ CHorizontalLayoutUI* COrderManagerUI::CreateDetailListHeader(CDuiString lstTicke
 	tmpHLayout->SetAttribute(_T("height"), _T("20"));
 	tmpHLayout->SetAttribute(_T("bkcolor"), _T("#FFB4EEB4"));
 	tmpHLayout->SetAttribute(_T("inset"), _T("2,2,2,2"));
-
 
 	{
 		///展开按钮
@@ -189,14 +185,25 @@ CListUI* COrderManagerUI::CreateTicketList(CDuiString lstTicketListName)
 	////
 	CListUI *lstTickUI = new CListUI();
 
+	lstTickUI->SetManager(m_mainFrame->GetPaintManagerUI(), NULL, false);
+
 	lstTickUI->SetAttribute(_T("vscrollbar"), _T("true"));
+
 	lstTickUI->SetAttribute(_T("hscrollbar"), _T("true"));
+
 	lstTickUI->SetAttribute(_T("itemvalign"), _T("vcenter"));
 
+	lstTickUI->SetAttribute(_T("itemshowrowline"), _T("true"));
+
+	lstTickUI->SetAttribute(_T("itemlinecolor"), _T("0x00FFFFFF"));
+
+
 	lstTickUI->SetName(lstTicketListName);
+	
 	lstTickUI->SetVisible(false);
 	
 	lstTickUI->Add(CreateTicketListHeader());
+	lstTickUI->Add(CreateListContainerEleUI());
 
 	return lstTickUI;
 }
@@ -210,6 +217,7 @@ CListHeaderUI* COrderManagerUI::CreateTicketListHeader()
 	{
 		CListHeaderItemUI *headerItemUI = new CListHeaderItemUI();
 		headerItemUI->SetText(_T("车次信息"));
+		headerItemUI->SetFont(2);
 		headerItemUI->SetFixedWidth(150);
 		headerItemUI->SetHotImage(_T("res='common/list_header_hot.png'"));
 		headerItemUI->SetPushedImage(_T("res='common/list_header_pushed.png'"));
@@ -220,6 +228,7 @@ CListHeaderUI* COrderManagerUI::CreateTicketListHeader()
 
 
 		headerItemUI = new CListHeaderItemUI();
+		headerItemUI->SetFont(2);
 		headerItemUI->SetText(_T("席位信息"));
 		headerItemUI->SetFixedWidth(150);
 		headerItemUI->SetHotImage(_T("res='common/list_header_hot.png'"));
@@ -230,6 +239,7 @@ CListHeaderUI* COrderManagerUI::CreateTicketListHeader()
 		headUI->Add(headerItemUI);
 
 		headerItemUI = new CListHeaderItemUI();
+		headerItemUI->SetFont(2);
 		headerItemUI->SetText(_T("旅客信息"));
 		headerItemUI->SetFixedWidth(150);
 		headerItemUI->SetHotImage(_T("res='common/list_header_hot.png'"));
@@ -240,6 +250,7 @@ CListHeaderUI* COrderManagerUI::CreateTicketListHeader()
 		headUI->Add(headerItemUI);
 
 		headerItemUI = new CListHeaderItemUI();
+		headerItemUI->SetFont(2);
 		headerItemUI->SetText(_T("票款金额"));
 		headerItemUI->SetFixedWidth(100);
 		headerItemUI->SetHotImage(_T("res='common/list_header_hot.png'"));
@@ -250,6 +261,7 @@ CListHeaderUI* COrderManagerUI::CreateTicketListHeader()
 		headUI->Add(headerItemUI);
 
 		headerItemUI = new CListHeaderItemUI();
+		headerItemUI->SetFont(2);
 		headerItemUI->SetText(_T("车票状态"));
 		headerItemUI->SetFixedWidth(100);
 		headerItemUI->SetHotImage(_T("res='common/list_header_hot.png'"));
@@ -260,6 +272,7 @@ CListHeaderUI* COrderManagerUI::CreateTicketListHeader()
 		headUI->Add(headerItemUI);
 
 		headerItemUI = new CListHeaderItemUI();
+		headerItemUI->SetFont(2);
 		headerItemUI->SetText(_T("操作"));
 		headerItemUI->SetFixedWidth(150);
 		headerItemUI->SetHotImage(_T("res='common/list_header_hot.png'"));
@@ -271,4 +284,177 @@ CListHeaderUI* COrderManagerUI::CreateTicketListHeader()
 	}
 
 	return headUI;
+}
+
+CListContainerElementUI* COrderManagerUI::CreateListContainerEleUI()
+{
+	CListContainerElementUI* pListItem = new CListContainerElementUI();
+	pListItem->SetChildVAlign(DT_VCENTER);
+	pListItem->SetFixedHeight(60);
+
+	{////车次信息
+		CVerticalLayoutUI *trainVLayout = new CVerticalLayoutUI();
+
+		trainVLayout->Add(new CControlUI());
+
+		CLabelUI *trainLeaveTime = new CLabelUI();
+		trainLeaveTime->SetFont(4);
+		trainLeaveTime->SetAttribute(_T("align") , _T("center"));
+		trainLeaveTime->SetText(_T("2016-12-19 05:33开"));
+		
+		trainVLayout->Add(trainLeaveTime);
+
+		trainVLayout->Add(new CControlUI());
+
+		CLabelUI *trainInfo = new CLabelUI();
+		trainInfo->SetFont(4);
+		trainInfo->SetTextColor(0xFF00AA00);
+		trainInfo->SetText(_T("D904 石家庄-北京西"));
+		trainInfo->SetAttribute(_T("align"), _T("center"));
+		trainVLayout->Add(trainInfo);
+
+		trainVLayout->Add(new CControlUI());
+
+		pListItem->Add(trainVLayout);
+	}
+
+	{////席位信息
+		CVerticalLayoutUI *seatVLayout = new CVerticalLayoutUI();
+
+		seatVLayout->Add(new CControlUI());
+
+		CLabelUI *trainRoomInfo = new CLabelUI();
+		trainRoomInfo->SetFont(4);
+		trainRoomInfo->SetText(_T("01车厢"));
+		trainRoomInfo->SetAttribute(_T("align"), _T("center"));
+		seatVLayout->Add(trainRoomInfo);
+
+		seatVLayout->Add(new CControlUI());
+
+		CLabelUI *seatInfo = new CLabelUI();
+		seatInfo->SetFont(4);
+		seatInfo->SetText(_T("02D号"));
+		seatInfo->SetAttribute(_T("align"), _T("center"));
+		seatVLayout->Add(seatInfo);
+
+		seatVLayout->Add(new CControlUI());
+
+		CLabelUI *seatCategory = new CLabelUI();
+		seatCategory->SetFont(1);
+		seatCategory->SetText(_T("二等座"));
+		seatCategory->SetAttribute(_T("align"), _T("center"));
+		seatVLayout->Add(seatCategory);
+
+		seatVLayout->Add(new CControlUI());
+
+		pListItem->Add(seatVLayout);
+	}
+
+
+	{////旅客信息
+		CVerticalLayoutUI *travelPersonVLayout = new CVerticalLayoutUI();
+
+		travelPersonVLayout->Add(new CControlUI());
+
+		CLabelUI *travelPerson = new CLabelUI();
+		travelPerson->SetFont(4);
+		travelPerson->SetText(_T("成亮"));
+		travelPerson->SetTextColor(0xFF00AA00);
+		travelPerson->SetAttribute(_T("align"), _T("center"));
+		travelPersonVLayout->Add(travelPerson);
+
+		travelPersonVLayout->Add(new CControlUI());
+
+		CLabelUI *travelCardType = new CLabelUI();
+		travelCardType->SetFont(1);
+		travelCardType->SetText(_T("二代身份证"));
+
+		travelCardType->SetAttribute(_T("align"), _T("center"));
+		travelPersonVLayout->Add(travelCardType);
+
+		travelPersonVLayout->Add(new CControlUI());
+
+		pListItem->Add(travelPersonVLayout);
+	}
+
+	{////票款金额
+		CVerticalLayoutUI *ticketFeeVLayout = new CVerticalLayoutUI();
+
+		ticketFeeVLayout->Add(new CControlUI());
+
+		CLabelUI *ticketType = new CLabelUI();
+		ticketType->SetFont(1);
+		ticketType->SetText(_T("成人票"));
+		ticketType->SetAttribute(_T("align"), _T("center"));
+		ticketFeeVLayout->Add(ticketType);
+
+		ticketFeeVLayout->Add(new CControlUI());
+
+		CLabelUI *ticketFee = new CLabelUI();
+		ticketFee->SetFont(1);
+		ticketFee->SetText(_T("86.5元"));
+		ticketFee->SetAttribute(_T("align"), _T("center"));
+		ticketFeeVLayout->Add(ticketFee);
+
+		ticketFeeVLayout->Add(new CControlUI());
+
+		pListItem->Add(ticketFeeVLayout);
+	}
+
+	{////车票状态
+		
+
+		CLabelUI *ticketStatus = new CLabelUI();
+		ticketStatus->SetFont(2);
+		ticketStatus->SetText(_T("已支付"));
+		ticketStatus->SetTextColor(0xFF00AA00);
+		ticketStatus->SetAttribute(_T("align"), _T("center"));
+		pListItem->Add(ticketStatus);
+	}
+
+	{////操作
+		CVerticalLayoutUI *operVLayout = new CVerticalLayoutUI();
+
+		///占位
+		operVLayout->Add(new CControlUI());
+
+		////退票
+		CButtonUI *ticketGiveBack = new CButtonUI();
+		ticketGiveBack->SetManager(m_mainFrame->GetPaintManagerUI(), NULL, false);
+
+		ticketGiveBack->SetName(_T("BTN_TICKET_GIVE_BACK"));
+		ticketGiveBack->SetAttribute(_T("style"), _T("btn_style"));
+		ticketGiveBack->SetText(_T("退票"));
+		ticketGiveBack->SetUserData(_T(""));
+		ticketGiveBack->SetFixedHeight(25);
+		operVLayout->Add(ticketGiveBack);
+
+		///占位
+		operVLayout->Add(new CControlUI());
+
+		////改签
+		CButtonUI *ticketChange = new CButtonUI();
+		ticketChange->SetManager(m_mainFrame->GetPaintManagerUI(), NULL, false);
+		
+		ticketGiveBack->SetName(_T("BTN_TICKET_CHANGE"));
+		ticketChange->SetAttribute(_T("style"), _T("btn_style"));
+		ticketChange->SetText(_T("改签"));
+		ticketChange->SetUserData(_T(""));
+		ticketChange->SetFixedHeight(25);
+		operVLayout->Add(ticketChange);
+
+		///占位
+		operVLayout->Add(new CControlUI());
+
+
+
+		pListItem->Add(operVLayout);
+
+		
+
+		
+	}
+
+
+	return pListItem;
 }

@@ -221,14 +221,84 @@ std::string Client12306Manager::ExecGet(std::string service, std::map<string, st
 	
 }
 
+int Client12306Manager::QueryTicketLog(std::string begPlace, std::string endPlace, std::string travelTime, bool &flag, _TICKET_TYPE ticketType)
+{
+	flag = false;
+	try
+	{
+
+		string strService = "/otn/leftTicket/log?";
+
+		///train_date   YYYY-mm-dd
+		strService += "leftTicketDTO.train_date=";
+		strService += travelTime;
+		strService += "&";
+
+		////leftTicketDTO.from_station
+		strService += "leftTicketDTO.from_station=";
+		strService += begPlace;
+		strService += "&";
+
+		////leftTicketDTO.to_station
+		strService += "leftTicketDTO.to_station=";
+		strService += endPlace;
+		strService += "&";
+
+		////purpose_codes
+		strService += "purpose_codes=";
+		switch (ticketType)
+		{
+		case _ADULT:
+		default:
+			strService += "ADULT";
+			break;
+		}
+
+
+		std::string strOrgRes = ExecGet(strService);
+	
+		do
+		{
+			JSON::Parser parser;
+			Dynamic::Var result;
+
+			result = parser.parse(strOrgRes);
+
+			JSON::Object::Ptr pObj = result.extract<JSON::Object::Ptr>();
+
+			Dynamic::Var jStatus = pObj->get("status");
+
+			if (jStatus.toString() != "true" && jStatus.toString() != "TRUE")
+				break;
+
+			flag = true;
+
+		} while (false);
+
+	}
+	catch (Poco::Exception &e)
+	{
+		DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
+		return FAIL;
+	}
+
+	return SUCCESS;
+}
 
 
 int Client12306Manager::QueryLeftTicket(std::string begPlace, std::string endPlace, std::string travelTime , std::vector<CTicketModel> &vecTicket, _TICKET_TYPE ticketType)
 {
+	/*bool bValid = false;
+	QueryTicketLog(begPlace, endPlace, travelTime, bValid, ticketType);
+
+
+	if (!bValid)
+		return FAIL;*/
+
 	try
 	{
 
-		string strService = "/otn/leftTicket/queryX?";
+		string strService = "/otn/leftTicket/queryA?";
 
 		///train_date   YYYY-mm-dd
 		strService += "leftTicketDTO.train_date=";
@@ -848,5 +918,224 @@ int Client12306Manager::InitMy12306(std::string &res)
 		return FAIL;
 	}
 
+	return SUCCESS;
+}
+
+
+int Client12306Manager::QueryMyOrder(std::string startDate, std::string endDate, std::string seqTrainName,std::map<string, COrderModel> &mapOrder)
+{
+	int iRetFlag = SUCCESS;
+	try
+	{
+
+		string strService = "/otn/queryOrder/queryMyOrder";
+
+		std::map<string, string> header;
+		header["Referer"] = "https://kyfw.12306.cn/otn/queryOrder/init";
+
+
+		std::map<string, string> param;
+		/// 1: 订单日期  ， 2： 乘车日期
+		param["queryType"] = "1";
+		param["queryStartDate"] = startDate;
+		param["queryEndDate"] = endDate;
+		param["come_from_flag"] = "my_order";
+		param["pageSize"] = "8888";
+		param["pageIndex"] = "0";
+		param["query_where"] = "G";
+		param["sequeue_train_name"] = seqTrainName;
+		
+		
+
+
+		std::string response = ExecPost(strService, &param, &header);
+		std::string gunRes;
+		Gunzip((Byte*)const_cast<char*>(response.c_str()), response.length(), gunRes);
+
+		DUI__Trace(_T("%s"), Utf8ToUnicode(gunRes).c_str());
+
+		
+		iRetFlag = JsonParseOrder(gunRes, mapOrder);;
+	}
+	catch (Poco::Exception &e)
+	{
+		DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
+		return FAIL;
+	}
+
+	return iRetFlag;
+}
+
+
+int Client12306Manager::JsonParseOrder(std::string jsonString, std::map<std::string, COrderModel> &mapOrder)
+{
+	try
+	{
+		JSON::Parser parser;
+		Dynamic::Var result;
+
+		result = parser.parse(jsonString);
+
+		JSON::Object::Ptr pObj = result.extract<JSON::Object::Ptr>();
+
+		Dynamic::Var jStatus = pObj->get("status");
+
+		if (jStatus.toString() != "true")
+		{
+			DUI__Trace(Utf8ToUnicode(jStatus.toString()).c_str());
+			return FAIL;
+		}
+
+		if (pObj->has("url"))
+		{
+			if (pObj->has("messages"))
+			{
+				Dynamic::Var jMsg = pObj->get("messages");
+				m_strLastErrInfo = jMsg.toString();
+			}
+
+			return FAIL;
+		}
+
+
+		////data object
+		Dynamic::Var pData = pObj->get("data");
+
+		JSON::Object::Ptr jData = pData.extract<JSON::Object::Ptr>();
+
+		////订单个数
+		int cnt = atoi(jData->get("order_total_number").toString().c_str());
+
+		JSON::Array::Ptr jOrderDTODataList = jData->getArray("OrderDTODataList");
+
+
+		for (int i = 0; i < cnt; ++i)
+		{
+
+			Dynamic::Var pOrderDTOData = jOrderDTODataList->get(0);
+
+			DUI__Trace(Utf8ToUnicode(pOrderDTOData.toString()).c_str());
+
+			JSON::Object::Ptr jOrderDTOData = pOrderDTOData.extract<JSON::Object::Ptr>();
+
+			COrderModel objOrder;
+			AssignJson2OrderObj(jOrderDTOData, objOrder);
+
+			
+
+			mapOrder.insert(std::pair<std::string, COrderModel>(UnicodeToUtf8(objOrder.GetOrderNo().GetData()), objOrder));
+
+		}
+	}
+	catch (Exception &e)
+	{
+		m_strLastErrInfo = e.displayText();
+		return FAIL;
+	}
+
+	return SUCCESS;
+}
+
+int Client12306Manager::AssignJson2OrderObj(JSON::Object::Ptr jOrderDTOData, COrderModel &objOrder)
+{
+	try
+	{
+		///订单号
+		objOrder.SetOrderNo(Utf8ToUnicode(jOrderDTOData->get("sequence_no").toString()).c_str() );
+
+		///订单日期
+		objOrder.SetOrderDate(Utf8ToUnicode(jOrderDTOData->get("order_date").toString()).c_str());
+
+		///旅客名称
+		JSON::Array::Ptr jArrayPassengerNames =  jOrderDTOData->getArray("array_passser_name_page");
+
+		objOrder.SetPassengerName(Utf8ToUnicode(jArrayPassengerNames->get(0).toString()).c_str());
+
+		///乘车站
+		objOrder.SetFromStation(Utf8ToUnicode(jOrderDTOData->get("from_station_name_page").toString()).c_str());
+
+		///下车站
+		objOrder.SetToStateion(Utf8ToUnicode(jOrderDTOData->get("to_station_name_page").toString()).c_str());
+
+		///发车时间
+		objOrder.SetTravelDate(Utf8ToUnicode(jOrderDTOData->get("start_train_date_page").toString()).c_str());
+
+		///车次
+		objOrder.SetTrainCode(Utf8ToUnicode(jOrderDTOData->get("train_code_page").toString()).c_str());
+
+
+		///
+		JSON::Array::Ptr jOrderTickets = jOrderDTOData->getArray("tickets");
+		JSON::Array::ConstIterator it = jOrderTickets->begin();
+
+		for (; it != jOrderTickets->end(); ++it)
+		{
+			JSON::Object::Ptr jOrderTicket = it->extract<JSON::Object::Ptr>();
+
+			COrderTicketModel orderTicketModel(&objOrder);
+			if (SUCCESS != AssignJson2OrderTicketObj(jOrderTicket, orderTicketModel))
+				return FAIL;
+
+			objOrder.Add(orderTicketModel);
+
+		}
+
+
+	}
+	catch (Exception &e)
+	{
+		m_strLastErrInfo = e.displayText();
+		return FAIL;
+	}
+	
+	return SUCCESS;
+}
+
+
+int Client12306Manager::AssignJson2OrderTicketObj(JSON::Object::Ptr jOrderTicketDTOData, COrderTicketModel &objOrderTicket)
+{
+	try
+	{
+	
+		///票号
+		objOrderTicket.SetTicketNo(Utf8ToUnicode(jOrderTicketDTOData->get("ticket_no").toString()).c_str());
+
+		///车厢
+		objOrderTicket.SetCoachName(Utf8ToUnicode(jOrderTicketDTOData->get("coach_name").toString()).c_str());
+
+		///座位
+		objOrderTicket.SetSeatName(Utf8ToUnicode(jOrderTicketDTOData->get("seat_name").toString()).c_str());
+
+		///座位类型
+		objOrderTicket.SetSeatTypeName(Utf8ToUnicode(jOrderTicketDTOData->get("seat_type_name").toString()).c_str());
+
+		///票类型
+		objOrderTicket.SetTicketTypeName(Utf8ToUnicode(jOrderTicketDTOData->get("ticket_type_name").toString()).c_str());
+
+		///票价格
+		objOrderTicket.SetTicketTypeName(Utf8ToUnicode(jOrderTicketDTOData->get("str_ticket_price_page").toString()).c_str());
+
+
+		///付款状态
+		objOrderTicket.SetTicketPayStatus(Utf8ToUnicode(jOrderTicketDTOData->get("ticket_status_name").toString()).c_str());
+
+
+		////passengerDTO
+		Dynamic::Var pPassengerDto = jOrderTicketDTOData->get("passengerDTO");
+
+		JSON::Object::Ptr jPassengerDto = pPassengerDto.extract<JSON::Object::Ptr>();
+
+
+		////乘车人
+		objOrderTicket.SetPassengerPersonName(Utf8ToUnicode(jPassengerDto->get("passenger_name").toString()).c_str());
+
+		////乘车证件
+		objOrderTicket.SetPassengerIDTypeName(Utf8ToUnicode(jPassengerDto->get("passenger_id_type_name").toString()).c_str());
+	}
+	catch (Exception &e)
+	{
+		m_strLastErrInfo = e.displayText();
+		return FAIL;
+	}
 	return SUCCESS;
 }
