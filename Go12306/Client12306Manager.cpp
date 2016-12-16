@@ -1144,6 +1144,18 @@ int Client12306Manager::AssignJson2OrderTicketObj(JSON::Object::Ptr jOrderTicket
 }
 
 
+static bool CmpStationBySN(const CStation *s1, const CStation *s2) 
+{
+	int len = min(s1->GetShortName().length(), s2->GetShortName().length());
+	return s1->GetShortName().compare(0, len, s2->GetShortName()) < 0;
+}
+
+static bool CmpStationByPY(const CStation *s1, const CStation *s2) 
+{
+	int len = min(s1->GetPinYinName().length(), s2->GetPinYinName().length());
+	return s1->GetPinYinName().compare(0, len, s2->GetPinYinName()) < 0 ;
+}
+
 int Client12306Manager::Query12306StationName()
 {
 	int iRetFlag = SUCCESS;
@@ -1157,12 +1169,34 @@ int Client12306Manager::Query12306StationName()
 
 		ParseStationString(response);
 
-		for (std::map<std::string, CStation>::iterator it = m_mapStation.begin(); it != m_mapStation.end(); ++it)
+		/*for (std::map<std::string, CStation>::iterator it = m_mapStation.begin(); it != m_mapStation.end(); ++it)
 		{
 			DUI__Trace(_T("%s,%s,%s,%s"), Utf8ToUnicode(it->second.GetStationCode()).c_str(),
 											Utf8ToUnicode(it->second.GetShortName()).c_str(),
 											Utf8ToUnicode(it->second.GetPinYinName()).c_str(),
 											Utf8ToUnicode(it->second.GetChinaName()).c_str());
+		}*/
+
+
+		///
+		std::sort(m_vecStationBySNSort.begin(), m_vecStationBySNSort.end(), CmpStationBySN);
+		std::sort(m_vecStationByPYSort.begin(), m_vecStationByPYSort.end(), CmpStationByPY);
+
+		/*for (std::vector<CStation*>::iterator it = m_vecStationBySNSort.begin(); it != m_vecStationBySNSort.end(); ++it)
+		{
+			DUI__Trace(_T("%s,%s,%s,%s"), Utf8ToUnicode((*it)->GetStationCode()).c_str(),
+				Utf8ToUnicode((*it)->GetShortName()).c_str(),
+				Utf8ToUnicode((*it)->GetPinYinName()).c_str(),
+				Utf8ToUnicode((*it)->GetChinaName()).c_str());
+		}*/
+
+
+		for (std::vector<CStation*>::iterator it = m_vecStationByPYSort.begin(); it != m_vecStationByPYSort.end(); ++it)
+		{
+			DUI__Trace(_T("%s,%s,%s,%s"), Utf8ToUnicode((*it)->GetStationCode()).c_str(),
+				Utf8ToUnicode((*it)->GetShortName()).c_str(),
+				Utf8ToUnicode((*it)->GetPinYinName()).c_str(),
+				Utf8ToUnicode((*it)->GetChinaName()).c_str());
 		}
 
 	}
@@ -1205,7 +1239,12 @@ int Client12306Manager::ParseStationString(std::string res)
 		iEnd = info.find("|", iBeg);
 		station.SetPinYinName(info.substr(iBeg,iEnd - iBeg));
 
-		m_mapStation.insert(std::pair<std::string, CStation>(station.GetStationCode(), station));
+		std::pair<std::map<std::string, CStation>::iterator, bool> retPair;
+		retPair = m_mapStation.insert(std::pair<std::string, CStation>(station.GetStationCode(), station));
+
+		m_vecStationBySNSort.push_back(&(retPair.first->second));
+
+		m_vecStationByPYSort.push_back(&(retPair.first->second));
 
 		begPos = endPos + 1;
 	}
@@ -1233,7 +1272,13 @@ int Client12306Manager::ParseStationString(std::string res)
 	iEnd = info.find("|", iBeg);
 	station.SetPinYinName(info.substr(iBeg,iEnd - iBeg ));
 
-	m_mapStation.insert(std::pair<std::string, CStation>(station.GetStationCode(), station));
+	std::pair<std::map<std::string, CStation>::iterator, bool> retPair;
+	retPair = m_mapStation.insert(std::pair<std::string, CStation>(station.GetStationCode(), station));
+
+	m_vecStationBySNSort.push_back(&(retPair.first->second));
+
+	m_vecStationByPYSort.push_back(&(retPair.first->second));
+	
 
 	return SUCCESS;
 }

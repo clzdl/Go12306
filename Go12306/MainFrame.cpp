@@ -53,19 +53,25 @@ void CMainFrame::InitWindow()
 	m_pOptOrderManage = static_cast<COptionUI*>(m_pm.FindControl(_T("order_manager")));
 	m_pOptUserManage = static_cast<COptionUI*>(m_pm.FindControl(_T("user_manager")));
 
+	m_pBegPlaceCombo = static_cast<CComboUI*>(m_pm.FindControl(_T("begPlace")));
+
+	
+	CListLabelElementUI *b = new CListLabelElementUI();
+	b->SetText(_T("AAAAAA"));
+	m_pBegPlaceCombo->Add(b);
+	////
+
 	Client12306Manager::Instance()->LoginInit();
 
 	Client12306Manager::Instance()->Query12306StationName();
 
 	m_pOrderManagerUI = new COrderManagerUI(this);
 
-	
-
 	m_pTicketManagerUI = new CTicketManager(this);
 
 	RefreshAllTrainCHeckBox(m_bAllTrainType);
 
-	CLoginWnd* pLogin = new CLoginWnd();
+	/*CLoginWnd* pLogin = new CLoginWnd();
 	pLogin->Create(NULL, _T("LoginWnd"), WS_POPUP | WS_CLIPCHILDREN, WS_EX_TOOLWINDOW);
 	pLogin->CenterWindow();
 
@@ -79,7 +85,7 @@ void CMainFrame::InitWindow()
 		break;
 
 	}
-	
+	*/
 	
 
 	// ×¢²áÍÐÅÌÍ¼±ê
@@ -399,6 +405,7 @@ void CMainFrame::Notify(TNotifyUI& msg)
 		
 		
 	}
+	
 
 }
 

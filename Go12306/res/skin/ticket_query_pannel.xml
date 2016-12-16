@@ -2,12 +2,12 @@
 <Window >
 	
 
-	<HorizontalLayout height="30" childpadding="4" bordersize="1,1,1,1" bordercolor="#F" >
+	<HorizontalLayout name ="aaaaa" height="30" childpadding="4" bordersize="1,1,1,1" bordercolor="#F" >
 		<Label text="始发地" textcolor="#FF000000" glowsize="0" font="font13" width="40"/>
-		<Edit name="begPlace" tipvalue="始发地" style="edit_style" />
+    <EditCombo name="begPlace" tipvalue="始发地" style="edit_style" />
 
 		<Label text="目的地" textcolor="#FF000000" glowsize="0" font="font13" width="40"/>
-		<Edit name="endPlace" tipvalue="目的地" style="edit_style" />
+    <Combo name="endPlace" tipvalue="目的地" style="edit_style" />
 
 		<Label text="出发日" textcolor="#FF000000" glowsize="0" font="font13" width="40"/>
 		<DateTime width="120" bordersize="1" bordercolor="#FF888888" textpadding="3"/>

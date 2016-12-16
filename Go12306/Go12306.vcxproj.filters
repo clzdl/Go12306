@@ -19,6 +19,12 @@
     <Filter Include="源文件\model">
       <UniqueIdentifier>{ad8bb4e5-f87f-46c0-bcdd-ec7272d9d581}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\control">
+      <UniqueIdentifier>{4c34e34f-42a6-492f-ba1c-0d206b2cf502}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\control">
+      <UniqueIdentifier>{1ab3b949-1f43-4499-84c2-05a411bde374}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -63,9 +69,6 @@
     <ClInclude Include="Login.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Code12306Cert.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="OrderManagerUI.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -74,6 +77,12 @@
     </ClInclude>
     <ClInclude Include="OrderModel.h">
       <Filter>头文件\model</Filter>
+    </ClInclude>
+    <ClInclude Include="Code12306Cert.h">
+      <Filter>头文件\control</Filter>
+    </ClInclude>
+    <ClInclude Include="EditCombo.h">
+      <Filter>头文件\control</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -104,9 +113,6 @@
     <ClCompile Include="Login.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Code12306Cert.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="OrderManagerUI.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -115,6 +121,12 @@
     </ClCompile>
     <ClCompile Include="OrderModel.cpp">
       <Filter>源文件\model</Filter>
+    </ClCompile>
+    <ClCompile Include="Code12306Cert.cpp">
+      <Filter>源文件\control</Filter>
+    </ClCompile>
+    <ClCompile Include="EdtiCombo.cpp">
+      <Filter>源文件\control</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -135,6 +147,12 @@
   </ItemGroup>
   <ItemGroup>
     <Xml Include="res\skin\main.xml">
+      <Filter>资源文件</Filter>
+    </Xml>
+    <Xml Include="res\skin\order_manager_pannel.xml">
+      <Filter>资源文件</Filter>
+    </Xml>
+    <Xml Include="res\skin\ticket_query_pannel.xml">
       <Filter>资源文件</Filter>
     </Xml>
   </ItemGroup>

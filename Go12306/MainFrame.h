@@ -20,7 +20,7 @@ class CTicketWorker;
 class COrderWorker;
 class CProgressDlg;
 
-class CMainFrame : public WindowImplBase, public CWebBrowserEventHandler, public SkinChangedReceiver
+class CMainFrame : public WindowImplBase, public SkinChangedReceiver
 {
 
 public:
@@ -116,6 +116,11 @@ private:
 	COptionUI *m_pOptTicketQuery;
 	COptionUI *m_pOptOrderManage;
 	COptionUI *m_pOptUserManage;
+
+
+	CComboUI *m_pBegPlaceCombo;
+	CComboUI *m_pEndPlaceCombo;
+
 
 	
 		 

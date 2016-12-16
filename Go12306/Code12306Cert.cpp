@@ -2,7 +2,6 @@
 
 #include "stdafx.h"
 #include "Code12306Cert.h"
-#include <fstream>
 #include "Client12306Manager.h"
 #include "OthFunc.h"
 #include "ximage.h"

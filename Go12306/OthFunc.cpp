@@ -5,6 +5,7 @@
 
 
 #include "Code12306Cert.h"
+#include "EditCombo.h"
 
 
 std::wstring Utf8ToUnicode(const std::string &str)
@@ -187,6 +188,7 @@ void InitResource()
 
 	// ×¢²á¿Ø¼þ
 	REGIST_DUICONTROL(CCode12306CertUI);
+	REGIST_DUICONTROL(CEditComboUI);
 }
 
 

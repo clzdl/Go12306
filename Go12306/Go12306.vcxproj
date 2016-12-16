@@ -152,6 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code12306Cert.h" />
+    <ClInclude Include="EditCombo.h" />
     <ClInclude Include="Go12306.h" />
     <ClInclude Include="Client12306Manager.h" />
     <ClInclude Include="Login.h" />
@@ -171,6 +172,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code12306Cert.cpp" />
+    <ClCompile Include="EdtiCombo.cpp" />
     <ClCompile Include="Go12306.cpp" />
     <ClCompile Include="Client12306Manager.cpp" />
     <ClCompile Include="Login.cpp" />
@@ -203,6 +205,8 @@
     <Xml Include="res\skin\main.xml">
       <SubType>Designer</SubType>
     </Xml>
+    <Xml Include="res\skin\order_manager_pannel.xml" />
+    <Xml Include="res\skin\ticket_query_pannel.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

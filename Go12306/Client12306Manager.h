@@ -68,10 +68,10 @@ public:
 	void SetPinYinName(std::string v) { m_strPinYinName = v; }
 	void SetStationCode(std::string v) { m_strStationCode = v; }
 
-	std::string GetShortName() { return  m_strShortName ; }
-	std::string GetChinaName() { return m_strChinaName; }
-	std::string GetPinYinName() { return m_strPinYinName; }
-	std::string GetStationCode() { return m_strStationCode; }
+	std::string GetShortName() const { return  m_strShortName ; }
+	std::string GetChinaName() const{ return m_strChinaName; }
+	std::string GetPinYinName() const { return m_strPinYinName; }
+	std::string GetStationCode() const { return m_strStationCode; }
 
 private:
 	std::string m_strShortName;   ///Æ´ÒôËõÐ´
@@ -223,5 +223,12 @@ private:
 
 	///Õ¾µã»º´æ
 	std::map<std::string, CStation> m_mapStation;
+
+	///¸ù¾ÝÃû³Æ¼òÐ´ÅÅÐò
+	std::vector<CStation*> m_vecStationBySNSort;
+
+
+	///¸ù¾ÝÆ´ÒôÈ«Æ´ÅÅÐò
+	std::vector<CStation*> m_vecStationByPYSort;
 
 };
