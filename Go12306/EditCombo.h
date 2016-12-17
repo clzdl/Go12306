@@ -47,6 +47,7 @@ namespace DuiLib
 		CDuiString GetDropBoxAttributeList();
 		bool GetScrollSelect();
 		LPCTSTR GetTipValue();
+		CDuiString GetText() const;
 
 		/////
 		UINT GetListType();
@@ -66,7 +67,7 @@ namespace DuiLib
 		bool RemoveAt(int iIndex);
 		void RemoveAll();
 
-		bool Activate();
+		bool ActivateCoboBox();
 
 		////
 		void DoPaint(HDC hDC, const RECT& rcPaint);
@@ -139,7 +140,7 @@ namespace DuiLib
 		DWORD m_dwTipValueColor;
 
 
-		/////////
+		///////// ÏÂÀ­¿ò
 		CComboWnd* m_pComboWindow;
 
 		int m_iCurSel;

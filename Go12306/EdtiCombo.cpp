@@ -8,9 +8,10 @@ namespace DuiLib
 	{
 	public:
 		void Init(CEditComboUI* pOwner);
-		void InValidate();
 
 		RECT CalcRect();
+
+		void Refresh();
 
 
 		LPCTSTR GetWindowClassName() const;
@@ -110,11 +111,14 @@ namespace DuiLib
 		m_rcPaint = CalcRect();
 
 		Create(pOwner->m_pManager->GetPaintWindow(), NULL, WS_POPUP, WS_EX_TOOLWINDOW, m_rcPaint);
+		
 
 		// HACK: Don't deselect the parent's caption
 		HWND hWndParent = m_hWnd;
 		while (::GetParent(hWndParent) != NULL) hWndParent = ::GetParent(hWndParent);
-		::ShowWindow(m_hWnd, SW_SHOW);
+		
+		//::ShowWindow(m_hWnd, SW_SHOW);
+		::ShowWindow(m_hWnd, SW_SHOWNOACTIVATE);
 		::SendMessage(hWndParent, WM_NCACTIVATE, TRUE, 0L);
 	}
 
@@ -132,6 +136,7 @@ namespace DuiLib
 		m_pOwner->m_uButtonState &= ~UISTATE_PUSHED;
 		m_pOwner->Invalidate();
 		delete this;
+		//::DestroyWindow(m_hWnd);
 	}
 
 	bool CComboWnd::IsHitItem(POINT ptMouse)
@@ -153,29 +158,20 @@ namespace DuiLib
 		return false;
 	}
 
-	void CComboWnd::InValidate()
+	void CComboWnd::Refresh()
 	{
-
-		//m_pLayout->RemoveAll();
+		m_pLayout->RemoveAll();
 		for (int i = 0; i < m_pOwner->GetCount(); i++) {
 			m_pLayout->Add(static_cast<CControlUI*>(m_pOwner->GetItemAt(i)));
 		}
-		
-		
 
 		RECT rect = CalcRect();
 
-		m_pLayout->NeedUpdate();
+		::SetWindowPos(m_hWnd , NULL , rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, SWP_NOACTIVATE);
 
-	/*	»áÊ¹ editWnd¶ªÊ§½¹µã
-		::SetWindowPos(m_hWnd, NULL, rect.left, rect.top, 
-						rect.right - rect.left, rect.bottom - rect.top, 
-						SWP_NOZORDER| SWP_NOMOVE); */
 
-		::MoveWindow(m_hWnd, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, true);
-		HWND hWndParent = m_hWnd;
-		while (::GetParent(hWndParent) != NULL) hWndParent = ::GetParent(hWndParent);
-		::SendMessage(hWndParent, WM_NCACTIVATE, TRUE, 0L);
+
+		m_pm.Invalidate();
 	}
 
 	LRESULT CComboWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -187,6 +183,7 @@ namespace DuiLib
 			// reassigned by this operation - which is why it is important to reassign
 			// the items back to the righfull owner/manager when the window closes.
 			m_pLayout = new CVerticalLayoutUI;
+			m_pLayout->SetName(_T("ComboVerticalLayout"));
 			m_pLayout->SetManager(&m_pm, NULL, true);
 			LPCTSTR pDefaultAttributes = m_pOwner->m_pManager->GetDefaultAttributeList(_T("VerticalLayout"));
 			if (pDefaultAttributes) {
@@ -212,22 +209,42 @@ namespace DuiLib
 			RECT rcNull = { 0 };
 			for (int i = 0; i < m_pOwner->GetCount(); i++) 
 				static_cast<CControlUI*>(m_pOwner->GetItemAt(i))->SetPos(rcNull);
+
 			//m_pOwner->SetFocus();
+
+			
+			
 		}
 		else if (uMsg == WM_LBUTTONDOWN) {
 			POINT pt = { 0 };
 			::GetCursorPos(&pt);
 			::ScreenToClient(m_pm.GetPaintWindow(), &pt);
 			m_bHitItem = IsHitItem(pt);
+
+			DUI__Trace(_T("CComboWnd::WM_LBUTTONDOWN"));
+
 		}
 		else if (uMsg == WM_LBUTTONUP) {
 			POINT pt = { 0 };
 			::GetCursorPos(&pt);
 			::ScreenToClient(m_pm.GetPaintWindow(), &pt);
 			if (m_bHitItem && IsHitItem(pt)) {
-				PostMessage(WM_KILLFOCUS);
+				//PostMessage(WM_KILLFOCUS);
+				PostMessage(WM_CLOSE);
+				
 			}
+			DUI__Trace(_T("CComboWnd::WM_LBUTTONUP"));
 			m_bHitItem = false;
+		}
+		else if (uMsg == WM_MOUSELEAVE)
+		{
+			DUI__Trace(_T("CComboWnd::WM_MOUSELEAVE"));
+			
+		}
+		else if (uMsg == WM_MOUSEHOVER)
+		{
+			DUI__Trace(_T("CComboWnd::WM_MOUSEHOVER"));
+			
 		}
 		else if (uMsg == WM_KEYDOWN) {
 			switch (wParam) {
@@ -261,6 +278,7 @@ namespace DuiLib
 			}
 			else {
 				m_pLayout->DoEvent(event);
+				
 				return 0;
 			}
 		
@@ -268,6 +286,7 @@ namespace DuiLib
 		else if (uMsg == WM_PAINT)
 		{
 			DUI__Trace(_T("CComboWnd::WM_PAINT"));
+			m_pLayout->NeedParentUpdate();
 
 		}
 		/*else if (uMsg == WM_KILLFOCUS) {
@@ -534,7 +553,7 @@ namespace DuiLib
 	{
 		LRESULT lRes = ::DefWindowProc(m_hWnd, uMsg, wParam, lParam);
 		
-		m_pOwner->BoxClose();
+		//m_pOwner->m_pComboWindow->ShowWindow(true);
 		
 		PostMessage(WM_CLOSE);
 		
@@ -558,8 +577,7 @@ namespace DuiLib
 
 
 		m_pOwner->EditTextChg();
-		
-		SetFocus(m_hWnd);
+
 
 		DUI__Trace(_T("CEditWnd::OnEditChanged"));
 		return 0;
@@ -658,21 +676,21 @@ namespace DuiLib
 		}
 		if (event.Type == UIEVENT_SETFOCUS && IsEnabled())
 		{
-			DUI__Trace(_T("event.Type = UIEVENT_SETFOCUS"));
-			Activate();
-			if (m_pWindow) return;
-			m_pWindow = new CEditWnd();
-			ASSERT(m_pWindow);
-			m_pWindow->Init(this);
-			
-			Invalidate();
+			DUI__Trace(_T("CEditComboUI::UIEVENT_SETFOCUS"));
+			//
+			//if (m_pWindow) return;
+			//m_pWindow = new CEditWnd();
+			//ASSERT(m_pWindow);
+			//m_pWindow->Init(this);
+			//
+			////Invalidate();
 
 			
 		}
 		if (event.Type == UIEVENT_KILLFOCUS && IsEnabled())
 		{
-			DUI__Trace(_T("event.Type = UIEVENT_KILLFOCUS"));
-			Invalidate();
+			DUI__Trace(_T("CEditComboUI::UIEVENT_KILLFOCUS"));
+			//Invalidate();
 		}
 		if (event.Type == UIEVENT_BUTTONDOWN || event.Type == UIEVENT_DBLCLICK || event.Type == UIEVENT_RBUTTONDOWN)
 		{
@@ -709,6 +727,8 @@ namespace DuiLib
 #endif
 				}
 			}
+
+			ActivateCoboBox();
 
 			
 			return;
@@ -995,12 +1015,15 @@ namespace DuiLib
 		CContainerUI::RemoveAll();
 	}
 
-	bool CEditComboUI::Activate()
+	bool CEditComboUI::ActivateCoboBox()
 	{
 		if (!CControlUI::Activate()) return false;
 		if (m_pComboWindow)
 		{
-			::ShowWindow(m_pComboWindow->GetHWND(), SW_SHOW);
+			m_pComboWindow->Refresh();
+			m_pComboWindow->ShowWindow(true);
+			
+
 			return true;
 		}
 
@@ -1008,13 +1031,15 @@ namespace DuiLib
 		ASSERT(m_pComboWindow);
 		m_pComboWindow->Init(this);
 		if (m_pManager != NULL) m_pManager->SendNotify(this, DUI_MSGTYPE_DROPDOWN);
-
+		Invalidate();
 		return true;
 	}
 
 	void CEditComboUI::DoPaint(HDC hDC, const RECT& rcPaint)
 	{
+		DUI__Trace(_T("CEditComboUI::DoPaint"));
 		CControlUI::DoPaint(hDC, rcPaint);
+
 	}
 
 	void CEditComboUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
@@ -1417,6 +1442,12 @@ namespace DuiLib
 		return CControlUI::EstimateSize(szAvailable);
 	}
 
+	CDuiString CEditComboUI::GetText() const
+	{
+		if (m_iCurSel < 0) return _T("");
+		CControlUI* pControl = static_cast<CControlUI*>(m_items[m_iCurSel]);
+		return pControl->GetText();
+	}
 
 	void CEditComboUI::PaintText(HDC hDC)
 	{
@@ -1533,13 +1564,13 @@ namespace DuiLib
 	{
 
 		CListLabelElementUI *b = new CListLabelElementUI();
-		b->SetText(_T("AAAAAbbb"));
+		b->SetName(_T("testsetset"));
+		b->SetText(_T("AAb"));
 	
 		
 		Add(b);
 
-		m_pComboWindow->InValidate();
-
+		ActivateCoboBox();
 
 		
 	}

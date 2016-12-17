@@ -262,6 +262,10 @@ LRESULT CMainFrame::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam,
 		return 0;
 
 	}
+	else if (uMsg == WM_PAINT)
+	{
+		DUI__Trace(_T("CMainFrame::WM_PAINT"));
+	}
 	
 	bHandled = FALSE;
 	return 0;
@@ -405,6 +409,7 @@ void CMainFrame::Notify(TNotifyUI& msg)
 		
 		
 	}
+
 	
 
 }
