@@ -327,6 +327,13 @@ int Client12306Manager::QueryLeftTicket(std::string begPlace, std::string endPla
 		
 
 		std::string strOrgRes = ExecGet(strService);
+
+		if (strOrgRes.empty())
+		{
+			m_strLastErrInfo = Gbk2Utf8("12306返回失败.");
+			return FAIL;
+		}
+
 		std::string strGunString;
 		Gunzip((byte*)const_cast<char*>(strOrgRes.c_str()), strOrgRes.length() , strGunString);
 
@@ -361,9 +368,17 @@ int Client12306Manager::JsonParseTicket(std::string jsonString, std::vector<CTic
 		return FAIL;
 	}
 
+
+
 	////array
 	JSON::Array::Ptr pArry = pObj->getArray("data");
 
+
+	if (0 > pArry->size())
+	{
+		m_strLastErrInfo = Gbk2Utf8("无余票信息");
+		return FAIL;
+	}
 
 	JSON::Array::ConstIterator it = pArry->begin();
 	//把数组里的所有内容打印出来

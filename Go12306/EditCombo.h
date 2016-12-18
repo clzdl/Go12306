@@ -48,6 +48,7 @@ namespace DuiLib
 		bool GetScrollSelect();
 		LPCTSTR GetTipValue();
 		CDuiString GetText() const;
+		LPCTSTR  GetUserData() const;
 
 		/////
 		UINT GetListType();

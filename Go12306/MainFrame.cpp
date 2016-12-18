@@ -7,7 +7,7 @@
 #include "OthFunc.h"
 
 
-#include "Client12306Manager.h"
+
 #include "ProgressDlg.h"
 #include "TicketModel.h"
 #include "Login.h"
@@ -55,30 +55,22 @@ void CMainFrame::InitWindow()
 	m_pOptUserManage = static_cast<COptionUI*>(m_pm.FindControl(_T("user_manager")));
 
 	m_pBegPlaceCombo = static_cast<CEditComboUI*>(m_pm.FindControl(_T("begPlace")));
-
+	m_pEndPlaceCombo = static_cast<CEditComboUI*>(m_pm.FindControl(_T("endPlace")));
+	m_pTicketLeaveTimeUI = static_cast<CDateTimeUI*>(m_pm.FindControl(_T("ticketLeaveTime")));
 	
-	CListLabelElementUI *b = new CListLabelElementUI();
-	b->SetText(_T("AAAAAA"));
-	m_pBegPlaceCombo->Add(b);
-
-	b = new CListLabelElementUI();
-	b->SetText(_T("AABCAA"));
-	m_pBegPlaceCombo->Add(b);
-
-
-	b = new CListLabelElementUI();
-	b->SetText(_T("ABAAAA"));
-	m_pBegPlaceCombo->Add(b);
-
-	b = new CListLabelElementUI();
-	b->SetText(_T("ACAAAA"));
-	m_pBegPlaceCombo->Add(b);
+	
 
 	////
 
 	Client12306Manager::Instance()->LoginInit();
 
 	Client12306Manager::Instance()->Query12306StationName();
+
+
+	StationComboRefresh(m_pBegPlaceCombo, Client12306Manager::Instance()->Get12306Station());
+
+	StationComboRefresh(m_pEndPlaceCombo, Client12306Manager::Instance()->Get12306Station());
+
 
 	m_pOrderManagerUI = new COrderManagerUI(this);
 
@@ -438,23 +430,25 @@ void CMainFrame::Notify(TNotifyUI& msg)
 			std::string sFind(UnicodeToUtf8(m_pBegPlaceCombo->GetText().GetData()).c_str());
 			std::vector<CStation*> vecStation = Client12306Manager::Instance()->GetStation(sFind);
 			
+			StationComboRefresh(m_pBegPlaceCombo, vecStation);
 
-			for (std::vector<CStation*>::iterator it = vecStation.begin(); it != vecStation.end(); ++it)
-			{
-
-				CListLabelElementUI *b = new CListLabelElementUI();
-				b->SetText(Utf8ToUnicode((*it)->GetChinaName()).c_str());
-				m_pBegPlaceCombo->Add(b);
-
-			}
-
-			m_pBegPlaceCombo->Refresh();
+			
 
 		}
 		else if (msg.pSender == m_pEndPlaceCombo)
 		{
 
 
+			DUI__Trace(_T("textchanged  %s "), m_pEndPlaceCombo->GetText().GetData());
+
+			m_pEndPlaceCombo->RemoveAll();
+
+
+
+			std::string sFind(UnicodeToUtf8(m_pEndPlaceCombo->GetText().GetData()).c_str());
+			std::vector<CStation*> vecStation = Client12306Manager::Instance()->GetStation(sFind);
+
+			StationComboRefresh(m_pEndPlaceCombo, vecStation);
 		}
 
 
@@ -471,8 +465,10 @@ void CMainFrame::OnLClick(CControlUI *pControl)
 	if (sName.CompareNoCase(_T("btnTicketQuery")) == 0)
 	{
 
-		//CMsgWnd::MessageBox(m_hWnd,  _T(""), _T("aaaaa"));
-		QueryTicket(_T("") , _T("") ,  _T(""));
+		CDuiString begPlace =  m_pBegPlaceCombo->GetUserData();
+		CDuiString endPlace = m_pEndPlaceCombo->GetUserData();
+		CDuiString leaveTime =  m_pTicketLeaveTimeUI->GetText();
+		QueryTicket(begPlace, endPlace, leaveTime);
 
 	}
 	else if (sName.CompareNoCase(_T("btnOrderQuery")) == 0)
@@ -508,9 +504,6 @@ int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString
 {
 
 
-	begPlace = _T("SJP");
-	endPlace = _T("BJP");
-	travelTime = _T("2016-12-15");
 
 	m_pProgressDlg = CProgressDlg::CreateDlg(this->GetHWND());
 	
@@ -630,6 +623,25 @@ int CMainFrame::RefreshMyOrderListView()
 	return SUCCESS;
 }
 
+int CMainFrame::StationComboRefresh(CEditComboUI *pEditComboUI, std::vector<CStation*> &vec)
+{
+	for (std::vector<CStation*>::iterator it = vec.begin(); it != vec.end(); ++it)
+	{
+
+		CListLabelElementUI *b = new CListLabelElementUI();
+		b->SetText(Utf8ToUnicode((*it)->GetChinaName()).c_str());
+		b->SetUserData(Utf8ToUnicode((*it)->GetStationCode()).c_str());
+		pEditComboUI->Add(b);
+
+	}
+
+	pEditComboUI->Refresh();
+
+	pEditComboUI->ActivateCoboBox();
+	
+	return SUCCESS;
+}
+
 ///////////////////////
 CTicketWorker::CTicketWorker(CMainFrame *mainFrame)
 	:m_mainFrame(mainFrame)
@@ -694,6 +706,10 @@ void COrderWorker::run()
 		break;
 
 	}
+
+
 }
+
+
 
 

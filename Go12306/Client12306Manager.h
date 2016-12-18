@@ -145,6 +145,10 @@ public:
 	/*@action: 获取符合条件的站点数据
 	*/
 	std::vector<CStation*> GetStation(std::string vPrefix);
+
+	/*@action: 
+	*/
+	std::vector<CStation*>& Get12306Station() { return m_vecStationByPYSort; }
 private:
 
 

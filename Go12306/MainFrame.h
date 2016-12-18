@@ -9,6 +9,7 @@
 #include "Poco/Runnable.h"
 
 #include "EditCombo.h"
+#include "Client12306Manager.h"
 
 using Poco::Thread;
 using Poco::ThreadPool;
@@ -105,6 +106,10 @@ private:
 	*/
 	int RefreshMyOrderListView();
 
+	/*@action:
+	*/
+	int StationComboRefresh(CEditComboUI *pEditComboUI , std::vector<CStation*> &vec);
+
 
 	CButtonUI* m_pCloseBtn;
 	CButtonUI* m_pMaxBtn;
@@ -122,8 +127,8 @@ private:
 
 
 	CEditComboUI *m_pBegPlaceCombo;
-	CComboUI *m_pEndPlaceCombo;
-
+	CEditComboUI *m_pEndPlaceCombo;
+	CDateTimeUI *m_pTicketLeaveTimeUI;
 
 	
 		 

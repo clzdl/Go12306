@@ -114,6 +114,7 @@ namespace DuiLib
 
 		Create(pOwner->m_pManager->GetPaintWindow(), NULL, WS_POPUP, WS_EX_TOOLWINDOW, m_rcPaint);
 		
+		Refresh();
 
 		// HACK: Don't deselect the parent's caption
 		HWND hWndParent = m_hWnd;
@@ -177,9 +178,6 @@ namespace DuiLib
 
 		::SetWindowPos(m_hWnd , NULL , rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, SWP_NOACTIVATE);
 
-
-
-		m_pm.Invalidate();
 	}
 
 	LRESULT CComboWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -218,10 +216,7 @@ namespace DuiLib
 			for (int i = 0; i < m_pOwner->GetCount(); i++) 
 				static_cast<CControlUI*>(m_pOwner->GetItemAt(i))->SetPos(rcNull);
 
-			//m_pOwner->SetFocus();
-
-			
-			
+		
 		}
 		else if (uMsg == WM_LBUTTONDOWN) {
 			DUI__Trace(_T("CComboWnd::WM_LBUTTONDOWN"));
@@ -249,14 +244,12 @@ namespace DuiLib
 		else if (uMsg == WM_MOUSELEAVE)
 		{
 			DUI__Trace(_T("CComboWnd::WM_MOUSELEAVE"));
-			//m_pOwner->SetFocus();
+
 		}
 		else if (uMsg == WM_MOUSEHOVER)
 		{
 			DUI__Trace(_T("CComboWnd::WM_MOUSEHOVER"));
 
-			//SetFocus(m_hWnd);
-			//SetActiveWindow(m_hWnd);
 		}
 		else if (uMsg == WM_KEYDOWN) {
 			switch (wParam) {
@@ -302,9 +295,12 @@ namespace DuiLib
 			m_pLayout->NeedUpdate();
 
 		}
-		/*else if (uMsg == WM_KILLFOCUS) {
-			if (m_hWnd != (HWND)wParam) PostMessage(WM_CLOSE);
-		}*/
+		else if (uMsg == WM_KILLFOCUS) {
+			//if (m_hWnd != (HWND)wParam) PostMessage(WM_CLOSE);
+		
+		}
+
+
 
 		LRESULT lRes = 0;
 		if (m_pm.MessageHandler(uMsg, wParam, lParam, lRes)) return lRes;
@@ -439,11 +435,11 @@ namespace DuiLib
 		rcPos.top += rcInset.top;
 		rcPos.right -= rcInset.right;
 		rcPos.bottom -= rcInset.bottom;
-		LONG lEditHeight = m_pOwner->m_pManager->GetFontInfo(m_pOwner->GetFont())->tm.tmHeight;
+		/*LONG lEditHeight = m_pOwner->m_pManager->GetFontInfo(m_pOwner->GetFont())->tm.tmHeight;
 		if (lEditHeight < rcPos.GetHeight()) {
 			rcPos.top += (rcPos.GetHeight() - lEditHeight) / 2;
 			rcPos.bottom = rcPos.top + lEditHeight;
-		}
+		}*/
 
 		CControlUI* pParent = m_pOwner;
 		RECT rcParent;
@@ -565,14 +561,14 @@ namespace DuiLib
 	LRESULT CEditWnd::OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 	{
 
-		/*
-		  must comment it
-		LRESULT lRes = ::DefWindowProc(m_hWnd, uMsg, wParam, lParam);
-		PostMessage(WM_CLOSE);
-
-		m_pOwner->BoxClose();
 		
-		DUI__Trace(_T("CEditWnd::OnKillFocus"));*/
+		//  must comment it
+		//LRESULT lRes = ::DefWindowProc(m_hWnd, uMsg, wParam, lParam);
+		//PostMessage(WM_CLOSE);
+
+		//m_pOwner->BoxClose();
+		
+		DUI__Trace(_T("CEditWnd::OnKillFocus"));
 		
 		///diliver this msg
 		bHandled = FALSE;
@@ -591,7 +587,8 @@ namespace DuiLib
 		::GetWindowText(m_hWnd, pstr, cchLen);
 		m_pOwner->m_sText = pstr;
 		m_pOwner->m_pManager->SendNotify(m_pOwner, DUI_MSGTYPE_TEXTCHANGED);
-		if (m_pOwner->m_pManager->IsLayered()) m_pOwner->Invalidate();
+		if (m_pOwner->m_pManager->IsLayered()) 
+			m_pOwner->Invalidate();
 
 
 		m_pOwner->EditTextChg();
@@ -697,11 +694,11 @@ namespace DuiLib
 		{
 			DUI__Trace(_T("CEditComboUI::UIEVENT_SETFOCUS"));
 			//
-			//if (m_pWindow) return;
-			//m_pWindow = new CEditWnd();
-			//ASSERT(m_pWindow);
-			//m_pWindow->Init(this);
-			//
+			if (m_pWindow) return;
+			m_pWindow = new CEditWnd();
+			ASSERT(m_pWindow);
+			m_pWindow->Init(this);
+			
 			Invalidate();
 
 			
@@ -713,6 +710,8 @@ namespace DuiLib
 		}
 		if (event.Type == UIEVENT_BUTTONDOWN || event.Type == UIEVENT_DBLCLICK || event.Type == UIEVENT_RBUTTONDOWN)
 		{
+			
+
 			if (IsEnabled()) {
 				m_pManager->ReleaseCapture();
 				if (IsFocused() && m_pWindow == NULL)
@@ -745,9 +744,11 @@ namespace DuiLib
 					::SendMessage(*m_pWindow, WM_LBUTTONDOWN, event.wParam, MAKELPARAM(pt.x, pt.y));
 #endif
 				}
+
+				ActivateCoboBox();
 			}
 
-			ActivateCoboBox();
+			
 
 			
 			return;
@@ -1051,17 +1052,16 @@ namespace DuiLib
 
 			return true;
 		}
+
 		m_vecBoxItem.clear();
 		for (int i = 0; i < GetCount(); ++i)
-		{
 			m_vecBoxItem.push_back(static_cast<CControlUI*>(GetItemAt(i)));
-		}
 
 		m_pComboWindow = new CComboWnd();
 		ASSERT(m_pComboWindow);
 		m_pComboWindow->Init(this);
 		if (m_pManager != NULL) m_pManager->SendNotify(this, DUI_MSGTYPE_DROPDOWN);
-		Invalidate();
+		//Invalidate();
 		return true;
 	}
 
@@ -1416,9 +1416,11 @@ namespace DuiLib
 
 	void CEditComboUI::SetPos(RECT rc, bool bNeedInvalidate)
 	{
-		//// 隐藏下拉窗口
-		//if (m_pComboWindow && ::IsWindow(m_pComboWindow->GetHWND()))
-		//	m_pComboWindow->Close();
+		////// 隐藏下拉窗口, 父窗口重绘，就会关闭，有问题 ,待解决
+	/*	if (m_pComboWindow && ::IsWindow(m_pComboWindow->GetHWND()))
+			m_pComboWindow->Close();
+*/
+
 		// 所有元素大小置为0
 		RECT rcNull = { 0 };
 		for (int i = 0; i < m_items.GetSize(); i++)
@@ -1479,8 +1481,22 @@ namespace DuiLib
 			return m_sText;
 		}
 		CControlUI* pControl = static_cast<CControlUI*>(m_items[m_iCurSel]);
+	
 		return pControl->GetText();
 	}
+
+	LPCTSTR  CEditComboUI::GetUserData() const
+	{
+		if (m_iCurSel < 0)
+		{
+			return _T("");
+		}
+		CControlUI* pControl = static_cast<CControlUI*>(m_items[m_iCurSel]);
+
+		return pControl->GetUserData();
+	}
+
+
 
 	void CEditComboUI::PaintText(HDC hDC)
 	{
@@ -1597,13 +1613,6 @@ namespace DuiLib
 	{
 		if (m_bResEditChg)
 		{
-
-			//CListLabelElementUI *b = new CListLabelElementUI();
-			//b->SetName(_T("testsetset"));
-			//b->SetText(_T("AAb"));
-
-			//
-			//Add(b);
 			m_vecBoxItem.clear();
 			for (int i = 0; i < GetCount(); i++) {
 
@@ -1612,15 +1621,17 @@ namespace DuiLib
 					m_vecBoxItem.push_back(static_cast<CControlUI*>(GetItemAt(i)));
 			}
 	
-
 			ActivateCoboBox();
+			
 		}
+
+		
 		
 	}
 
 	void CEditComboUI::BoxClose()
 	{
-		if (m_pComboWindow)
+		if (m_pComboWindow && IsWindow(m_pComboWindow->GetHWND()))
 			m_pComboWindow->Close();
 	}
 
@@ -1633,8 +1644,7 @@ namespace DuiLib
 			m_vecBoxItem.push_back(static_cast<CControlUI*>(GetItemAt(i)));
 			
 		}
-
-		m_pComboWindow->Refresh();
+		
 	}
 
 	void CEditComboUI::Invalidate()
@@ -1647,7 +1657,8 @@ namespace DuiLib
 
 	void CEditComboUI::EditClose()
 	{
-		m_pWindow->Close();
+		if(m_pWindow && IsWindow(m_pWindow->GetHWND()))
+			m_pWindow->Close();
 	}
 
 }

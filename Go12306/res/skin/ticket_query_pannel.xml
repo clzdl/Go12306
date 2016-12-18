@@ -7,10 +7,10 @@
     <EditCombo name="begPlace" tipvalue="始发地" style="edit_style" />
 
 		<Label text="目的地" textcolor="#FF000000" glowsize="0" font="font13" width="40"/>
-    <Combo name="endPlace" tipvalue="目的地" style="edit_style" />
+    <EditCombo name="endPlace" tipvalue="目的地" style="edit_style" />
 
 		<Label text="出发日" textcolor="#FF000000" glowsize="0" font="font13" width="40"/>
-		<DateTime width="120" bordersize="1" bordercolor="#FF888888" textpadding="3"/>
+		<DateTime name="ticketLeaveTime" width="120" bordersize="1" bordercolor="#FF888888" textpadding="3"/>
 
 		<Button name="btnTicketQuery" text="查询" textcolor="#FF000000" style="btn_style" width="60" textpadding="20,0,0,0" foreimage="dest='4,7,20,23' res='other/icon.png'" />
 	</HorizontalLayout>
