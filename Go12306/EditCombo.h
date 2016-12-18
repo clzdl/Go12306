@@ -126,7 +126,11 @@ namespace DuiLib
 		///
 		void BoxClose();
 
+		void Refresh();
 
+		void EditClose();
+
+		void Invalidate();
 	private:
 		CEditWnd* m_pWindow;
 		int m_iWindowStyls;
@@ -152,6 +156,7 @@ namespace DuiLib
 		bool	m_bShowHtml;
 		CDuiString m_sDropBoxAttributes;
 		SIZE m_szDropBox;
+  
 
 		CDuiString m_sNormalImage;
 		CDuiString m_sHotImage;
@@ -161,6 +166,10 @@ namespace DuiLib
 		CDuiString m_sTipValue;
 		bool m_bScrollSelect;
 		TListInfoUI m_ListInfo;
+
+		std::vector<CControlUI*> m_vecBoxItem;
+
+		bool m_bResEditChg;
 	};
 
 }

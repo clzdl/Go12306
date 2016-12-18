@@ -67,17 +67,20 @@ public:
 	void SetChinaName(std::string v) { m_strChinaName = v; }
 	void SetPinYinName(std::string v) { m_strPinYinName = v; }
 	void SetStationCode(std::string v) { m_strStationCode = v; }
+	void SetSeq(unsigned int v) { m_uiSeq = v; }
 
 	std::string GetShortName() const { return  m_strShortName ; }
 	std::string GetChinaName() const{ return m_strChinaName; }
 	std::string GetPinYinName() const { return m_strPinYinName; }
 	std::string GetStationCode() const { return m_strStationCode; }
+	unsigned int GetSeq() const {return m_uiSeq;}
 
 private:
 	std::string m_strShortName;   ///拼音缩写
 	std::string m_strChinaName;		///汉字
 	std::string m_strPinYinName;   ///汉字拼音
 	std::string m_strStationCode;   ///站点编码
+	unsigned m_uiSeq;		///序号
 
 
 };
@@ -138,6 +141,10 @@ public:
 	int Query12306StationName();
 
 	std::string GetLastErrInfo() { return m_strLastErrInfo; }
+
+	/*@action: 获取符合条件的站点数据
+	*/
+	std::vector<CStation*> GetStation(std::string vPrefix);
 private:
 
 
@@ -232,3 +239,4 @@ private:
 	std::vector<CStation*> m_vecStationByPYSort;
 
 };
+

@@ -20,6 +20,7 @@
 
 
 
+
 CMainFrame::CMainFrame()
 :m_bAllTrainType(true),
  m_tWorker(new CTicketWorker(this)),
@@ -53,12 +54,26 @@ void CMainFrame::InitWindow()
 	m_pOptOrderManage = static_cast<COptionUI*>(m_pm.FindControl(_T("order_manager")));
 	m_pOptUserManage = static_cast<COptionUI*>(m_pm.FindControl(_T("user_manager")));
 
-	m_pBegPlaceCombo = static_cast<CComboUI*>(m_pm.FindControl(_T("begPlace")));
+	m_pBegPlaceCombo = static_cast<CEditComboUI*>(m_pm.FindControl(_T("begPlace")));
 
 	
 	CListLabelElementUI *b = new CListLabelElementUI();
 	b->SetText(_T("AAAAAA"));
 	m_pBegPlaceCombo->Add(b);
+
+	b = new CListLabelElementUI();
+	b->SetText(_T("AABCAA"));
+	m_pBegPlaceCombo->Add(b);
+
+
+	b = new CListLabelElementUI();
+	b->SetText(_T("ABAAAA"));
+	m_pBegPlaceCombo->Add(b);
+
+	b = new CListLabelElementUI();
+	b->SetText(_T("ACAAAA"));
+	m_pBegPlaceCombo->Add(b);
+
 	////
 
 	Client12306Manager::Instance()->LoginInit();
@@ -408,6 +423,41 @@ void CMainFrame::Notify(TNotifyUI& msg)
 		}
 		
 		
+	}
+	else if (msg.sType == _T("textchanged"))
+	{
+		if (msg.pSender == m_pBegPlaceCombo)
+		{
+
+			DUI__Trace(_T("textchanged  %s ") , m_pBegPlaceCombo->GetText().GetData());
+
+			m_pBegPlaceCombo->RemoveAll();
+
+
+
+			std::string sFind(UnicodeToUtf8(m_pBegPlaceCombo->GetText().GetData()).c_str());
+			std::vector<CStation*> vecStation = Client12306Manager::Instance()->GetStation(sFind);
+			
+
+			for (std::vector<CStation*>::iterator it = vecStation.begin(); it != vecStation.end(); ++it)
+			{
+
+				CListLabelElementUI *b = new CListLabelElementUI();
+				b->SetText(Utf8ToUnicode((*it)->GetChinaName()).c_str());
+				m_pBegPlaceCombo->Add(b);
+
+			}
+
+			m_pBegPlaceCombo->Refresh();
+
+		}
+		else if (msg.pSender == m_pEndPlaceCombo)
+		{
+
+
+		}
+
+
 	}
 
 	

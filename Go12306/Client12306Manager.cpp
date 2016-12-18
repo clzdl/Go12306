@@ -1146,16 +1146,19 @@ int Client12306Manager::AssignJson2OrderTicketObj(JSON::Object::Ptr jOrderTicket
 
 static bool CmpStationBySN(const CStation *s1, const CStation *s2) 
 {
-	int len = min(s1->GetShortName().length(), s2->GetShortName().length());
-	return s1->GetShortName().compare(0, len, s2->GetShortName()) < 0;
+	return s1->GetShortName().compare(0, s2->GetShortName().length(), s2->GetShortName()) < 0;
 }
 
 static bool CmpStationByPY(const CStation *s1, const CStation *s2) 
 {
-	int len = min(s1->GetPinYinName().length(), s2->GetPinYinName().length());
-	return s1->GetPinYinName().compare(0, len, s2->GetPinYinName()) < 0 ;
+	return s1->GetPinYinName().compare(0, s2->GetPinYinName().length(), s2->GetPinYinName()) < 0 ;
 }
 
+
+static bool CmpStationBySEQ(const CStation *s1, const CStation *s2)
+{
+	return s1->GetSeq() < s2->GetSeq();
+}
 int Client12306Manager::Query12306StationName()
 {
 	int iRetFlag = SUCCESS;
@@ -1218,11 +1221,11 @@ int Client12306Manager::ParseStationString(std::string res)
 	{
 		std::string info = res.substr(begPos, endPos - begPos );
 		CStation station;
-		//////∆¥“ÙÀı–¥
+		////
 		int iBeg = 0;
 		int iEnd = 0;
 		iEnd = info.find("|");
-		station.SetShortName(info.substr(iBeg,iEnd - iBeg ));
+
 
 		///∫∫◊÷
 		iBeg = iEnd + 1;
@@ -1239,6 +1242,16 @@ int Client12306Manager::ParseStationString(std::string res)
 		iEnd = info.find("|", iBeg);
 		station.SetPinYinName(info.substr(iBeg,iEnd - iBeg));
 
+
+		//////∆¥“ÙÀı–¥
+		iBeg = iEnd + 1;
+		iEnd = info.find("|", iBeg);
+		station.SetShortName(info.substr(iBeg, iEnd - iBeg));
+
+		///–Ú∫≈
+		iBeg = iEnd + 1;
+		station.SetSeq(atoi(info.substr(iBeg).c_str()));
+
 		std::pair<std::map<std::string, CStation>::iterator, bool> retPair;
 		retPair = m_mapStation.insert(std::pair<std::string, CStation>(station.GetStationCode(), station));
 
@@ -1251,11 +1264,11 @@ int Client12306Manager::ParseStationString(std::string res)
 
 	std::string info = res.substr(begPos);
 	CStation station;
-	//////∆¥“ÙÀı–¥
+	///
 	int iBeg = 0;
 	int iEnd = 0;
 	iEnd = info.find("|");
-	station.SetShortName(info.substr(iBeg,iEnd - iBeg ));
+	
 
 	///∫∫◊÷
 	iBeg = iEnd + 1;
@@ -1272,6 +1285,16 @@ int Client12306Manager::ParseStationString(std::string res)
 	iEnd = info.find("|", iBeg);
 	station.SetPinYinName(info.substr(iBeg,iEnd - iBeg ));
 
+	////∆¥“ÙÀı–¥
+	iBeg = iEnd + 1;
+	iEnd = info.find("|", iBeg);
+	station.SetShortName(info.substr(iBeg, iEnd - iBeg));
+
+
+	///–Ú∫≈
+	iBeg = iEnd + 1;
+	station.SetSeq(atoi(info.substr(iBeg).c_str()));
+
 	std::pair<std::map<std::string, CStation>::iterator, bool> retPair;
 	retPair = m_mapStation.insert(std::pair<std::string, CStation>(station.GetStationCode(), station));
 
@@ -1281,4 +1304,64 @@ int Client12306Manager::ParseStationString(std::string res)
 	
 
 	return SUCCESS;
+}
+
+
+
+static bool CmpStationBySN01(const CStation *s1, const CStation *s2)
+{
+	return s1->GetShortName().compare(0, s2->GetShortName().length(), s2->GetShortName() , 0 , s2->GetShortName().length()) < 0;
+}
+
+static bool CmpStationByPY01(const CStation *s1, const CStation *s2)
+{
+	return s1->GetPinYinName().compare(0, s2->GetPinYinName().length(), s2->GetPinYinName() , 0 , s2->GetPinYinName().length()) < 0;
+}
+
+
+std::vector<CStation*> Client12306Manager::GetStation(std::string vPrefix)
+{
+	std::vector<CStation*> vecRes;
+
+	CStation sa;
+	sa.SetPinYinName(vPrefix);
+	sa.SetShortName(vPrefix);
+
+
+	std::vector<CStation*>::iterator lowerIt;
+	
+	std::set<std::string> setString;
+	lowerIt = std::lower_bound(m_vecStationBySNSort.begin(), m_vecStationBySNSort.end(), &sa, CmpStationBySN01);
+
+	for(; lowerIt != m_vecStationBySNSort.end(); ++lowerIt)
+	{
+		CStation *sa = *lowerIt;
+		int len = min(vPrefix.length(), sa->GetShortName().length());
+		if (vPrefix.compare(0, len,sa->GetShortName() , 0 , len))
+			break;
+		
+		vecRes.push_back(sa);
+		setString.insert(sa->GetStationCode());
+	}
+
+	lowerIt = std::lower_bound(m_vecStationByPYSort.begin(), m_vecStationByPYSort.end(), &sa, CmpStationByPY01);
+
+	for (; lowerIt != m_vecStationByPYSort.end(); ++lowerIt)
+	{
+		CStation *sa = *lowerIt;
+		int len = min(vPrefix.length(), sa->GetPinYinName().length());
+		if (vPrefix.compare(0, len, sa->GetPinYinName(), 0, len))
+			break;
+
+		std::set < std::string>::iterator v = setString.find(sa->GetStationCode());
+
+		if (v != setString.end())
+			continue;
+
+		vecRes.push_back(sa);
+	}
+
+	std::sort(vecRes.begin(), vecRes.end(), CmpStationBySEQ);
+
+	return vecRes;
 }

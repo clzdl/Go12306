@@ -8,6 +8,7 @@
 #include "Poco/Thread.h"
 #include "Poco/Runnable.h"
 
+#include "EditCombo.h"
 
 using Poco::Thread;
 using Poco::ThreadPool;
@@ -19,6 +20,8 @@ class CTicketManager;
 class CTicketWorker;
 class COrderWorker;
 class CProgressDlg;
+
+
 
 class CMainFrame : public WindowImplBase, public SkinChangedReceiver
 {
@@ -118,7 +121,7 @@ private:
 	COptionUI *m_pOptUserManage;
 
 
-	CComboUI *m_pBegPlaceCombo;
+	CEditComboUI *m_pBegPlaceCombo;
 	CComboUI *m_pEndPlaceCombo;
 
 
