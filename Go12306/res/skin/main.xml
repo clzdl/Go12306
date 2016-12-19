@@ -46,9 +46,9 @@
 		<VerticalLayout name="body" >
 			<HorizontalLayout name="tab_header" height="30" >
 				<Control />
-				<Option  width="98" text="余票查询" name="ticket_query" style="colortab_style" selected="true" />
-				<Option  width="98" text="订单管理" name="order_manager" style="colortab_style" />
-				<Option  width="98" text="用户信息" name="user_manager" style="colortab_style" />
+				<Option  width="98" text="余票查询" name="ticket_query" style="colortab_style" group="naviage_tab" selected="true" />
+				<Option  width="98" text="订单管理" name="order_manager" style="colortab_style" group="naviage_tab" />
+				<Option  width="98" text="用户信息" name="user_manager" style="colortab_style" group="naviage_tab" />
 				<Control />
 			</HorizontalLayout>
 
