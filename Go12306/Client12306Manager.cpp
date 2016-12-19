@@ -288,6 +288,8 @@ int Client12306Manager::QueryTicketLog(std::string begPlace, std::string endPlac
 
 int Client12306Manager::QueryLeftTicket(std::string begPlace, std::string endPlace, std::string travelTime , std::vector<CTicketModel> &vecTicket, _TICKET_TYPE ticketType)
 {
+	int iRet = SUCCESS;
+
 	/*bool bValid = false;
 	QueryTicketLog(begPlace, endPlace, travelTime, bValid, ticketType);
 
@@ -337,17 +339,18 @@ int Client12306Manager::QueryLeftTicket(std::string begPlace, std::string endPla
 		std::string strGunString;
 		Gunzip((byte*)const_cast<char*>(strOrgRes.c_str()), strOrgRes.length() , strGunString);
 
-		JsonParseTicket(strGunString, vecTicket);
+		iRet = JsonParseTicket(strGunString, vecTicket);
 		
 
 	}
 	catch (Poco::Exception &e)
 	{
 		DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
+		m_strLastErrInfo = Gbk2Utf8("结果返回错误");
 		return FAIL;
 	}
 
-	return SUCCESS;
+	return iRet;
 }
 
 
@@ -356,61 +359,71 @@ int Client12306Manager::JsonParseTicket(std::string jsonString, std::vector<CTic
 	JSON::Parser parser;
 	Dynamic::Var result;
 
-	result = parser.parse(jsonString);
-
-	JSON::Object::Ptr pObj = result.extract<JSON::Object::Ptr>();
-
-	Dynamic::Var jStatus = pObj->get("status");
-
-	if (jStatus.toString() != "true")
+	try
 	{
-		DUI__Trace(Utf8ToUnicode(jStatus.toString()).c_str());
-		return FAIL;
+
+		result = parser.parse(jsonString);
+
+		JSON::Object::Ptr pObj = result.extract<JSON::Object::Ptr>();
+
+		Dynamic::Var jStatus = pObj->get("status");
+
+		if (jStatus.toString() != "true")
+		{
+			DUI__Trace(Utf8ToUnicode(jStatus.toString()).c_str());
+			return FAIL;
+		}
+
+
+
+		////array
+		JSON::Array::Ptr pArry = pObj->getArray("data");
+
+
+		if (0 > pArry->size())
+		{
+			m_strLastErrInfo = Gbk2Utf8("无余票信息");
+			return FAIL;
+		}
+
+		JSON::Array::ConstIterator it = pArry->begin();
+		//把数组里的所有内容打印出来
+		//当然也可以把每个对象拿出来用。
+		for (; it != pArry->end(); it++)
+		{
+			DUI__Trace(Utf8ToUnicode(it->toString()).c_str());
+
+			JSON::Object::Ptr pItem = it->extract<JSON::Object::Ptr>();
+
+			CTicketModel ticketModel;
+
+			Dynamic::Var tmpJObj;
+			////buttonTextInfo
+			tmpJObj = pItem->get("buttonTextInfo");
+			ticketModel.SetBtnTextInfo(Utf8ToUnicode(tmpJObj.toString()).c_str());
+
+			/////secretStr
+			tmpJObj = pItem->get("secretStr");
+			ticketModel.SetSecretStr(Utf8ToUnicode(tmpJObj.toString()).c_str());
+
+
+			////queryLeftNewDTO
+			tmpJObj = pItem->get("queryLeftNewDTO");
+
+			JSON::Object::Ptr pQueryDto = tmpJObj.extract<JSON::Object::Ptr>();
+
+
+			AssignJson2TicketObj(pQueryDto, ticketModel);
+
+			vecTicket.emplace_back(ticketModel);
+
+		}
 	}
-
-
-
-	////array
-	JSON::Array::Ptr pArry = pObj->getArray("data");
-
-
-	if (0 > pArry->size())
+	catch (Poco::Exception &e)
 	{
-		m_strLastErrInfo = Gbk2Utf8("无余票信息");
+		DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
+		m_strLastErrInfo = Gbk2Utf8("结果返回错误");
 		return FAIL;
-	}
-
-	JSON::Array::ConstIterator it = pArry->begin();
-	//把数组里的所有内容打印出来
-	//当然也可以把每个对象拿出来用。
-	for (; it != pArry->end(); it++)
-	{
-		DUI__Trace(Utf8ToUnicode(it->toString()).c_str());
-
-		JSON::Object::Ptr pItem = it->extract<JSON::Object::Ptr>();
-		
-		CTicketModel ticketModel;
-
-		Dynamic::Var tmpJObj;
-		////buttonTextInfo
-		tmpJObj = pItem->get("buttonTextInfo");
-		ticketModel.SetBtnTextInfo(Utf8ToUnicode(tmpJObj.toString()).c_str());
-
-		/////secretStr
-		tmpJObj = pItem->get("secretStr");
-		ticketModel.SetSecretStr(Utf8ToUnicode(tmpJObj.toString()).c_str());
-
-
-		////queryLeftNewDTO
-		tmpJObj = pItem->get("queryLeftNewDTO");
-
-		JSON::Object::Ptr pQueryDto = tmpJObj.extract<JSON::Object::Ptr>();
-
-		
-		AssignJson2TicketObj(pQueryDto, ticketModel);
-		
-		vecTicket.emplace_back(ticketModel);
-
 	}
 
 	return SUCCESS;

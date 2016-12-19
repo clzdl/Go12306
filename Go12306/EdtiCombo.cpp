@@ -705,6 +705,9 @@ namespace DuiLib
 		if (event.Type == UIEVENT_KILLFOCUS && IsEnabled())
 		{
 			DUI__Trace(_T("=====CEditComboUI::UIEVENT_KILLFOCUS"));
+			if (m_pComboWindow && IsWindow(m_pComboWindow->GetHWND()))
+				m_pComboWindow->Close();
+
 			Invalidate();
 		}
 		if (event.Type == UIEVENT_BUTTONDOWN || event.Type == UIEVENT_DBLCLICK || event.Type == UIEVENT_RBUTTONDOWN)
@@ -1429,10 +1432,6 @@ namespace DuiLib
 
 	void CEditComboUI::SetPos(RECT rc, bool bNeedInvalidate)
 	{
-		////// 隐藏下拉窗口, 父窗口重绘，就会关闭，有问题 ,待解决
-	/*	if (m_pComboWindow && ::IsWindow(m_pComboWindow->GetHWND()))
-			m_pComboWindow->Close();
-*/
 
 		// 所有元素大小置为0
 		RECT rcNull = { 0 };
