@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Window>
+	
+	<HorizontalLayout childpadding="4" bordersize="1,1,1,1" bordercolor="#F" >
+		
+		
+		<Label text="乘客联系人" align="center" width="100" textcolor="#FF000000" glowsize="0" font="2"/>
+    <List name="passengerListView" width="350" itemshowrowline="true" itemlinecolor="0x00FFFFFF" bordersize="1,1,1,1" bordercolor="#F" vscrollbar="true" hscrollbar="true"  itemvalign="vcenter" scrollstepsize="100">
+      <ListHeader height="40">
+        <ListHeaderItem text="姓名" width="80" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+        <ListHeaderItem text="证件类型" width="100" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+        <ListHeaderItem text="证件号码" width="150" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+      </ListHeader>
+    </List>
+    
+  </HorizontalLayout>
+
+</Window>

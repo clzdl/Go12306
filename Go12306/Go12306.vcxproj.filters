@@ -84,6 +84,15 @@
     <ClInclude Include="EditCombo.h">
       <Filter>头文件\control</Filter>
     </ClInclude>
+    <ClInclude Include="Passenger.h">
+      <Filter>头文件\model</Filter>
+    </ClInclude>
+    <ClInclude Include="PassengerManagerUI.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="OrderTicketWnd.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -128,6 +137,15 @@
     <ClCompile Include="EdtiCombo.cpp">
       <Filter>源文件\control</Filter>
     </ClCompile>
+    <ClCompile Include="Passenger.cpp">
+      <Filter>源文件\model</Filter>
+    </ClCompile>
+    <ClCompile Include="PassengerManagerUI.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="OrderTicketWnd.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Go12306.rc">
@@ -153,6 +171,9 @@
       <Filter>资源文件</Filter>
     </Xml>
     <Xml Include="res\skin\ticket_query_pannel.xml">
+      <Filter>资源文件</Filter>
+    </Xml>
+    <Xml Include="res\skin\user_manager_pannel.xml">
       <Filter>资源文件</Filter>
     </Xml>
   </ItemGroup>

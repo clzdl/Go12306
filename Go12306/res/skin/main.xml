@@ -66,8 +66,8 @@
 				</VerticalLayout>
 				
 				<VerticalLayout name="user_manager_pannel" inset="2,2,2,2" >
-
-				</VerticalLayout>
+          <Include source="user_manager_pannel.xml"/>
+        </VerticalLayout>
 
 			</AnimationTabLayout>
 		</VerticalLayout>

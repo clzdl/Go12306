@@ -210,7 +210,7 @@ namespace DuiLib
 			return 0;
 		}
 		else if (uMsg == WM_CLOSE) {
-			DUI__Trace(_T("CComboWnd::WM_CLOSE"));
+			
 			m_pOwner->SetManager(m_pOwner->GetManager(), m_pOwner->GetParent(), false);
 			RECT rcNull = { 0 };
 			for (int i = 0; i < m_pOwner->GetCount(); i++) 
@@ -219,7 +219,7 @@ namespace DuiLib
 		
 		}
 		else if (uMsg == WM_LBUTTONDOWN) {
-			DUI__Trace(_T("CComboWnd::WM_LBUTTONDOWN"));
+			
 			POINT pt = { 0 };
 			::GetCursorPos(&pt);
 			::ScreenToClient(m_pm.GetPaintWindow(), &pt);
@@ -229,7 +229,7 @@ namespace DuiLib
 
 		}
 		else if (uMsg == WM_LBUTTONUP) {
-			DUI__Trace(_T("CComboWnd::WM_LBUTTONUP"));
+			
 			POINT pt = { 0 };
 			::GetCursorPos(&pt);
 			::ScreenToClient(m_pm.GetPaintWindow(), &pt);
@@ -243,12 +243,10 @@ namespace DuiLib
 		}
 		else if (uMsg == WM_MOUSELEAVE)
 		{
-			DUI__Trace(_T("CComboWnd::WM_MOUSELEAVE"));
 
 		}
 		else if (uMsg == WM_MOUSEHOVER)
 		{
-			DUI__Trace(_T("CComboWnd::WM_MOUSEHOVER"));
 
 		}
 		else if (uMsg == WM_KEYDOWN) {
@@ -290,7 +288,6 @@ namespace DuiLib
 		}
 		else if (uMsg == WM_PAINT)
 		{
-			DUI__Trace(_T("CComboWnd::WM_PAINT"));
 			////去掉后不能实时更新
 			m_pLayout->NeedUpdate();
 
@@ -377,8 +374,7 @@ namespace DuiLib
 
 	void CEditWnd::Init(CEditComboUI* pOwner)
 	{
-		DUI__Trace(_T("====CEditWnd::Init"));
-
+		
 		m_pOwner = pOwner;
 		RECT rcPos = CalPos();
 		UINT uStyle = 0;
@@ -473,9 +469,7 @@ namespace DuiLib
 	}
 
 	void CEditWnd::OnFinalMessage(HWND hWnd)
-	{
-		DUI__Trace(_T("CEditWnd::OnFinalMessage"));
-		
+	{		
 		m_pOwner->m_pWindow = NULL;
 		// Clear reference and die
 		if (m_hBkBrush != NULL) ::DeleteObject(m_hBkBrush);
@@ -567,7 +561,6 @@ namespace DuiLib
 
 	LRESULT CEditWnd::OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 	{
-		DUI__Trace(_T("CEditWnd::OnKillFocus"));
 		LRESULT lRes = ::DefWindowProc(m_hWnd, uMsg, wParam, lParam);
 		PostMessage(WM_CLOSE);
 
@@ -590,11 +583,8 @@ namespace DuiLib
 		if (m_pOwner->m_pManager->IsLayered()) 
 			m_pOwner->Invalidate();
 
-
 		m_pOwner->EditTextChg();
 
-
-		DUI__Trace(_T("CEditWnd::OnEditChanged"));
 		return 0;
 	}
 
@@ -695,16 +685,11 @@ namespace DuiLib
 			}
 		}
 		if (event.Type == UIEVENT_SETFOCUS && IsEnabled())
-		{
-			DUI__Trace(_T("====CEditComboUI::UIEVENT_SETFOCUS"));
-			
-			Invalidate();
-
-			
+		{		
+			Invalidate();	
 		}
 		if (event.Type == UIEVENT_KILLFOCUS && IsEnabled())
 		{
-			DUI__Trace(_T("=====CEditComboUI::UIEVENT_KILLFOCUS"));
 			if (m_pComboWindow && IsWindow(m_pComboWindow->GetHWND()))
 				m_pComboWindow->Close();
 
@@ -712,14 +697,11 @@ namespace DuiLib
 		}
 		if (event.Type == UIEVENT_BUTTONDOWN || event.Type == UIEVENT_DBLCLICK || event.Type == UIEVENT_RBUTTONDOWN)
 		{
-			
-			DUI__Trace(_T("==CEditComboUI::UIEVENT_BUTTONDOWN"));
+
 			if (IsEnabled()) {
 				m_pManager->ReleaseCapture();
 				if (IsFocused() && m_pWindow == NULL)
 				{
-
-					DUI__Trace(_T("CEditComboUI::IsFocused() && m_pWindow == NULL "));
 					m_pWindow = new CEditWnd();
 					ASSERT(m_pWindow);
 					m_pWindow->Init(this);
@@ -736,7 +718,6 @@ namespace DuiLib
 				}
 				else if (m_pWindow != NULL)
 				{
-					DUI__Trace(_T("CEditComboUI::m_pWindow != NULL"));
 					Edit_Enable(m_pWindow->GetHWND(), IsEnabled() == true);
 					int nSize = GetWindowTextLength(*m_pWindow);
 					if (nSize == 0)
@@ -1083,7 +1064,6 @@ namespace DuiLib
 
 	void CEditComboUI::DoPaint(HDC hDC, const RECT& rcPaint)
 	{
-		DUI__Trace(_T("CEditComboUI::DoPaint(%d,%d,%d,%d)") , rcPaint.left, rcPaint.top, rcPaint.right, rcPaint.bottom);
 		CControlUI::DoPaint(hDC, rcPaint);
 
 	}

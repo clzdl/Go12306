@@ -13,11 +13,34 @@
 #include "Login.h"
 #include "OrderManagerUI.h"
 #include "TicketManager.h"
+#include "PassengerManagerUI.h"
+#include "OrderTicketWnd.h"
 
 
 
+DUI_BEGIN_MESSAGE_MAP(CMainFrame, WindowImplBase)
+	DUI_ON_CLICK_CTRNAME(_T("btnTicketQuery"), TicketQueryCb)
+	DUI_ON_CLICK_CTRNAME(_T("btnOrderQuery"), OrderQueryCb)
+	DUI_ON_CLICK_CTRNAME(_T("menubtn"), MenuBtnCb)
+	DUI_ON_CLICK_CTRNAME(_T("btnTicketPlaceChg"), TicketPlaceChgCb)
+	DUI_ON_CLICK_CTRNAME(_T("OrderTicketBtn"), OrderTicketCb)
+	DUI_ON_SELECTCHANGED_CTRNAME(_T("train_all"), TrainAllChkBtnCb)
+	DUI_ON_SELECTCHANGED_CTRNAME(_T("train_gc"), TrainGcCkgBtnCb)
+	DUI_ON_SELECTCHANGED_CTRNAME(_T("train_d"), TrainDCkgBtnCb)
+	DUI_ON_SELECTCHANGED_CTRNAME(_T("train_z"), TrainZCkgBtnCb)
+	DUI_ON_SELECTCHANGED_CTRNAME(_T("train_t"), TrainTCkgBtnCb)
+	DUI_ON_SELECTCHANGED_CTRNAME(_T("train_k"), TrainKCkgBtnCb)
+	DUI_ON_SELECTCHANGED_CTRNAME(_T("train_o"), TrainOCkgBtnCb)
+	DUI_ON_SELECTCHANGED_CTRNAME(_T("ORDER_EXPAND_BTN"), OrderExpandBtn)
+	
+	DUI_ON_MSGTYPE_CTRNAME(_T("textchanged") , _T("begPlace") , TxtChgBegPlaceCb)
+	DUI_ON_MSGTYPE_CTRNAME(_T("textchanged"), _T("endPlace"), TxtChgEndPlaceCb)
 
+	
 
+	
+
+DUI_END_MESSAGE_MAP()
 
 
 
@@ -26,7 +49,8 @@ CMainFrame::CMainFrame()
  m_tWorker(new CTicketWorker(this)),
  m_tOrderWorker(new COrderWorker(this)),
  m_pOrderManagerUI(NULL),
- m_pTicketManagerUI(NULL)
+ m_pTicketManagerUI(NULL),
+ m_pPassengerManagerUI(NULL)
 {}
 
 CControlUI* CMainFrame::CreateControl(LPCTSTR pstrClass)
@@ -77,9 +101,11 @@ void CMainFrame::InitWindow()
 
 	m_pTicketManagerUI = new CTicketManager(this);
 
+	m_pPassengerManagerUI = new CPassengerManagerUI(this);
+
 	RefreshAllTrainCHeckBox(m_bAllTrainType);
 
-	/*CLoginWnd* pLogin = new CLoginWnd();
+	CLoginWnd* pLogin = new CLoginWnd();
 	pLogin->Create(NULL, _T("LoginWnd"), WS_POPUP | WS_CLIPCHILDREN, WS_EX_TOOLWINDOW);
 	pLogin->CenterWindow();
 
@@ -93,7 +119,13 @@ void CMainFrame::InitWindow()
 		break;
 
 	}
-	*/
+	
+
+	////获取联系人
+
+	Client12306Manager::Instance()->QueryPassenger();
+
+	m_pPassengerManagerUI->RefreshPassengerListView(Client12306Manager::Instance()->GetPassenger());
 	
 
 	// 注册托盘图标
@@ -303,14 +335,16 @@ void CMainFrame::Notify(TNotifyUI& msg)
 		}
 		else if (msg.pSender == m_pSkinBtn) {
 			new CSkinFrame(m_hWnd, m_pSkinBtn);
+			return;
 		}
-		// 按钮消息
-		OnLClick(msg.pSender);
+		
 	}
 	else if (msg.sType == _T("selectchanged"))
 	{
 
-		if (m_pOptTicketQuery == msg.pSender || m_pOptOrderManage == msg.pSender || m_pOptUserManage == msg.pSender)
+		if (m_pOptTicketQuery == msg.pSender 
+				|| m_pOptOrderManage == msg.pSender 
+					|| m_pOptUserManage == msg.pSender)
 		{
 			CTabLayoutUI* pTabSwitch = static_cast<CTabLayoutUI*>(m_pm.FindControl(_T("tab_switch")));
 			if (name.CompareNoCase(_T("ticket_query")) == 0)
@@ -325,227 +359,15 @@ void CMainFrame::Notify(TNotifyUI& msg)
 			{
 				pTabSwitch->SelectItem(2);
 			}
-		}
-		else if (name.CompareNoCase(_T("train_all")) == 0)
-		{
-			m_bAllTrainType = !m_bAllTrainType;
 
-			RefreshAllTrainCHeckBox(m_bAllTrainType);
-
-			RefreshTicketListView();
-
-		}
-		else if (name.CompareNoCase(_T("train_gc")) == 0)
-		{
-
-			CCheckBoxUI *pCheckBoxUI = dynamic_cast<CCheckBoxUI*>(msg.pSender);
-
-			if (pCheckBoxUI->GetCheck())
-				m_setShowTrainType.insert(_GC);
-			else
-				m_setShowTrainType.erase(_GC);
-
-			RefreshTicketListView();
-		}
-		else if (name.CompareNoCase(_T("train_d")) == 0)
-		{
-			CCheckBoxUI *pCheckBoxUI = dynamic_cast<CCheckBoxUI*>(msg.pSender);
-
-			if (pCheckBoxUI->GetCheck())
-				m_setShowTrainType.insert(_D);
-			else
-				m_setShowTrainType.erase(_D);
-
-			RefreshTicketListView();
-		}
-		else if (name.CompareNoCase(_T("train_z")) == 0)
-		{
-			CCheckBoxUI *pCheckBoxUI = dynamic_cast<CCheckBoxUI*>(msg.pSender);
-
-			if (pCheckBoxUI->GetCheck())
-				m_setShowTrainType.insert(_Z);
-			else
-				m_setShowTrainType.erase(_Z);
-
-			RefreshTicketListView();
-		}
-		else if (name.CompareNoCase(_T("train_t")) == 0)
-		{
-			CCheckBoxUI *pCheckBoxUI = dynamic_cast<CCheckBoxUI*>(msg.pSender);
-
-			if (pCheckBoxUI->GetCheck())
-				m_setShowTrainType.insert(_T);
-			else
-				m_setShowTrainType.erase(_T);
-
-			RefreshTicketListView();
-		}
-		else if (name.CompareNoCase(_T("train_k")) == 0)
-		{
-			CCheckBoxUI *pCheckBoxUI = dynamic_cast<CCheckBoxUI*>(msg.pSender);
-
-			if (pCheckBoxUI->GetCheck())
-				m_setShowTrainType.insert(_K);
-			else
-				m_setShowTrainType.erase(_K);
-
-			RefreshTicketListView();
-		}
-		else if (name.CompareNoCase(_T("train_o")) == 0)
-		{
-			CCheckBoxUI *pCheckBoxUI = dynamic_cast<CCheckBoxUI*>(msg.pSender);
-
-			if (pCheckBoxUI->GetCheck())
-				m_setShowTrainType.insert(_O);
-			else
-				m_setShowTrainType.erase(_O);
-
-			RefreshTicketListView();
-		}
-		else if (name.CompareNoCase(_T("ORDER_EXPAND_BTN")) == 0)
-		{
-			CCheckBoxUI *pOrderExpandBtn = dynamic_cast<CCheckBoxUI*>(msg.pSender);
-
-			CListUI* pLstTicket = (CListUI*)m_pm.FindControl(pOrderExpandBtn->GetUserData());
-
-			m_pOrderManagerUI->RefreshOrderDetailList(pLstTicket, pOrderExpandBtn->GetCheck());
-
-		}
-		
-		
-		
-	}
-	else if (msg.sType == _T("textchanged"))
-	{
-		if (msg.pSender == m_pBegPlaceCombo)
-		{
-
-			DUI__Trace(_T("textchanged  %s ") , m_pBegPlaceCombo->GetText().GetData());
-
-			m_pBegPlaceCombo->RemoveAll();
-
-
-
-			std::string sFind(UnicodeToUtf8(m_pBegPlaceCombo->GetText().GetData()).c_str());
-			std::vector<CStation*> vecStation = Client12306Manager::Instance()->GetStation(sFind);
-			
-			StationComboRefresh(m_pBegPlaceCombo, vecStation);
-
-			
-
-		}
-		else if (msg.pSender == m_pEndPlaceCombo)
-		{
-
-
-			DUI__Trace(_T("textchanged  %s "), m_pEndPlaceCombo->GetText().GetData());
-
-			m_pEndPlaceCombo->RemoveAll();
-
-
-
-			std::string sFind(UnicodeToUtf8(m_pEndPlaceCombo->GetText().GetData()).c_str());
-			std::vector<CStation*> vecStation = Client12306Manager::Instance()->GetStation(sFind);
-
-			StationComboRefresh(m_pEndPlaceCombo, vecStation);
-		}
-
-
-	}
-
-	
-
-}
-
-
-void CMainFrame::OnLClick(CControlUI *pControl)
-{
-	CDuiString sName = pControl->GetName();
-	if (sName.CompareNoCase(_T("btnTicketQuery")) == 0)
-	{
-
-		CDuiString begPlace =  m_pBegPlaceCombo->GetUserData();
-		CDuiString endPlace = m_pEndPlaceCombo->GetUserData();
-		CDuiString leaveTime =  m_pTicketLeaveTimeUI->GetText();
-		_TICKET_TYPE ticketType = _ADULT;
-
-		if (begPlace.IsEmpty() || endPlace.IsEmpty())
-		{
-			CMsgWnd::MessageBox(GetHWND() , _T("提示") , _T("请选择始发地/目的地"));
 			return;
 		}
-		
-		if (m_pTikcetStudent->IsSelected())
-			ticketType = _STUDENT;
-
-		QueryTicket(begPlace, endPlace, leaveTime , ticketType);
-
-	}
-	else if (sName.CompareNoCase(_T("btnOrderQuery")) == 0)
-	{
-		QueryMyOrder();
-
-	}
-	else if (sName.CompareNoCase(_T("menubtn")) == 0)
-	{
-		if (m_pMenu != NULL) {
-			delete m_pMenu;
-			m_pMenu = NULL;
-		}
-		m_pMenu = new CMenuWnd();
-		CMenuWnd::GetGlobalContextMenuObserver().SetMenuCheckInfo(&m_MenuInfos);
-		CDuiPoint point;
-		::GetCursorPos(&point);
-
-		m_pMenu->Init(NULL, _T("menu.xml"), point, &m_pm);
-
-
-		// 动态添加后重新设置菜单的大小
-		m_pMenu->ResizeMenu();
-	}
-	else if (sName.CompareNoCase(_T("btnTicketPlaceChg")) == 0 )
-	{
-		
-		CDuiString  begStationCode = m_pBegPlaceCombo->GetUserData();
-		CDuiString  endStationCode = m_pEndPlaceCombo->GetUserData();
-
-
-		CStation *begStation = Client12306Manager::Instance()->GetStationByCode(UnicodeToUtf8(begStationCode.GetData()));
-
-
-
-		CStation *endStation = Client12306Manager::Instance()->GetStationByCode(UnicodeToUtf8(endStationCode.GetData()));
-
-
-
-		m_pBegPlaceCombo->RemoveAll();
-		m_pEndPlaceCombo->RemoveAll();
-		
-
-		CListLabelElementUI *b = new CListLabelElementUI();
-		b->SetText(Utf8ToUnicode(endStation->GetChinaName()).c_str());
-		b->SetUserData(Utf8ToUnicode(endStation->GetStationCode()).c_str());
-
-		m_pBegPlaceCombo->Add(b);
-		m_pBegPlaceCombo->Refresh();
-		m_pBegPlaceCombo->SelectItem(0);
-
-
-		b = new CListLabelElementUI();
-		b->SetText(Utf8ToUnicode(begStation->GetChinaName()).c_str());
-		b->SetUserData(Utf8ToUnicode(begStation->GetStationCode()).c_str());
-
-		m_pEndPlaceCombo->Add(b);
-		m_pEndPlaceCombo->Refresh();
-		m_pEndPlaceCombo->SelectItem(0);
-
-		
-			
+	
 	}
 	
-	
-	
+	WindowImplBase::Notify(msg);
 }
+
 
 
 int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString travelTime , _TICKET_TYPE ticketType)
@@ -637,18 +459,16 @@ void CMainFrame::RefreshAllTrainCHeckBox(bool flag)
 		m_setShowTrainType.clear();
 }
 
-int CMainFrame::QueryMyOrder()
+int CMainFrame::QueryMyOrder(CDuiString begDate , CDuiString endDate , CDuiString type , CDuiString seqTrainName)
 {
-	CDuiString begDate = _T("2016-12-01");
-	CDuiString endDate = _T("2016-12-14");
-	CDuiString seqTrainName = _T("");
+
 
 	
 	m_pProgressDlg = CProgressDlg::CreateDlg(this->GetHWND());
 
 
 	m_tOrderWorker->SetMapOrder(&m_mapMyOrder);
-	m_tOrderWorker->SetQueryParam(begDate, endDate, seqTrainName);
+	m_tOrderWorker->SetQueryParam(begDate, endDate , type, seqTrainName);
 	m_tpWorker.start(*m_tOrderWorker);
 
 	m_pProgressDlg->ShowModal();
@@ -667,6 +487,7 @@ int CMainFrame::RefreshMyOrderListView()
 	return SUCCESS;
 }
 
+
 int CMainFrame::StationComboRefresh(CEditComboUI *pEditComboUI, std::vector<CStation*> &vec)
 {
 	for (std::vector<CStation*>::iterator it = vec.begin(); it != vec.end(); ++it)
@@ -684,6 +505,217 @@ int CMainFrame::StationComboRefresh(CEditComboUI *pEditComboUI, std::vector<CSta
 	pEditComboUI->ActivateCoboBox();
 	
 	return SUCCESS;
+}
+
+
+void CMainFrame::TicketQueryCb(TNotifyUI& msg)
+{
+	CDuiString begPlace = m_pBegPlaceCombo->GetUserData();
+	CDuiString endPlace = m_pEndPlaceCombo->GetUserData();
+	CDuiString leaveTime = m_pTicketLeaveTimeUI->GetText();
+	_TICKET_TYPE ticketType = _ADULT;
+
+	if (begPlace.IsEmpty() || endPlace.IsEmpty())
+	{
+		CMsgWnd::MessageBox(GetHWND(), _T("提示"), _T("请选择始发地/目的地"));
+		return;
+	}
+
+	if (m_pTikcetStudent->IsSelected())
+		ticketType = _STUDENT;
+
+	QueryTicket(begPlace, endPlace, leaveTime, ticketType);
+}
+
+
+void CMainFrame::OrderQueryCb(TNotifyUI& msg)
+{
+	CDateTimeUI *pBegDate = static_cast<CDateTimeUI*>(m_pm.FindControl(_T("orderQueryBegDate")));
+	CDateTimeUI *pEndDate = static_cast<CDateTimeUI*>(m_pm.FindControl(_T("orderQueryEndDate")));
+	CEditUI *pEdtSeqString = static_cast<CEditUI*>(m_pm.FindControl(_T("edtSeqString")));
+	CComboUI *pComboType = static_cast<CComboUI*>(m_pm.FindControl(_T("comboOrderQueryType")));
+	
+	CControlUI* pSelCtrl = pComboType->GetItemAt(pComboType->GetCurSel());
+	
+	QueryMyOrder(pBegDate->GetText(), pEndDate->GetText() , pSelCtrl->GetUserData(), pEdtSeqString->GetText());
+}
+
+void CMainFrame::MenuBtnCb(TNotifyUI& msg)
+{
+	if (m_pMenu != NULL) {
+		delete m_pMenu;
+		m_pMenu = NULL;
+	}
+	m_pMenu = new CMenuWnd();
+	CMenuWnd::GetGlobalContextMenuObserver().SetMenuCheckInfo(&m_MenuInfos);
+	CDuiPoint point;
+	::GetCursorPos(&point);
+
+	m_pMenu->Init(NULL, _T("menu.xml"), point, &m_pm);
+
+
+	// 动态添加后重新设置菜单的大小
+	m_pMenu->ResizeMenu();
+}
+
+void CMainFrame::TicketPlaceChgCb(TNotifyUI& msg)
+{
+	CDuiString  begStationCode = m_pBegPlaceCombo->GetUserData();
+	CDuiString  endStationCode = m_pEndPlaceCombo->GetUserData();
+
+
+	CStation *begStation = Client12306Manager::Instance()->GetStationByCode(UnicodeToUtf8(begStationCode.GetData()));
+
+
+
+	CStation *endStation = Client12306Manager::Instance()->GetStationByCode(UnicodeToUtf8(endStationCode.GetData()));
+
+
+
+	m_pBegPlaceCombo->RemoveAll();
+	m_pEndPlaceCombo->RemoveAll();
+
+
+	CListLabelElementUI *b = new CListLabelElementUI();
+	b->SetText(Utf8ToUnicode(endStation->GetChinaName()).c_str());
+	b->SetUserData(Utf8ToUnicode(endStation->GetStationCode()).c_str());
+
+	m_pBegPlaceCombo->Add(b);
+	m_pBegPlaceCombo->Refresh();
+	m_pBegPlaceCombo->SelectItem(0);
+
+
+	b = new CListLabelElementUI();
+	b->SetText(Utf8ToUnicode(begStation->GetChinaName()).c_str());
+	b->SetUserData(Utf8ToUnicode(begStation->GetStationCode()).c_str());
+
+	m_pEndPlaceCombo->Add(b);
+	m_pEndPlaceCombo->Refresh();
+	m_pEndPlaceCombo->SelectItem(0);
+}
+
+void CMainFrame::OrderTicketCb(TNotifyUI& msg)
+{
+	COrderTicketWnd::MessageBox(GetHWND());
+}
+
+void CMainFrame::TrainAllChkBtnCb(TNotifyUI& msg)
+{
+	m_bAllTrainType = !m_bAllTrainType;
+
+	RefreshAllTrainCHeckBox(m_bAllTrainType);
+
+	RefreshTicketListView();
+}
+
+void CMainFrame::TrainGcCkgBtnCb(TNotifyUI& msg)
+{
+	CCheckBoxUI *pCheckBoxUI = dynamic_cast<CCheckBoxUI*>(msg.pSender);
+
+	if (pCheckBoxUI->GetCheck())
+		m_setShowTrainType.insert(_GC);
+	else
+		m_setShowTrainType.erase(_GC);
+
+	RefreshTicketListView();
+}
+
+void CMainFrame::TrainDCkgBtnCb(TNotifyUI& msg)
+{
+	CCheckBoxUI *pCheckBoxUI = dynamic_cast<CCheckBoxUI*>(msg.pSender);
+
+	if (pCheckBoxUI->GetCheck())
+		m_setShowTrainType.insert(_D);
+	else
+		m_setShowTrainType.erase(_D);
+
+	RefreshTicketListView();
+}
+
+void CMainFrame::TrainZCkgBtnCb(TNotifyUI& msg)
+{
+	CCheckBoxUI *pCheckBoxUI = dynamic_cast<CCheckBoxUI*>(msg.pSender);
+
+	if (pCheckBoxUI->GetCheck())
+		m_setShowTrainType.insert(_Z);
+	else
+		m_setShowTrainType.erase(_Z);
+
+	RefreshTicketListView();
+}
+
+void CMainFrame::TrainTCkgBtnCb(TNotifyUI& msg)
+{
+	CCheckBoxUI *pCheckBoxUI = dynamic_cast<CCheckBoxUI*>(msg.pSender);
+
+	if (pCheckBoxUI->GetCheck())
+		m_setShowTrainType.insert(_T);
+	else
+		m_setShowTrainType.erase(_T);
+
+	RefreshTicketListView();
+}
+
+void CMainFrame::TrainKCkgBtnCb(TNotifyUI& msg)
+{
+	CCheckBoxUI *pCheckBoxUI = dynamic_cast<CCheckBoxUI*>(msg.pSender);
+
+	if (pCheckBoxUI->GetCheck())
+		m_setShowTrainType.insert(_K);
+	else
+		m_setShowTrainType.erase(_K);
+
+	RefreshTicketListView();
+}
+
+void CMainFrame::TrainOCkgBtnCb(TNotifyUI& msg)
+{
+	CCheckBoxUI *pCheckBoxUI = dynamic_cast<CCheckBoxUI*>(msg.pSender);
+
+	if (pCheckBoxUI->GetCheck())
+		m_setShowTrainType.insert(_O);
+	else
+		m_setShowTrainType.erase(_O);
+
+	RefreshTicketListView();
+}
+
+void CMainFrame::OrderExpandBtn(TNotifyUI& msg)
+{
+	CCheckBoxUI *pOrderExpandBtn = dynamic_cast<CCheckBoxUI*>(msg.pSender);
+
+	CListUI* pLstTicket = (CListUI*)m_pm.FindControl(pOrderExpandBtn->GetUserData());
+
+	m_pOrderManagerUI->RefreshOrderDetailList(pLstTicket, pOrderExpandBtn->GetCheck());
+
+}
+
+void CMainFrame::TxtChgBegPlaceCb(TNotifyUI& msg)
+{
+	DUI__Trace(_T("textchanged  %s "), m_pBegPlaceCombo->GetText().GetData());
+
+	m_pBegPlaceCombo->RemoveAll();
+
+
+
+	std::string sFind(UnicodeToUtf8(m_pBegPlaceCombo->GetText().GetData()).c_str());
+	std::vector<CStation*> vecStation = Client12306Manager::Instance()->GetStation(sFind);
+
+	StationComboRefresh(m_pBegPlaceCombo, vecStation);
+}
+
+void CMainFrame::TxtChgEndPlaceCb(TNotifyUI& msg)
+{
+	DUI__Trace(_T("textchanged  %s "), m_pEndPlaceCombo->GetText().GetData());
+
+	m_pEndPlaceCombo->RemoveAll();
+
+
+
+	std::string sFind(UnicodeToUtf8(m_pEndPlaceCombo->GetText().GetData()).c_str());
+	std::vector<CStation*> vecStation = Client12306Manager::Instance()->GetStation(sFind);
+
+	StationComboRefresh(m_pEndPlaceCombo, vecStation);
 }
 
 ///////////////////////
@@ -739,6 +771,7 @@ void COrderWorker::run()
 		
 		int iRetFlag = Client12306Manager::Instance()->QueryMyOrder(UnicodeToUtf8(m_strBegDate.GetData()),
 			UnicodeToUtf8(m_strEndDate.GetData()),
+			UnicodeToUtf8(m_strType.GetData()),
 			UnicodeToUtf8(m_strSeqTrainName.GetData()) , *m_mapTicket);
 
 

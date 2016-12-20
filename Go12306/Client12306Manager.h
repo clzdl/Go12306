@@ -36,6 +36,7 @@
 
 #include "TicketModel.h"
 #include "OrderModel.h"
+#include "Passenger.h"
 
 using Poco::StreamCopier;
 using Poco::Net::Context;
@@ -134,7 +135,7 @@ public:
 
 	/*@action: 查询用户订单
 	*/
-	int QueryMyOrder(std::string startDate , std::string endDate , std::string seqTrainName , std::map<string, COrderModel> &mapOrder);
+	int QueryMyOrder(std::string startDate , std::string endDate , std::string type, std::string seqTrainName , std::map<string, COrderModel> &mapOrder);
 
 	/*@action:  查询站点新
 	*/
@@ -153,6 +154,15 @@ public:
 	/*@action:
 	*/
 	CStation* GetStationByCode(std::string code);
+
+	/*@action:
+	*/
+
+	int QueryPassenger();
+
+	/*@action:
+	*/
+	std::map<std::string, CPassenger>& GetPassenger() { return m_mapPassenger; }
 
 private:
 
@@ -214,6 +224,10 @@ private:
 	int ParseStationString(std::string res);
 
 
+	/*@action:
+	*/
+	int ParsePassengerString(std::string res );
+
 
 	Client12306Manager();
 
@@ -247,5 +261,7 @@ private:
 	///根据拼音全拼排序
 	std::vector<CStation*> m_vecStationByPYSort;
 
+	///乘客信息
+	std::map<std::string, CPassenger> m_mapPassenger;
 };
 

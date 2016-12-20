@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Window size="800,572" sizebox="4,4,6,6" roundcorner="0,0" caption="0,0,0,64" layered="false" mininfo="400,300" showshadow="true" shadowimage="main/shadow.png" shadowsize="6" shadowcorner="8,8,8,8">
+	<Font shared="true" id="0" name="宋体" size="13" default="true"/>
+	<Font shared="true" id="1" name="宋体" size="12" bold="false" underline="true"/>
+	
+	<VerticalLayout bkcolor="#FFDCDCDC" height="564">
+		<HorizontalLayout name="appbar" height="64" >
+			<HorizontalLayout name="apptitle" childpadding="6">
+				<Container width="64" height="64" bkimage="logo.png" />
+				<VerticalLayout inset="0,10,0,0" childpadding="5">
+					<Label name="title_lb" text="车票预订" valign="vcenter" align="left" wordbreak="true" textcolor="#FF000000" font="2"/>
+				</VerticalLayout>
+			</HorizontalLayout>
+
+			<HorizontalLayout inset="0,-1,0,0" float="true" width="40" floatalign="right,top">
+				<FadeButton name="closebtn" width="39" height="20" tooltip="关闭" normalimage="file='sysbtn/btn_close_normal.png'" hotimage="file='sysbtn/btn_close_highlight.png'" pushedimage="file='sysbtn/btn_close_down.png' "/>
+			</HorizontalLayout>
+		  
+		</HorizontalLayout>
+
+		
+		<Label height="1" bkimage="common/hor_line.png"/>
+		
+	   <HorizontalLayout bkcolor="#FFDCDCDC">
+			<List name="passengerListView" width="350" itemshowrowline="true" itemlinecolor="0x00FFFFFF" bordersize="1,1,1,1" bordercolor="#F" vscrollbar="true" hscrollbar="true"  itemvalign="vcenter" scrollstepsize="100">
+			  <ListHeader height="40">
+				<ListHeaderItem text="姓名" width="80" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+				<ListHeaderItem text="证件类型" width="100" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+				<ListHeaderItem text="证件号码" width="150" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+			  </ListHeader>
+			</List>
+	  </HorizontalLayout>
+	</VerticalLayout>
+</Window>

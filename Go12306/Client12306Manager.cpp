@@ -321,6 +321,9 @@ int Client12306Manager::QueryLeftTicket(std::string begPlace, std::string endPla
 		strService += "purpose_codes=";
 		switch(ticketType)
 		{
+		case _STUDENT:
+			strService += "0X00";
+			break;
 		case _ADULT:
 		default:
 			strService += "ADULT";
@@ -950,7 +953,7 @@ int Client12306Manager::InitMy12306(std::string &res)
 }
 
 
-int Client12306Manager::QueryMyOrder(std::string startDate, std::string endDate, std::string seqTrainName,std::map<string, COrderModel> &mapOrder)
+int Client12306Manager::QueryMyOrder(std::string startDate, std::string endDate , std::string type, std::string seqTrainName,std::map<string, COrderModel> &mapOrder)
 {
 	int iRetFlag = SUCCESS;
 	try
@@ -964,7 +967,7 @@ int Client12306Manager::QueryMyOrder(std::string startDate, std::string endDate,
 
 		std::map<string, string> param;
 		/// 1: 订单日期  ， 2： 乘车日期
-		param["queryType"] = "1";
+		param["queryType"] = type;
 		param["queryStartDate"] = startDate;
 		param["queryEndDate"] = endDate;
 		param["come_from_flag"] = "my_order";
@@ -979,11 +982,8 @@ int Client12306Manager::QueryMyOrder(std::string startDate, std::string endDate,
 		std::string response = ExecPost(strService, &param, &header);
 		std::string gunRes;
 		Gunzip((Byte*)const_cast<char*>(response.c_str()), response.length(), gunRes);
-
-		DUI__Trace(_T("%s"), Utf8ToUnicode(gunRes).c_str());
-
 		
-		iRetFlag = JsonParseOrder(gunRes, mapOrder);;
+		iRetFlag = JsonParseOrder(gunRes, mapOrder);
 	}
 	catch (Poco::Exception &e)
 	{
@@ -1406,4 +1406,111 @@ CStation* Client12306Manager::GetStationByCode(std::string code)
 	}
 
 	return pRet;
+}
+
+
+int Client12306Manager::QueryPassenger()
+{
+	int iRetFlag = SUCCESS;
+	try
+	{
+
+		string strService = "/otn/confirmPassenger/getPassengerDTOs";
+
+
+		std::string response = ExecGet(strService);
+		std::string gunRes;
+		Gunzip((Byte*)const_cast<char*>(response.c_str()), response.length(), gunRes);
+
+		DUI__Trace(_T("%s"), Utf8ToUnicode(gunRes).c_str());
+
+		ParsePassengerString(gunRes);
+	}
+	catch (Poco::Exception &e)
+	{
+		DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
+		return FAIL;
+	}
+
+	return iRetFlag;
+}
+
+int Client12306Manager::ParsePassengerString(std::string res)
+{
+	try
+	{
+		JSON::Parser parser;
+		Dynamic::Var result;
+
+		result = parser.parse(res);
+
+		JSON::Object::Ptr pObj = result.extract<JSON::Object::Ptr>();
+
+		Dynamic::Var jStatus = pObj->get("status");
+
+		if (jStatus.toString() != "true")
+		{
+			DUI__Trace(Utf8ToUnicode(jStatus.toString()).c_str());
+			return FAIL;
+		}
+
+		if (pObj->has("url"))
+		{
+			if (pObj->has("messages"))
+			{
+				Dynamic::Var jMsg = pObj->get("messages");
+				m_strLastErrInfo = jMsg.toString();
+			}
+
+			return FAIL;
+		}
+
+
+		////data object
+		Dynamic::Var pData = pObj->get("data");
+
+		JSON::Object::Ptr jData = pData.extract<JSON::Object::Ptr>();
+
+
+
+
+		////订单个数
+		
+
+		JSON::Array::Ptr jNorPassengers = jData->getArray("normal_passengers");
+		int cnt = jNorPassengers->size();
+
+		for (int i = 0; i < cnt; ++i)
+		{
+
+			Dynamic::Var pPassengerObj = jNorPassengers->get(i);
+			JSON::Object::Ptr jPassengerObj = pPassengerObj.extract<JSON::Object::Ptr>();
+
+			CPassenger passenger;
+
+			///
+			Dynamic::Var pName = jPassengerObj->get("passenger_name");
+
+			passenger.SetName(Utf8ToUnicode( pName.toString() ).c_str() );
+
+			Dynamic::Var pTypeCode = jPassengerObj->get("passenger_id_type_code");
+			passenger.SetCardType(Utf8ToUnicode(pTypeCode.toString()).c_str());
+
+			Dynamic::Var pTypeName = jPassengerObj->get("passenger_id_type_name");
+			passenger.SetCardTypeName(Utf8ToUnicode(pTypeName.toString()).c_str());
+
+			Dynamic::Var pIdNo = jPassengerObj->get("passenger_id_no");
+			
+			passenger.SetCardNo(Utf8ToUnicode(pIdNo.toString()).c_str());
+
+			m_mapPassenger.insert(std::pair<std::string, CPassenger>(UnicodeToUtf8(passenger.GetCardNo().GetData()), passenger));
+		}
+	}
+	catch (Exception &e)
+	{
+		m_strLastErrInfo = e.displayText();
+		return FAIL;
+	}
+
+	return SUCCESS;
 }

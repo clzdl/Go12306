@@ -160,7 +160,10 @@
     <ClInclude Include="MsgWnd.h" />
     <ClInclude Include="OrderManagerUI.h" />
     <ClInclude Include="OrderModel.h" />
+    <ClInclude Include="OrderTicketWnd.h" />
     <ClInclude Include="OthFunc.h" />
+    <ClInclude Include="Passenger.h" />
+    <ClInclude Include="PassengerManagerUI.h" />
     <ClInclude Include="ProgressDlg.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SkinFrame.h" />
@@ -180,7 +183,10 @@
     <ClCompile Include="MsgWnd.cpp" />
     <ClCompile Include="OrderManagerUI.cpp" />
     <ClCompile Include="OrderModel.cpp" />
+    <ClCompile Include="OrderTicketWnd.cpp" />
     <ClCompile Include="OthFunc.cpp" />
+    <ClCompile Include="Passenger.cpp" />
+    <ClCompile Include="PassengerManagerUI.cpp" />
     <ClCompile Include="ProgressDlg.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -207,6 +213,7 @@
     </Xml>
     <Xml Include="res\skin\order_manager_pannel.xml" />
     <Xml Include="res\skin\ticket_query_pannel.xml" />
+    <Xml Include="res\skin\user_manager_pannel.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -38,7 +38,7 @@ void CCode12306CertUI::DoEvent(TEventUI& event)
 {
 	if (event.Type == UIEVENT_RBUTTONUP)
 	{
-
+		m_vecClickPoints.clear();
 		Client12306Manager::Instance()->QueryPassCode("login", m_ortImageBytes);
 		Invalidate();
 	}

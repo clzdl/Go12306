@@ -21,6 +21,7 @@ class CTicketManager;
 class CTicketWorker;
 class COrderWorker;
 class CProgressDlg;
+class CPassengerManagerUI;
 
 
 
@@ -76,16 +77,43 @@ public:
 
 	void Notify(TNotifyUI& msg);
 	
-	void OnLClick(CControlUI *pControl);
+	//void OnLClick(CControlUI *pControl);
+
+	void TicketQueryCb(TNotifyUI& msg);
+	void OrderQueryCb(TNotifyUI& msg);
+	void OrderTicketCb(TNotifyUI& msg);
+	void TicketPlaceChgCb(TNotifyUI& msg);
+	void MenuBtnCb(TNotifyUI& msg);
+
+
+	
+	void TrainAllChkBtnCb(TNotifyUI& msg);
+	void TrainGcCkgBtnCb(TNotifyUI& msg);
+	void TrainDCkgBtnCb(TNotifyUI& msg);
+	void TrainZCkgBtnCb(TNotifyUI& msg);
+	void TrainTCkgBtnCb(TNotifyUI& msg);
+	void TrainKCkgBtnCb(TNotifyUI& msg);
+	void TrainOCkgBtnCb(TNotifyUI& msg);
+	void OrderExpandBtn(TNotifyUI& msg);
+
+	void TxtChgBegPlaceCb(TNotifyUI& msg);
+	void TxtChgEndPlaceCb(TNotifyUI& msg);
+
+	
+	
 
 	CPaintManagerUI* GetPaintManagerUI() { return &m_pm; }
+
+
+	DUI_DECLARE_MESSAGE_MAP()
+
 
 private:
 
 	int QueryTicket(CDuiString begPlace , CDuiString endPlace, CDuiString travelTime, _TICKET_TYPE ticketType);
 
 
-	int QueryMyOrder();
+	int QueryMyOrder(CDuiString begDate, CDuiString endDate , CDuiString type, CDuiString seqTrainName);
 
 
 	/*@action: À¢–¬”‡∆±¡–±Ì
@@ -109,6 +137,7 @@ private:
 	/*@action:
 	*/
 	int StationComboRefresh(CEditComboUI *pEditComboUI , std::vector<CStation*> &vec);
+
 
 
 	CButtonUI* m_pCloseBtn;
@@ -152,6 +181,8 @@ private:
 
 	COrderManagerUI *m_pOrderManagerUI;
 	CTicketManager *m_pTicketManagerUI;
+	CPassengerManagerUI *m_pPassengerManagerUI;
+
 
 	CProgressDlg* m_pProgressDlg;
 };
@@ -214,16 +245,18 @@ public:
 	}
 
 
-	void SetQueryParam(CDuiString begDate, CDuiString endDate, CDuiString seqTrainName)
+	void SetQueryParam(CDuiString begDate, CDuiString endDate , CDuiString type, CDuiString seqTrainName)
 	{
 		m_strBegDate = begDate;
 		m_strEndDate = endDate;
+		m_strType = type;
 		m_strSeqTrainName = seqTrainName;
 	}
 
 private:
 	CDuiString  m_strBegDate;
 	CDuiString  m_strEndDate;
+	CDuiString  m_strType;
 	CDuiString  m_strSeqTrainName;
 
 	std::map<string,COrderModel> *m_mapTicket;

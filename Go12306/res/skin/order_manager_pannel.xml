@@ -4,7 +4,7 @@
 	<HorizontalLayout height="30" childpadding="4" bordersize="1,1,1,1" bordercolor="#F" >
 		<Combo name="comboOrderQueryType" itemfont="2" width="150" style="combo_style" dropbox="hscrollbar=&quot;true&quot;" textcolor="#FFFFFFFF" >
 			<ListLabelElement text="按订票日期查询" userdata="1" selected="true" height="23" />
-			<ListLabelElement text="按乘车日期查询" userdata="1" height="23" />
+			<ListLabelElement text="按乘车日期查询" userdata="2" height="23" />
 		</Combo>
 		
 		<Label text="查询日期" textcolor="#FF000000" glowsize="0" font="font13" width="60"/>
@@ -13,7 +13,7 @@
 		<Label text="-" textcolor="#FF000000" glowsize="0" align="center" font="font13" width="10"/>
 		<DateTime name="orderQueryEndDate" width="120" bordersize="1" bordercolor="#FF888888" textpadding="3" />
 
-		<Edit name="edit1" tipvalue="订单号/车次/姓名" style="edit_style" />
+		<Edit name="edtSeqString" tipvalue="订单号/车次/姓名" style="edit_style" />
 
 		<Button name="btnOrderQuery" text="查询" textcolor="#FF000000" style="btn_style" width="60" textpadding="20,0,0,0" foreimage="dest='4,7,20,23' res='common/SearchIcon.png'" />
 	</HorizontalLayout>

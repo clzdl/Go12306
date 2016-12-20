@@ -23,6 +23,9 @@ public:
 	DUI_DECLARE_MESSAGE_MAP()
 		virtual void OnClick(TNotifyUI& msg);
 
+	virtual void Login(TNotifyUI& msg);
+	virtual void Cancel(TNotifyUI& msg);
+
 	virtual LRESULT OnSysCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
