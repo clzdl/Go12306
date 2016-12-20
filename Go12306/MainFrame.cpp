@@ -58,7 +58,8 @@ void CMainFrame::InitWindow()
 	m_pEndPlaceCombo = static_cast<CEditComboUI*>(m_pm.FindControl(_T("endPlace")));
 	m_pTicketLeaveTimeUI = static_cast<CDateTimeUI*>(m_pm.FindControl(_T("ticketLeaveTime")));
 	
-	
+	m_pTikcetAdult = static_cast<COptionUI*>(m_pm.FindControl(_T("ticketAdult")));
+	m_pTikcetStudent = static_cast<COptionUI*>(m_pm.FindControl(_T("ticketStudent")));
 
 	////
 
@@ -269,10 +270,7 @@ LRESULT CMainFrame::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam,
 		return 0;
 
 	}
-	else if (uMsg == WM_PAINT)
-	{
-		DUI__Trace(_T("CMainFrame::WM_PAINT"));
-	}
+	
 	
 	bHandled = FALSE;
 	return 0;
@@ -415,6 +413,7 @@ void CMainFrame::Notify(TNotifyUI& msg)
 		}
 		
 		
+		
 	}
 	else if (msg.sType == _T("textchanged"))
 	{
@@ -468,7 +467,18 @@ void CMainFrame::OnLClick(CControlUI *pControl)
 		CDuiString begPlace =  m_pBegPlaceCombo->GetUserData();
 		CDuiString endPlace = m_pEndPlaceCombo->GetUserData();
 		CDuiString leaveTime =  m_pTicketLeaveTimeUI->GetText();
-		QueryTicket(begPlace, endPlace, leaveTime);
+		_TICKET_TYPE ticketType = _ADULT;
+
+		if (begPlace.IsEmpty() || endPlace.IsEmpty())
+		{
+			CMsgWnd::MessageBox(GetHWND() , _T("提示") , _T("请选择始发地/目的地"));
+			return;
+		}
+		
+		if (m_pTikcetStudent->IsSelected())
+			ticketType = _STUDENT;
+
+		QueryTicket(begPlace, endPlace, leaveTime , ticketType);
 
 	}
 	else if (sName.CompareNoCase(_T("btnOrderQuery")) == 0)
@@ -493,24 +503,58 @@ void CMainFrame::OnLClick(CControlUI *pControl)
 		// 动态添加后重新设置菜单的大小
 		m_pMenu->ResizeMenu();
 	}
-	
+	else if (sName.CompareNoCase(_T("btnTicketPlaceChg")) == 0 )
+	{
+		
+		CDuiString  begStationCode = m_pBegPlaceCombo->GetUserData();
+		CDuiString  endStationCode = m_pEndPlaceCombo->GetUserData();
+
+
+		CStation *begStation = Client12306Manager::Instance()->GetStationByCode(UnicodeToUtf8(begStationCode.GetData()));
+
+
+
+		CStation *endStation = Client12306Manager::Instance()->GetStationByCode(UnicodeToUtf8(endStationCode.GetData()));
+
+
+
+		m_pBegPlaceCombo->RemoveAll();
+		m_pEndPlaceCombo->RemoveAll();
+		
+
+		CListLabelElementUI *b = new CListLabelElementUI();
+		b->SetText(Utf8ToUnicode(endStation->GetChinaName()).c_str());
+		b->SetUserData(Utf8ToUnicode(endStation->GetStationCode()).c_str());
+
+		m_pBegPlaceCombo->Add(b);
+		m_pBegPlaceCombo->Refresh();
+		m_pBegPlaceCombo->SelectItem(0);
+
+
+		b = new CListLabelElementUI();
+		b->SetText(Utf8ToUnicode(begStation->GetChinaName()).c_str());
+		b->SetUserData(Utf8ToUnicode(begStation->GetStationCode()).c_str());
+
+		m_pEndPlaceCombo->Add(b);
+		m_pEndPlaceCombo->Refresh();
+		m_pEndPlaceCombo->SelectItem(0);
+
+		
+			
+	}
 	
 	
 	
 }
 
 
-int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString travelTime )
+int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString travelTime , _TICKET_TYPE ticketType)
 {
-
-
 
 	m_pProgressDlg = CProgressDlg::CreateDlg(this->GetHWND());
 	
-	
-
 	m_tWorker->SetVecTicket(&m_vecTicket);
-	m_tWorker->SetQueryParam(begPlace, endPlace, travelTime,_ADULT);
+	m_tWorker->SetQueryParam(begPlace, endPlace, travelTime, ticketType);
 	m_tpWorker.start(*m_tWorker);
 	m_pProgressDlg->ShowModal();
 

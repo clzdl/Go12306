@@ -1393,3 +1393,17 @@ std::vector<CStation*> Client12306Manager::GetStation(std::string vPrefix)
 
 	return vecRes;
 }
+
+
+CStation* Client12306Manager::GetStationByCode(std::string code)
+{
+	CStation* pRet = NULL;
+	std::map<std::string, CStation>::iterator it =  m_mapStation.find(code);
+
+	if (it != m_mapStation.end())
+	{
+		pRet = &(it->second);
+	}
+
+	return pRet;
+}

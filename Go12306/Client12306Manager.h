@@ -149,6 +149,11 @@ public:
 	/*@action: 
 	*/
 	std::vector<CStation*>& Get12306Station() { return m_vecStationByPYSort; }
+
+	/*@action:
+	*/
+	CStation* GetStationByCode(std::string code);
+
 private:
 
 

@@ -11,8 +11,8 @@
 
 		<Label text="出发日" textcolor="#FF000000" glowsize="0" font="font13" width="40"/>
 		<DateTime name="ticketLeaveTime" width="120" bordersize="1" bordercolor="#FF888888" textpadding="3"/>
-    <Option text="成人" font="2" width="65" group="radio_ticket_type" textpadding="30,0,0,0" normalimage="file='common/radio-unselected.png' source='2,2,30,30' dest='0,0,30,30'" selectedimage="file='common/radio-selected.png' source='2,2,30,30' dest='0,0,30,30'"/>
-    <Option text="学生" font="2" width="65" group="radio_ticket_type" textpadding="30,0,0,0" normalimage="file='common/radio-unselected.png' source='2,2,30,30' dest='0,0,30,30'" selectedimage="file='common/radio-selected.png' source='2,2,30,30' dest='0,0,30,30'"/>
+    <Option text="成人" name="ticketAdult" selected="true" font="2" width="65" group="radio_ticket_type" textpadding="30,0,0,0" normalimage="file='common/radio-unselected.png' source='2,2,30,30' dest='0,0,30,30'" selectedimage="file='common/radio-selected.png' source='2,2,30,30' dest='0,0,30,30'"/>
+    <Option text="学生" name="ticketStudent" font="2" width="65" group="radio_ticket_type" textpadding="30,0,0,0" normalimage="file='common/radio-unselected.png' source='2,2,30,30' dest='0,0,30,30'" selectedimage="file='common/radio-selected.png' source='2,2,30,30' dest='0,0,30,30'"/>
 		<Button name="btnTicketQuery" text="查询" textcolor="#FF000000" style="btn_style" width="60" textpadding="20,0,0,0" foreimage="dest='4,7,20,23' res='other/icon.png'" />
 	</HorizontalLayout>
 

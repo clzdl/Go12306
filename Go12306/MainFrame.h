@@ -82,7 +82,7 @@ public:
 
 private:
 
-	int QueryTicket(CDuiString begPlace , CDuiString endPlace, CDuiString travelTime );
+	int QueryTicket(CDuiString begPlace , CDuiString endPlace, CDuiString travelTime, _TICKET_TYPE ticketType);
 
 
 	int QueryMyOrder();
@@ -129,6 +129,10 @@ private:
 	CEditComboUI *m_pBegPlaceCombo;
 	CEditComboUI *m_pEndPlaceCombo;
 	CDateTimeUI *m_pTicketLeaveTimeUI;
+
+	COptionUI *m_pTikcetAdult;
+	COptionUI *m_pTikcetStudent;
+
 
 	
 		 
