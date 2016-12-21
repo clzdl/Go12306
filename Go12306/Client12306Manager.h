@@ -164,6 +164,10 @@ public:
 	*/
 	std::map<std::string, CPassenger>& GetPassenger() { return m_mapPassenger; }
 
+
+	/*@action 根据证件号码获取passenger信息
+	*/
+	CPassenger* GetPassengerByCardNo(std::string cardNo);
 private:
 
 

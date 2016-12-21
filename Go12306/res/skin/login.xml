@@ -1,26 +1,26 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Window caption="0,0,0,40" size="400,380" showshadow="true" shadowimage="main/shadow.png" shadowsize="6" shadowcorner="8,8,8,8">
+<Window caption="0,0,0,40" size="380,350" showshadow="true" shadowimage="main/shadow.png" shadowsize="6" shadowcorner="8,8,8,8">
   <Font id="0" name="微软雅黑" size="12" default="true"/>
   <Font id="1" name="微软雅黑" size="14"/>
 
-  <VerticalLayout  bkcolor="#FFDCDCDC">
+  <VerticalLayout  bkcolor="#FFDCDCDC" >
     <HorizontalLayout name="appbar" height="30" inset="6,-1" bkcolor="#FF202223" >
 	  <Label name="MessageTitle" valign="vcenter" text="用户登录" textcolor="#FFFFFFFF" font="1" />
       <Button name="closebtn" width="39" height="20" tooltip="关闭" normalimage="file='sysbtn/btn_close_normal.png'" hotimage="file='sysbtn/btn_close_highlight.png'" pushedimage="file='sysbtn/btn_close_down.png'"/>
     </HorizontalLayout>
-	
-	
-	<HorizontalLayout height="40" inset="10,10,10,10">
+
+    <Label height="4"/>
+	<HorizontalLayout height="35" inset="4,4,4,4">
 		<Label name="txtLoginName" width="60" valign="vcenter" text="用户名" font="1" />
-        <Edit name="edtLoginName" width="293" tipvalue="用户名" style="edit_style"/>
+    <Edit name="edtLoginName" width="293"  tipvalue="用户名" style="edit_style"/>
 	</HorizontalLayout>
 	
-	<HorizontalLayout height="40" inset="10,10,10,10">
+	<HorizontalLayout height="35" inset="4,4,4,4">
 		<Label name="txtLoginPwd" width="60" valign="vcenter" text="密码" font="1" />
         <Edit name="edtLoginPwd" width="293" tipvalue="密码" style="edit_style" password="true" passwordchar="●"/>
 	</HorizontalLayout>
 	
-	<HorizontalLayout  height="210" inset="10,10,10,10">
+	<HorizontalLayout  height="200" inset="4,4,4,4">
 		<Label name="txtLoginName"  width="60" valign="vcenter" text="验证码" font="1" />
 
 		<Code12306Cert name="code12306Code" width="293" height="190" normalimage="file='sysbtn/btn_close_highlight.png'" tooltip="右键点击切换验证码"/>
@@ -28,7 +28,7 @@
 		<Control />
 	</HorizontalLayout>
 	
-    <HorizontalLayout height="60" inset="10,10,10,10">
+    <HorizontalLayout height="40" inset="4,4,4,4">
       <Control />
       <Button name="btnLogin" font="1" text="登录" height="30" width="75" align="center" valign="vcenter" style="colorbtn_style"/>
       <Button name="btnCancel" font="1" text="取消" height="30" width="75" align="center" valign="vcenter" style="colorbtn_style"/>

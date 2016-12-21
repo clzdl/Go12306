@@ -1,8 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Window size="800,572" sizebox="4,4,6,6" roundcorner="0,0" caption="0,0,0,64" layered="false" mininfo="400,300" showshadow="true" shadowimage="main/shadow.png" shadowsize="6" shadowcorner="8,8,8,8">
 	<Font shared="true" id="0" name="宋体" size="13" default="true"/>
-	<Font shared="true" id="1" name="宋体" size="12" bold="false" underline="true"/>
-	
+	<Font shared="true" id="1" name="宋体" size="14" bold="true" underline="true"/>
+ 
+  <Style name="combo_style"  value="height=&quot;28&quot; textcolor=&quot;#FFFFFFFF&quot; textpadding=&quot;4,1,28,1&quot; normalimage=&quot;res='common/combo.png' source='0,0,161,28' corner='2,2,28,2'&quot; hotimage=&quot;res='common/combo.png' source='0,28,161,56' corner='2,2,28,2'&quot; pushedimage=&quot;res='common/combo.png' source='0,56,161,84' corner='2,2,28,2'&quot;" />
+  
+  
 	<VerticalLayout bkcolor="#FFDCDCDC" height="564">
 		<HorizontalLayout name="appbar" height="64" >
 			<HorizontalLayout name="apptitle" childpadding="6">
@@ -12,23 +15,68 @@
 				</VerticalLayout>
 			</HorizontalLayout>
 
-			<HorizontalLayout inset="0,-1,0,0" float="true" width="40" floatalign="right,top">
-				<FadeButton name="closebtn" width="39" height="20" tooltip="关闭" normalimage="file='sysbtn/btn_close_normal.png'" hotimage="file='sysbtn/btn_close_highlight.png'" pushedimage="file='sysbtn/btn_close_down.png' "/>
+			<HorizontalLayout inset="0,-1,0,0" float="true" width="70" floatalign="right,top">
+        <FadeButton name="maxbtn" width="28" height="20" tooltip="最大化" normalimage="file='sysbtn/btn_max_normal.png'" hotimage="file='sysbtn/btn_max_highlight.png'" pushedimage="file='sysbtn/btn_max_down.png' "/>
+        <FadeButton name="restorebtn" width="28" height="20" tooltip="还原" visible="false" normalimage="file='sysbtn/btn_restore_normal.png'" hotimage="file='sysbtn/btn_restore_highlight.png'" pushedimage="file='sysbtn/btn_restore_down.png' "/>
+        <FadeButton name="closebtn" width="39" height="20" tooltip="关闭" normalimage="file='sysbtn/btn_close_normal.png'" hotimage="file='sysbtn/btn_close_highlight.png'" pushedimage="file='sysbtn/btn_close_down.png' "/>
 			</HorizontalLayout>
 		  
 		</HorizontalLayout>
 
 		
 		<Label height="1" bkimage="common/hor_line.png"/>
-		
-	   <HorizontalLayout bkcolor="#FFDCDCDC">
-			<List name="passengerListView" width="350" itemshowrowline="true" itemlinecolor="0x00FFFFFF" bordersize="1,1,1,1" bordercolor="#F" vscrollbar="true" hscrollbar="true"  itemvalign="vcenter" scrollstepsize="100">
-			  <ListHeader height="40">
-				<ListHeaderItem text="姓名" width="80" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
-				<ListHeaderItem text="证件类型" width="100" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
-				<ListHeaderItem text="证件号码" width="150" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
-			  </ListHeader>
-			</List>
-	  </HorizontalLayout>
-	</VerticalLayout>
+
+
+    <Label text="列车信息" font="1" bkcolor="#FFFFFFFF"/>
+      
+    <HorizontalLayout name="trainInfo" hscrollbar="true" height ="30" inset="10,2">
+      <Label text="2016-12-21（周三）" width="150"/>
+      <Label text="Z286次" width="80"/>
+      <Label text="石家庄站（14:33开）" width="150" />
+      <Label text="—" width="10" />
+      <Label text="北京西站（17:03到）" width="150" align="right"/>
+    </HorizontalLayout>
+
+    <HorizontalLayout name="seatInfo" hscrollbar="true" height ="30" inset="10,2">
+          <Label text="硬卧有票" width="150"/>
+          <Label text="硬座无票" width="150"/>
+          <Label text="软卧有票" width="150"/>
+          <Label text="无座有票" width="150"/>
+    </HorizontalLayout>
+
+    <Label height="1" bkimage="common/hor_line.png"/>
+    <Label text="乘客信息" font="1" bkcolor="#FFFFFFFF"/>
+    <HorizontalLayout >
+
+      <VerticalLayout inset="1,1,1,1" width="350">
+       
+        <List name="passengerListView" inset="2,2,2,2"   itemshowrowline="true" itemlinecolor="0x00FFFFFF" bordersize="1,1,1,1" bordercolor="#F" vscrollbar="true" hscrollbar="true"  itemvalign="vcenter" scrollstepsize="100">
+          <ListHeader height="40">
+            <ListHeaderItem text="姓名" width="80" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+            <ListHeaderItem text="证件类型" width="100" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+            <ListHeaderItem text="证件号码" width="150" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+          </ListHeader>
+        </List>
+      </VerticalLayout>
+
+      <VerticalLayout inset="1,1,1,1" >
+        <List name="orderListView" inset="2,2,2,2"  itemshowrowline="true" itemlinecolor="0x00FFFFFF" bordersize="1,1,1,1" bordercolor="#F" vscrollbar="true" hscrollbar="true"  itemvalign="vcenter" scrollstepsize="100">
+          <ListHeader height="40">
+            <ListHeaderItem text="席别" width="80" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+            <ListHeaderItem text="票种" width="80" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+            <ListHeaderItem text="姓名" width="80" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+            <ListHeaderItem text="证件类型" width="150" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+            <ListHeaderItem text="证件号码" width="150" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+            <ListHeaderItem text="手机号码" width="150" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+          </ListHeader>
+        </List>
+
+
+      </VerticalLayout>
+    </HorizontalLayout>
+
+    
+    
+  </VerticalLayout>
+    
 </Window>

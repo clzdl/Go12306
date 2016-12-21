@@ -46,3 +46,9 @@ int gzcompress(Bytef *data, uLong ndata, Bytef *zdata, uLong *nzdata);
 /*@action: ½âÑ¹ gzipµÄÑ¹ËõÁ÷  
 */
 int Gunzip(Byte *zdata, uLong nzdata , std::string &gunZipString);
+
+
+
+/*@action:
+*/
+long String2Number(std::string str);

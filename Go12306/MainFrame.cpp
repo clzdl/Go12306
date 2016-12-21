@@ -596,7 +596,13 @@ void CMainFrame::TicketPlaceChgCb(TNotifyUI& msg)
 
 void CMainFrame::OrderTicketCb(TNotifyUI& msg)
 {
-	COrderTicketWnd::MessageBox(GetHWND());
+	CButtonUI *orderTicket = static_cast<CButtonUI*>(msg.pSender);
+	int index = _wtoi(orderTicket->GetUserData().GetData());
+	
+	CTicketModel *pTicket= &(m_vecTicket[index]);
+	
+
+	COrderTicketWnd::MessageBox(GetHWND() , pTicket);
 }
 
 void CMainFrame::TrainAllChkBtnCb(TNotifyUI& msg)

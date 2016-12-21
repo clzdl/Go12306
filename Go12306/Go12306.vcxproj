@@ -208,10 +208,12 @@
     <None Include="res\duidemo.zip" />
   </ItemGroup>
   <ItemGroup>
+    <Xml Include="res\skin\login.xml" />
     <Xml Include="res\skin\main.xml">
       <SubType>Designer</SubType>
     </Xml>
     <Xml Include="res\skin\order_manager_pannel.xml" />
+    <Xml Include="res\skin\order_ticket_wnd.xml" />
     <Xml Include="res\skin\ticket_query_pannel.xml" />
     <Xml Include="res\skin\user_manager_pannel.xml" />
   </ItemGroup>

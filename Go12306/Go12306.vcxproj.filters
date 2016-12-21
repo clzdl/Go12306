@@ -176,5 +176,11 @@
     <Xml Include="res\skin\user_manager_pannel.xml">
       <Filter>资源文件</Filter>
     </Xml>
+    <Xml Include="res\skin\order_ticket_wnd.xml">
+      <Filter>资源文件</Filter>
+    </Xml>
+    <Xml Include="res\skin\login.xml">
+      <Filter>资源文件</Filter>
+    </Xml>
   </ItemGroup>
 </Project>

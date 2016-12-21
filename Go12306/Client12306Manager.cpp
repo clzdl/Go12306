@@ -1503,6 +1503,10 @@ int Client12306Manager::ParsePassengerString(std::string res)
 			
 			passenger.SetCardNo(Utf8ToUnicode(pIdNo.toString()).c_str());
 
+			Dynamic::Var pMobileNo = jPassengerObj->get("mobile_no");
+
+			passenger.SetPhoneNo(Utf8ToUnicode(pMobileNo.toString()).c_str());
+
 			m_mapPassenger.insert(std::pair<std::string, CPassenger>(UnicodeToUtf8(passenger.GetCardNo().GetData()), passenger));
 		}
 	}
@@ -1513,4 +1517,15 @@ int Client12306Manager::ParsePassengerString(std::string res)
 	}
 
 	return SUCCESS;
+}
+
+CPassenger* Client12306Manager::GetPassengerByCardNo(std::string cardNo)
+{
+	CPassenger *ret = NULL;
+	std::map<std::string, CPassenger>::iterator it = m_mapPassenger.find(cardNo);
+	if (it != m_mapPassenger.end())
+	{
+		ret = &(it->second);
+	}
+	return ret;
 }

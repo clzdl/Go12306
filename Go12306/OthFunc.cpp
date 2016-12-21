@@ -311,3 +311,23 @@ END:
 	return 0;
 
 }
+
+
+long String2Number(std::string str)
+{
+	long res = 0;
+	for (std::string::iterator it = str.begin(); it != str.end(); ++it)
+	{
+		unsigned char p = *it;
+		if (!isdigit(p))
+			return 0;
+
+		unsigned int i = p - 0x30;
+
+		res *= 10;
+		res += i;
+		
+	}
+
+	return res;
+}
