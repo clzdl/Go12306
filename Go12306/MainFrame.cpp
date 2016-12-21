@@ -32,14 +32,8 @@ DUI_BEGIN_MESSAGE_MAP(CMainFrame, WindowImplBase)
 	DUI_ON_SELECTCHANGED_CTRNAME(_T("train_k"), TrainKCkgBtnCb)
 	DUI_ON_SELECTCHANGED_CTRNAME(_T("train_o"), TrainOCkgBtnCb)
 	DUI_ON_SELECTCHANGED_CTRNAME(_T("ORDER_EXPAND_BTN"), OrderExpandBtn)
-	
 	DUI_ON_MSGTYPE_CTRNAME(_T("textchanged") , _T("begPlace") , TxtChgBegPlaceCb)
 	DUI_ON_MSGTYPE_CTRNAME(_T("textchanged"), _T("endPlace"), TxtChgEndPlaceCb)
-
-	
-
-	
-
 DUI_END_MESSAGE_MAP()
 
 

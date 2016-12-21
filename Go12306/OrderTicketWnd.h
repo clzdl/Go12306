@@ -45,6 +45,7 @@ public:
 	virtual void OnClick(TNotifyUI& msg);
 
 	void OnPassengerListItemClick(TNotifyUI& msg);
+	void OnDeleteOrderTicket(TNotifyUI& msg);
 
 	LRESULT HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 

@@ -4,7 +4,7 @@
 	<Font shared="true" id="1" name="宋体" size="14" bold="true" underline="true"/>
  
   <Style name="combo_style"  value="height=&quot;28&quot; textcolor=&quot;#FFFFFFFF&quot; textpadding=&quot;4,1,28,1&quot; normalimage=&quot;res='common/combo.png' source='0,0,161,28' corner='2,2,28,2'&quot; hotimage=&quot;res='common/combo.png' source='0,28,161,56' corner='2,2,28,2'&quot; pushedimage=&quot;res='common/combo.png' source='0,56,161,84' corner='2,2,28,2'&quot;" />
-  
+  <Style name="btn_style" value="drag=&quot;true&quot; textpadding=&quot;6,0,6,0&quot; normalimage=&quot;res='common/button_normal.png' corner='4,4,4,4'&quot; hotimage=&quot;res='common/button_hover.png' corner='4,4,4,4'&quot; pushedimage=&quot;res='common/button_pushed.png' corner='4,4,4,4'&quot; focusedimage=&quot;res='common/button_pushed.png' corner='4,4,4,4'&quot; selectedimage=&quot;res='common/button_pushed.png' corner='4,4,4,4'&quot;"  />
   
 	<VerticalLayout bkcolor="#FFDCDCDC" height="564">
 		<HorizontalLayout name="appbar" height="64" >
@@ -68,6 +68,7 @@
             <ListHeaderItem text="证件类型" width="150" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
             <ListHeaderItem text="证件号码" width="150" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
             <ListHeaderItem text="手机号码" width="150" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+            <ListHeaderItem text="操作" width="150" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
           </ListHeader>
         </List>
 

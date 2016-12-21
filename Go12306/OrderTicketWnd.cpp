@@ -5,10 +5,8 @@
 
 DUI_BEGIN_MESSAGE_MAP(COrderTicketWnd, WindowImplBase)
 	DUI_ON_MSGTYPE(DUI_MSGTYPE_CLICK, OnClick)
-
-	DUI_ON_MSGTYPE_CTRNAME(DUI_MSGTYPE_ITEMACTIVATE , _T("passengerListItem") , OnPassengerListItemClick)
-	
-
+	DUI_ON_MSGTYPE_CTRNAME(DUI_MSGTYPE_ITEMACTIVATE, _T("passengerListItem"), OnPassengerListItemClick)
+	DUI_ON_CLICK_CTRNAME(_T("BTN_DELETE_ORDER") , OnDeleteOrderTicket)
 DUI_END_MESSAGE_MAP()
 
 
@@ -142,7 +140,7 @@ void COrderTicketWnd::OnPassengerListItemClick(TNotifyUI& msg)
 		return;
 
 
-	AddOrderTicketList(passenger);
+	AddOrderTicketList(passenger );
 
 	
 
@@ -190,6 +188,17 @@ void COrderTicketWnd::AddOrderTicketList(CPassenger *passenger)
 	txtPhoneNo->SetAttribute(_T("align"), _T("center"));
 	txtPhoneNo->SetText(passenger->GetPhoneNo());
 	pListItem->Add(txtPhoneNo);
+
+
+	///É¾³ý°´Å¥
+	CButtonUI *btnDelete = new CButtonUI();
+	btnDelete->SetManager(&m_pm , NULL , false);
+	btnDelete->SetName(_T("BTN_DELETE_ORDER"));
+	btnDelete->SetAttribute(_T("style"), _T("btn_style"));
+	btnDelete->SetText(_T("É¾³ý"));
+	
+	pListItem->Add(btnDelete);
+
 
 
 }
@@ -325,9 +334,21 @@ CComboUI* COrderTicketWnd::CreateTicketTypeCombo()
 	pOpt = new CListLabelElementUI();
 	pOpt->SetText(_T("²Ð¾üÆ±"));
 	pOpt->SetUserData(_T("3"));
+
 	pElement->Add(pOpt);
 	
 	pElement->SelectItem(0);
 
 	return pElement;
+}
+
+void COrderTicketWnd::OnDeleteOrderTicket(TNotifyUI& msg)
+{
+	CButtonUI *pBtn = static_cast<CButtonUI*>(msg.pSender);
+
+	int index = m_pOrderListView->GetItemIndex(pBtn->GetParent());
+
+	m_pOrderListView->RemoveAt(index);
+
+
 }
