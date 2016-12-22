@@ -23,6 +23,8 @@ public:
 
 	void SetNormalImage(CDuiString v) { m_sNormalImage = v; }
 
+	void SetModule(CDuiString v) { m_sModule = v; }
+
 	std::vector<CDuiPoint> GetSelectedPoint();
 
 	void Refresh();
@@ -35,4 +37,5 @@ private:
 
 	std::vector<CDuiRect> m_vecClickPoints;
 
+	CDuiString m_sModule;   ///login   /  passenger
 };

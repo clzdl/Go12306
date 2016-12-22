@@ -56,6 +56,8 @@ public:
 	void SetSwzNum(CDuiString v) { m_strSwzNum = v; }
 	void SetSecretStr(CDuiString v) { m_strSecretStr = v; }
 	void SetBtnTextInfo(CDuiString v) { m_strBtnTextInfo = v; }
+	void SetTrainDate(CDuiString v) { m_strTrainDate = v; }
+	void SetTicketType(_TICKET_TYPE v) { m_ticketType = v; }
 
 
 	CDuiString GetTrainNo() { return m_strTrainNo; }
@@ -105,7 +107,9 @@ public:
 	CDuiString GetSwzNum() { return m_strSwzNum; }
 	CDuiString GetSecretStr() { return m_strSecretStr; }
 	CDuiString GetBtnTextInfo() { return m_strBtnTextInfo; }
+	CDuiString GetTrainDate() { return m_strTrainDate; }
 
+	_TICKET_TYPE GetTicketType() { return m_ticketType; }
 
 private:
 
@@ -156,9 +160,12 @@ private:
 	CDuiString m_strZyNum;							////zy_num		一等座  
 	CDuiString m_strSwzNum;							////swz_num  商务座
 
+
+	CDuiString m_strTrainDate;				///乘车日期
+
 	CDuiString m_strSecretStr;						////secretStr
 	CDuiString m_strBtnTextInfo;					///buttonTextInfo
 	
-
+	_TICKET_TYPE m_ticketType;
 
 };

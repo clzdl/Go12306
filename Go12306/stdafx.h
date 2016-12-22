@@ -54,3 +54,33 @@ typedef enum
 	_ADULT,
 	_STUDENT,
 } _TICKET_TYPE;
+
+
+/////////12306 座位信息定义
+#define  _SEAT_TYPE_YDZ		_T("M")					////一等座
+#define  _SEAT_TYPE_EDZ		_T("O")					////二等座
+#define  _SEAT_TYPE_TDZ		_T("P")					////特等座
+#define  _SEAT_TYPE_SWZ		_T("9")					////商务座
+
+#define  _SEAT_TYPE_YW		_T("3")					////硬卧
+#define  _SEAT_TYPE_RW		_T("4")					////软卧
+#define  _SEAT_TYPE_YZ		_T("1")					////硬座
+#define	 _SEAT_TYPE_RZ		_T("2")					////软座
+#define  _SEAT_TYPE_GJRW	_T("6")					////高级软卧
+
+
+
+///////12306 证件信息定义
+#define  _CARD_TYPE_SFZ		_T("1")					////省份证
+#define  _CARD_TYPE_GAZ		_T("C")					////港澳通行证
+#define  _CARD_TYPE_TWZ		_T("G")					////台湾通行证
+#define  _CARD_TYPE_HZ		_T("B")					////护照
+
+
+///////12306  票类型信息定义
+#define	 _TICKET_TYPE_CRP	_T("1")					/////成人票
+#define	 _TICKET_TYPE_ETP	_T("2")					/////儿童票
+#define	 _TICKET_TYPE_XSP	_T("3")					/////学生票
+#define	 _TICKET_TYPE_CJP	_T("4")					/////残军票
+
+

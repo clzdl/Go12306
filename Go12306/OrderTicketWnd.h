@@ -46,6 +46,7 @@ public:
 
 	void OnPassengerListItemClick(TNotifyUI& msg);
 	void OnDeleteOrderTicket(TNotifyUI& msg);
+	void OnTicketOrderSubmit(TNotifyUI& msg);
 
 	LRESULT HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 

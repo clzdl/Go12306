@@ -15,6 +15,7 @@ IMPLEMENT_DUICONTROL(CCode12306CertUI)
 
 
 CCode12306CertUI::CCode12306CertUI()
+	:m_sModule(_T("login"))
 {
 
 }
@@ -98,8 +99,11 @@ void CCode12306CertUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 {
 	CControlUI::SetAttribute( pstrName,  pstrValue);
 
-	if (_tcsicmp(pstrName, _T("normalimage")) == 0) 
+	if (_tcsicmp(pstrName, _T("normalimage")) == 0)
 		SetNormalImage(pstrValue);
+
+	else if (_tcsicmp(pstrName, _T("requestModuleName")) == 0)
+		SetModule(pstrValue);
 	
 }
 
@@ -124,7 +128,7 @@ std::vector<CDuiPoint> CCode12306CertUI::GetSelectedPoint()
 
 void CCode12306CertUI::Refresh()
 {
-	Client12306Manager::Instance()->QueryPassCode("login", m_ortImageBytes);
+	Client12306Manager::Instance()->QueryPassCode(UnicodeToUtf8(m_sModule.GetData()), m_ortImageBytes);
 	m_vecClickPoints.clear();
 	Invalidate();
 }

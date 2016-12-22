@@ -2,11 +2,15 @@
 #include "OrderTicketWnd.h"
 #include "Client12306Manager.h"
 #include "OthFunc.h"
+#include "MsgWnd.h"
+#include "CertCodeWnd.h"
 
 DUI_BEGIN_MESSAGE_MAP(COrderTicketWnd, WindowImplBase)
 	DUI_ON_MSGTYPE(DUI_MSGTYPE_CLICK, OnClick)
 	DUI_ON_MSGTYPE_CTRNAME(DUI_MSGTYPE_ITEMACTIVATE, _T("passengerListItem"), OnPassengerListItemClick)
 	DUI_ON_CLICK_CTRNAME(_T("BTN_DELETE_ORDER") , OnDeleteOrderTicket)
+	DUI_ON_CLICK_CTRNAME(_T("TICKET_ORDER_SUBMIT"), OnTicketOrderSubmit)
+	
 DUI_END_MESSAGE_MAP()
 
 
@@ -61,6 +65,30 @@ void COrderTicketWnd::InitWindow()
 	pLabelUI = static_cast<CLabelUI*>(m_pm.FindControl(_T("endPlace")));
 	pLabelUI->SetText(m_pTicket->GetToStationName() + _T(" 站(") + m_pTicket->GetArriveTime() + _T(")"));
 
+	///用户校验
+	if (SUCCESS != Client12306Manager::Instance()->CheckUser())
+	{
+
+		CMsgWnd::MessageBox(GetHWND() , _T("提示") , Utf8ToUnicode( Client12306Manager::Instance()->GetLastErrInfo()).c_str());
+		
+
+		PostMessage(WM_CLOSE);
+	}
+
+	if (SUCCESS != Client12306Manager::Instance()->SubmitOrderRequest(m_pTicket))
+	{
+		CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
+
+
+		PostMessage(WM_CLOSE);
+	}
+
+
+	if (SUCCESS != Client12306Manager::Instance()->InitDc())
+	{
+		CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
+		PostMessage(WM_CLOSE);
+	}
 
 	RefreshTicketSeatInfo();
 
@@ -191,7 +219,8 @@ void COrderTicketWnd::AddOrderTicketList(CPassenger *passenger)
 	///证件类型
 	CLabelUI *txtCardType = new CLabelUI();
 	txtCardType->SetAttribute(_T("align"), _T("center"));
-	txtCardType->SetText(passenger->GetCardType());
+	txtCardType->SetText(passenger->GetCardTypeName());
+	txtCardType->SetUserData(passenger->GetCardType());
 	pListItem->Add(txtCardType);
 
 	///证件号码
@@ -232,7 +261,7 @@ CComboUI* COrderTicketWnd::CreateSeatTypeCombo(CTicketModel *ticket)
 	{///高级软卧
 		pOpt = new CListLabelElementUI();
 		pOpt->SetText(_T("高级软卧"));
-		pOpt->SetUserData(_T("gr"));
+		pOpt->SetUserData(_SEAT_TYPE_GJRW);
 		pElement->Add(pOpt);
 	}
 
@@ -248,7 +277,7 @@ CComboUI* COrderTicketWnd::CreateSeatTypeCombo(CTicketModel *ticket)
 	{///软卧
 		pOpt = new CListLabelElementUI();
 		pOpt->SetText(_T("软卧"));
-		pOpt->SetUserData(_T("rw"));
+		pOpt->SetUserData(_SEAT_TYPE_RW);
 		pElement->Add(pOpt);
 	}
 
@@ -256,7 +285,7 @@ CComboUI* COrderTicketWnd::CreateSeatTypeCombo(CTicketModel *ticket)
 	{///软座
 		pOpt = new CListLabelElementUI();
 		pOpt->SetText(_T("软座"));
-		pOpt->SetUserData(_T("rz"));
+		pOpt->SetUserData(_SEAT_TYPE_RZ);
 		pElement->Add(pOpt);
 	}
 
@@ -264,7 +293,7 @@ CComboUI* COrderTicketWnd::CreateSeatTypeCombo(CTicketModel *ticket)
 	{///特等座
 		pOpt = new CListLabelElementUI();
 		pOpt->SetText(_T("特等座"));
-		pOpt->SetUserData(_T("tz"));
+		pOpt->SetUserData(_SEAT_TYPE_TDZ);
 		pElement->Add(pOpt);
 	}
 
@@ -272,7 +301,7 @@ CComboUI* COrderTicketWnd::CreateSeatTypeCombo(CTicketModel *ticket)
 	{///无座
 		pOpt = new CListLabelElementUI();
 		pOpt->SetText(_T("无座"));
-		pOpt->SetUserData(_T("wz"));
+		pOpt->SetUserData(_SEAT_TYPE_YZ);
 		pElement->Add(pOpt);
 	}
 
@@ -280,7 +309,7 @@ CComboUI* COrderTicketWnd::CreateSeatTypeCombo(CTicketModel *ticket)
 	{///硬卧
 		pOpt = new CListLabelElementUI();
 		pOpt->SetText(_T("硬卧"));
-		pOpt->SetUserData(_T("yw"));
+		pOpt->SetUserData(_SEAT_TYPE_YW);
 		pElement->Add(pOpt);
 	}
 
@@ -288,7 +317,7 @@ CComboUI* COrderTicketWnd::CreateSeatTypeCombo(CTicketModel *ticket)
 	{///硬座
 		pOpt = new CListLabelElementUI();
 		pOpt->SetText(_T("硬座"));
-		pOpt->SetUserData(_T("yz"));
+		pOpt->SetUserData(_SEAT_TYPE_YZ);
 		pElement->Add(pOpt);
 	}
 
@@ -296,7 +325,7 @@ CComboUI* COrderTicketWnd::CreateSeatTypeCombo(CTicketModel *ticket)
 	{///二等座
 		pOpt = new CListLabelElementUI();
 		pOpt->SetText(_T("二等座"));
-		pOpt->SetUserData(_T("ze"));
+		pOpt->SetUserData(_SEAT_TYPE_EDZ);
 		pElement->Add(pOpt);
 	}
 
@@ -305,7 +334,7 @@ CComboUI* COrderTicketWnd::CreateSeatTypeCombo(CTicketModel *ticket)
 	{///一等座
 		pOpt = new CListLabelElementUI();
 		pOpt->SetText(_T("一等座"));
-		pOpt->SetUserData(_T("zy"));
+		pOpt->SetUserData(_SEAT_TYPE_YDZ);
 		pElement->Add(pOpt);
 	}
 
@@ -313,7 +342,7 @@ CComboUI* COrderTicketWnd::CreateSeatTypeCombo(CTicketModel *ticket)
 	{///商务座
 		pOpt = new CListLabelElementUI();
 		pOpt->SetText(_T("商务座"));
-		pOpt->SetUserData(_T("swz"));
+		pOpt->SetUserData(_SEAT_TYPE_SWZ);
 		pElement->Add(pOpt);
 	}
 
@@ -335,22 +364,22 @@ CComboUI* COrderTicketWnd::CreateTicketTypeCombo()
 
 	pOpt = new CListLabelElementUI();
 	pOpt->SetText(_T("成人"));
-	pOpt->SetUserData(_T("0"));
+	pOpt->SetUserData(_TICKET_TYPE_CRP);
 	pElement->Add(pOpt);
 
 	pOpt = new CListLabelElementUI();
 	pOpt->SetText(_T("儿童票"));
-	pOpt->SetUserData(_T("1"));
+	pOpt->SetUserData(_TICKET_TYPE_ETP);
 	pElement->Add(pOpt);
 
 	pOpt = new CListLabelElementUI();
 	pOpt->SetText(_T("学生票"));
-	pOpt->SetUserData(_T("2"));
+	pOpt->SetUserData(_TICKET_TYPE_XSP);
 	pElement->Add(pOpt);
 
 	pOpt = new CListLabelElementUI();
 	pOpt->SetText(_T("残军票"));
-	pOpt->SetUserData(_T("3"));
+	pOpt->SetUserData(_TICKET_TYPE_CJP);
 
 	pElement->Add(pOpt);
 	
@@ -613,4 +642,85 @@ void COrderTicketWnd::RefreshTicketSeatInfo()
 
 
 	
+}
+
+
+void COrderTicketWnd::OnTicketOrderSubmit(TNotifyUI& msg)
+{
+	int iCnt = m_pOrderListView->GetCount();
+
+	std::vector<CPassengerTicket> vecPT;
+
+	for(int i = 0 ; i < iCnt ; ++i)
+	{
+		CPassengerTicket pt;
+
+		CListContainerElementUI *pEleContainer = static_cast<CListContainerElementUI*>(m_pOrderListView->GetItemAt(i));
+
+		///
+		CComboUI* pSeatCombo = static_cast<CComboUI*>(pEleContainer->GetItemAt(0));
+
+		///席别
+		pt.SetSeatType(pSeatCombo->GetItemAt(pSeatCombo->GetCurSel())->GetUserData());
+
+
+		///票种
+		CComboUI* pTicketCombo = static_cast<CComboUI*>(pEleContainer->GetItemAt(1));
+		pt.SetTicketType(pTicketCombo->GetItemAt(pTicketCombo->GetCurSel())->GetUserData());
+
+		///姓名
+		CLabelUI *pTxtName = static_cast<CLabelUI*>(pEleContainer->GetItemAt(2));
+		pt.SetPassengerName(pTxtName->GetText());
+
+
+		///证件类型
+		CLabelUI *pTxtIdType = static_cast<CLabelUI*>(pEleContainer->GetItemAt(3));
+		pt.SetIdType(pTxtIdType->GetUserData());
+
+		///证件号码
+		CLabelUI *pTxtIdNo = static_cast<CLabelUI*>(pEleContainer->GetItemAt(4));
+		pt.SetIdNo(pTxtIdNo->GetText());
+
+		///手机号码
+		CLabelUI *pMobileNo = static_cast<CLabelUI*>(pEleContainer->GetItemAt(4));
+		pt.SetMobileNo(pMobileNo->GetText());
+
+		pt.SetSaveStatus(_T("N"));
+
+
+		vecPT.push_back(pt);
+	}
+	CCheckOrderInfoResult result;
+	if (SUCCESS != Client12306Manager::Instance()->CheckOrderInfo(vecPT, result))
+	{
+		CMsgWnd::MessageBox(GetHWND(), _T("提示") , Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
+		return;
+	}
+
+
+	if (result.GetIfShowPassCode() == "Y")
+	{///需要显示验证码
+
+		std::vector<CDuiPoint> selPoint;
+		switch (CCertCodeWnd::MessageBox(GetHWND(), _T("请输入验证码") , selPoint))
+		{
+			case MSGID_OK:
+				///
+				if (selPoint.empty())
+				{
+					CMsgWnd::MessageBox(GetHWND(), _T("提示"),_T("验证码未选择"));
+
+					return;
+				}
+
+
+
+				break;
+			case MSGID_CANCEL:
+				PostQuitMessage(0L);
+				break;
+
+		}
+	}
+
 }

@@ -37,6 +37,7 @@
 #include "TicketModel.h"
 #include "OrderModel.h"
 #include "Passenger.h"
+#include "PassengerTicket.h"
 
 using Poco::StreamCopier;
 using Poco::Net::Context;
@@ -57,6 +58,23 @@ using Poco::URI;
 
 using namespace Poco::Dynamic;
 using namespace Poco;
+
+
+class CParam
+{
+public:
+	CParam(std::string key, std::string value , bool encode = false):m_strKey(key),m_strValue(value), m_bNeedEndcode(encode){}
+	~CParam() {}
+
+	std::string GetKey() { return m_strKey; }
+	std::string GetValue() { return m_strValue; }
+	bool GetNeedEncode() { return m_bNeedEndcode; }
+
+private:
+	std::string m_strKey;
+	std::string m_strValue;
+	bool m_bNeedEndcode;
+};
 
 class CStation
 {
@@ -82,6 +100,46 @@ private:
 	std::string m_strPinYinName;   ///汉字拼音
 	std::string m_strStationCode;   ///站点编码
 	unsigned m_uiSeq;		///序号
+
+
+};
+
+class CCheckOrderInfoResult
+{
+public:
+	CCheckOrderInfoResult() {}
+	~CCheckOrderInfoResult() {}
+
+
+	void SetIfShowPassCode(std::string v) { m_strIfShowPassCode = v; }
+	void SetCanChooseBeds(std::string v) { m_strCanChooseBeds = v; }
+	void SetCanChooseSeats(std::string v) { m_strCanChooseSeats = v; }
+	void SetChoose_Seats(std::string v) { m_strChoose_Seats = v; }
+	void SetIsCanChooseMid(std::string v) { m_strIsCanChooseMid = v; }
+	void SetIfShowPassCodeTime(std::string v) { m_strIfShowPassCodeTime = v; }
+	void SetSubmitStatus(std::string v) { m_strSubmitStatus = v; }
+	void SetSmokeStr(std::string v) { m_strSmokeStr = v; }
+
+
+	std::string GetIfShowPassCode() { return m_strIfShowPassCode; }
+	std::string GetCanChooseBeds() { return m_strCanChooseBeds; }
+	std::string GetCanChooseSeats() { return m_strCanChooseSeats; }
+	std::string GetChoose_Seats() { return m_strChoose_Seats; }
+	std::string GetIsCanChooseMid() {  return m_strIsCanChooseMid; }
+	std::string GetIfShowPassCodeTime() { return m_strIfShowPassCodeTime; }
+	std::string GetSubmitStatus() { return  m_strSubmitStatus ; }
+	std::string GetSmokeStr() { return  m_strSmokeStr; }
+
+private:
+
+	std::string  m_strIfShowPassCode;		////"ifShowPassCode" : "N",
+	std::string m_strCanChooseBeds;			////"canChooseBeds" : "N",
+	std::string m_strCanChooseSeats;		////"canChooseSeats" : "N",
+	std::string m_strChoose_Seats;			////"choose_Seats" : "MOP9",
+	std::string m_strIsCanChooseMid;		////	"isCanChooseMid" : "N",
+	std::string m_strIfShowPassCodeTime;	////"ifShowPassCodeTime" : "1",
+	std::string m_strSubmitStatus;			////"submitStatus" : true,
+	std::string m_strSmokeStr;				////"smokeStr" : ""
 
 
 };
@@ -168,16 +226,41 @@ public:
 	/*@action 根据证件号码获取passenger信息
 	*/
 	CPassenger* GetPassengerByCardNo(std::string cardNo);
+
+	/*@action:  检查用户
+	*/
+	int CheckUser();
+
+	/*@action:  提交订单请求
+	*/
+	int SubmitOrderRequest(CTicketModel *ticket);
+
+
+	/*@action:  初始化单程购票界面
+	*/
+	int InitDc();
+
+	/*@action:  检查订单信息
+	*/
+	int CheckOrderInfo(std::vector<CPassengerTicket> &vecPT , CCheckOrderInfoResult &resOrderInfo);
+
 private:
 
 
-	/*@action: 执行 http 的get请求
+	/*@action: 执行 http 的post请求
 	*/
 	std::string ExecPost(std::string service, std::map<string, string> *param = NULL,std::map<string,string> *header=NULL);
 
 	/*@action: 执行 http 的post请求
 	*/
+	std::string ExecPostBySeq(std::string service, std::vector<CParam> *param = NULL, std::map<string, string> *header = NULL);
+
+	/*@action: 执行 http 的get请求
+	*/
 	std::string ExecGet(std::string service, std::map<string, string> *param = NULL, std::map<string, string> *header = NULL);
+
+
+	
 
 	/*@action: 异步校验验证码
 	*/
@@ -194,7 +277,7 @@ private:
 	*	vecTicket:出参， 余票信息
 	*@return: 0-success;-1-fail
 	*/
-	int JsonParseTicket(std::string jsonString , std::vector<CTicketModel> &vecTicket);
+	int JsonParseTicket(std::string jsonString ,std::string travelTime, _TICKET_TYPE ticketType, std::vector<CTicketModel> &vecTicket);
 
 	/*@action: 
 	*/
@@ -268,4 +351,6 @@ private:
 	///乘客信息
 	std::map<std::string, CPassenger> m_mapPassenger;
 };
+
+
 

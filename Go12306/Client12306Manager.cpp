@@ -139,6 +139,89 @@ std::string Client12306Manager::ExecPost(std::string service, std::map<string, s
 	return ostr.str();
 }
 
+
+std::string Client12306Manager::ExecPostBySeq(std::string service, std::vector<CParam> *param , std::map<string, string> *header)
+{
+	HTTPRequest request(HTTPRequest::HTTP_POST, service, Net::HTTPMessage::HTTP_1_1);
+
+	std::stringstream body;
+	if (param && !(param->empty()))
+	{
+
+		for (std::vector<CParam>::iterator it = param->begin(); it != param->end(); ++it)
+		{
+
+			if (it != param->begin())
+				body << "&";
+
+			std::string enStr = it->GetValue();
+
+			if(it->GetNeedEncode())
+				URI::encode(it->GetValue(), "@,", enStr);
+
+			body << it->GetKey() << "=" << enStr;
+		}
+
+
+	}
+
+	std::string utf8Body = body.str();
+
+	request.setContentLength(utf8Body.length());
+	if (!m_cookieCollection.empty())
+		request.setCookies(m_cookieCollection);
+
+
+	///增加默认全局默认header
+	for (std::map<string, string>::iterator it = m_headerDefault.begin(); it != m_headerDefault.end(); ++it)
+		request.set(it->first, it->second);
+
+
+	if (header)
+	{///增加特殊header
+		for (std::map<string, string>::iterator it = header->begin(); it != header->end(); ++it)
+		{
+			request.set(it->first, it->second);
+		}
+	}
+
+	request.setKeepAlive(true);
+
+	{
+		std::stringstream ss;
+		request.write(ss);
+
+		///请求头
+		DUI__Trace(_T(" %s "), Utf8ToUnicode(ss.str()).c_str());
+		///请求体
+		DUI__Trace(_T(" %s "), Utf8ToUnicode(utf8Body).c_str());
+	}
+
+	std::ostream &os = m_sessHttpsClient.sendRequest(request);
+
+	os << utf8Body;
+
+	HTTPResponse response;
+
+	std::istream& rs = m_sessHttpsClient.receiveResponse(response);
+
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+
+	{
+		std::stringstream ss;
+		response.write(ss);
+
+		///输出相应头
+		DUI__Trace(_T(" %s "), Utf8ToUnicode(ss.str()).c_str());
+
+		///输出相应体
+		DUI__Trace(_T(" %s "), Utf8ToUnicode(ostr.str()).c_str());
+	}
+
+	return ostr.str();
+}
+
 std::string Client12306Manager::ExecGet(std::string service, std::map<string, string> *param,std::map<string, string> *header)
 {
 	if (param && !param->empty())
@@ -342,7 +425,7 @@ int Client12306Manager::QueryLeftTicket(std::string begPlace, std::string endPla
 		std::string strGunString;
 		Gunzip((byte*)const_cast<char*>(strOrgRes.c_str()), strOrgRes.length() , strGunString);
 
-		iRet = JsonParseTicket(strGunString, vecTicket);
+		iRet = JsonParseTicket(strGunString , travelTime , ticketType , vecTicket);
 		
 
 	}
@@ -357,7 +440,7 @@ int Client12306Manager::QueryLeftTicket(std::string begPlace, std::string endPla
 }
 
 
-int Client12306Manager::JsonParseTicket(std::string jsonString, std::vector<CTicketModel> &vecTicket)
+int Client12306Manager::JsonParseTicket(std::string jsonString , std::string travelTime , _TICKET_TYPE ticketType , std::vector<CTicketModel> &vecTicket)
 {
 	JSON::Parser parser;
 	Dynamic::Var result;
@@ -399,6 +482,9 @@ int Client12306Manager::JsonParseTicket(std::string jsonString, std::vector<CTic
 			JSON::Object::Ptr pItem = it->extract<JSON::Object::Ptr>();
 
 			CTicketModel ticketModel;
+
+			ticketModel.SetTrainDate(Utf8ToUnicode(travelTime).c_str());
+			ticketModel.SetTicketType(ticketType);
 
 			Dynamic::Var tmpJObj;
 			////buttonTextInfo
@@ -1528,4 +1614,263 @@ CPassenger* Client12306Manager::GetPassengerByCardNo(std::string cardNo)
 		ret = &(it->second);
 	}
 	return ret;
+}
+
+int Client12306Manager::CheckUser()
+{
+	int iRetFlag = SUCCESS;
+	try
+	{
+
+		string strService = "/otn/login/checkUser";
+
+		std::string response = ExecPost(strService);
+
+		std::string gunString;
+		Gunzip((Byte*)response.c_str() , response.length() , gunString);
+
+
+
+		JSON::Parser parser;
+		Dynamic::Var result;
+
+		result = parser.parse(gunString);
+
+		JSON::Object::Ptr pObj = result.extract<JSON::Object::Ptr>();
+
+		Dynamic::Var jStatus = pObj->get("status");
+
+		if (jStatus.toString() != "true")
+		{
+			DUI__Trace(Utf8ToUnicode(jStatus.toString()).c_str());
+			return FAIL;
+		}
+
+		if (pObj->has("url"))
+		{
+			if (pObj->has("messages"))
+			{
+				Dynamic::Var jMsg = pObj->get("messages");
+				m_strLastErrInfo = jMsg.toString();
+			}
+
+			return FAIL;
+		}
+			
+
+
+	}
+	catch (Poco::Exception &e)
+	{
+		DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
+		m_strLastErrInfo = e.displayText();
+		return FAIL;
+	}
+
+	return iRetFlag;
+}
+
+
+int Client12306Manager::SubmitOrderRequest(CTicketModel *ticket)
+{
+	int iRetFlag = SUCCESS;
+	try
+	{
+		string strService = "/otn/leftTicket/submitOrderRequest";
+
+		std::vector <CParam> param;
+
+		////加密串 12306 服务器返回时，已为 encode 模式
+		param.push_back(CParam("secretStr" , UnicodeToUtf8(ticket->GetSecretStr().GetData())));		
+		param.push_back(CParam("train_date", UnicodeToUtf8(ticket->GetTrainDate().GetData())));
+		param.push_back(CParam("back_train_date", UnicodeToUtf8(ticket->GetTrainDate().GetData())));
+		param.push_back(CParam("tour_flag", "dc"));
+		param.push_back(CParam("purpose_codes", ticket->GetTicketType() == _ADULT ? "ADULT" : "0X00" ));
+		param.push_back(CParam("query_from_station_name", UnicodeToUtf8(ticket->GetFromStationName().GetData()) ));
+		param.push_back(CParam("query_to_station_name", UnicodeToUtf8(ticket->GetToStationName().GetData())  ));
+
+
+		std::string response = ExecPostBySeq(strService ,  &param , NULL);
+
+		std::string gunString;
+		Gunzip((Byte*)response.c_str(), response.length(), gunString);
+
+
+		JSON::Parser parser;
+		Dynamic::Var result;
+
+		result = parser.parse(gunString);
+
+		JSON::Object::Ptr pObj = result.extract<JSON::Object::Ptr>();
+
+		Dynamic::Var jStatus = pObj->get("status");
+
+		if (jStatus.toString() != "true")
+		{
+			DUI__Trace(Utf8ToUnicode(jStatus.toString()).c_str());
+			return FAIL;
+		}
+
+		if (pObj->has("url"))
+		{
+			if (pObj->has("messages"))
+			{
+				Dynamic::Var jMsg = pObj->get("messages");
+				m_strLastErrInfo = jMsg.toString();
+			}
+
+			return FAIL;
+		}
+
+
+	}
+	catch (Poco::Exception &e)
+	{
+		DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
+		return FAIL;
+	}
+
+	return iRetFlag;
+}
+
+
+int Client12306Manager::InitDc()
+{
+	int iRetFlag = SUCCESS;
+	try
+	{
+		string strService = "/otn/confirmPassenger/initDc";
+		
+		std::string response = ExecPostBySeq(strService, NULL, NULL);
+
+		std::string gunString;
+		Gunzip((Byte*)response.c_str(), response.length(), gunString);
+
+
+
+	}
+	catch (Poco::Exception &e)
+	{
+		DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
+		return FAIL;
+	}
+
+	return iRetFlag;
+
+}
+
+int Client12306Manager::CheckOrderInfo(std::vector<CPassengerTicket> &vecPT , CCheckOrderInfoResult &resOrderInfo)
+{
+	int iRetFlag = SUCCESS;
+	try
+	{
+		string strService = "/otn/confirmPassenger/checkOrderInfo";
+
+		std::vector<CParam> param;
+
+		param.push_back(CParam("cancel_flag", "2"));
+		param.push_back(CParam("bed_level_order_num", "000000000000000000000000000000"));
+
+		std::string passengerTicketString;
+		std::string oldPassengerString;
+
+		for (std::vector<CPassengerTicket>::iterator it = vecPT.begin(); it != vecPT.end(); ++it)
+		{
+			if (it != vecPT.begin())
+			{
+				passengerTicketString += "_";
+				oldPassengerString += "_";
+			}
+
+			passengerTicketString += UnicodeToUtf8(it->GetSeatType().GetData());
+			passengerTicketString += ",";
+			passengerTicketString += "0";
+			passengerTicketString += ",";
+			passengerTicketString += UnicodeToUtf8(it->GetTicketType().GetData());
+			passengerTicketString += ",";
+			passengerTicketString += UnicodeToUtf8(it->GetPassengerName().GetData());
+			passengerTicketString += ",";
+			passengerTicketString += UnicodeToUtf8(it->GetIdType().GetData());
+			passengerTicketString += ",";
+			passengerTicketString += UnicodeToUtf8(it->GetIdNo().GetData());
+			passengerTicketString += ",";
+			passengerTicketString += UnicodeToUtf8(it->GetMobileNo().GetData());
+			passengerTicketString += ",";
+			passengerTicketString += UnicodeToUtf8(it->GetSaveStatus().GetData());
+
+
+
+			oldPassengerString += UnicodeToUtf8(it->GetPassengerName().GetData());
+			oldPassengerString += ",";
+			oldPassengerString += UnicodeToUtf8(it->GetIdType().GetData());
+			oldPassengerString += ",";
+			oldPassengerString += UnicodeToUtf8(it->GetIdNo().GetData());
+			oldPassengerString += ",";
+			oldPassengerString += UnicodeToUtf8(it->GetPassengerType().GetData());
+
+		}
+
+
+		param.push_back(CParam("passengerTicketStr", passengerTicketString));
+		param.push_back(CParam("oldPassengerStr", oldPassengerString));
+		param.push_back(CParam("tour_flag", "dc"));
+		param.push_back(CParam("randCode", ""));
+
+
+
+		
+		std::string response = ExecPostBySeq(strService, &param, NULL);
+
+		std::string gunString;
+		Gunzip((Byte*)response.c_str(), response.length(), gunString);
+
+
+
+		JSON::Parser parser;
+		Dynamic::Var result;
+
+		result = parser.parse(gunString);
+
+		JSON::Object::Ptr pObj = result.extract<JSON::Object::Ptr>();
+
+		Dynamic::Var jStatus = pObj->get("status");
+
+		if (jStatus.toString() != "true")
+		{
+			DUI__Trace(Utf8ToUnicode(jStatus.toString()).c_str());
+			return FAIL;
+		}
+
+		if (pObj->has("url"))
+		{
+			if (pObj->has("messages"))
+			{
+				Dynamic::Var jMsg = pObj->get("messages");
+				m_strLastErrInfo = jMsg.toString();
+			}
+
+			return FAIL;
+		}
+
+		Dynamic::Var pData = pObj->get("data");
+		JSON::Object::Ptr jData = pData.extract<JSON::Object::Ptr>();
+
+		resOrderInfo.SetIfShowPassCode(jData->get("ifShowPassCode"));
+		resOrderInfo.SetCanChooseBeds(jData->get("canChooseBeds"));
+		resOrderInfo.SetCanChooseSeats(jData->get("canChooseSeats"));
+		resOrderInfo.SetChoose_Seats(jData->get("choose_Seats"));
+		resOrderInfo.SetIsCanChooseMid(jData->get("isCanChooseMid"));
+		resOrderInfo.SetIfShowPassCodeTime(jData->get("ifShowPassCodeTime"));
+		resOrderInfo.SetSubmitStatus(jData->get("submitStatus"));
+		resOrderInfo.SetSmokeStr(jData->get("smokeStr"));
+
+
+	}
+	catch (Poco::Exception &e)
+	{
+		DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
+		return FAIL;
+	}
+
+	return iRetFlag;
 }

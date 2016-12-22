@@ -9,7 +9,7 @@
   <Xml id="XML_MAIN" path="main.xml"/>
   <Xml id="XML_MSG" path="msg.xml"/>
   <Xml id="XML_ORDER_TICKET_WND" path="order_ticket_wnd.xml"/>
-
+  <Xml id="XML_CERT_CODE" path="cert_code_wnd.xml"/>
 
   <Xml id="XML_PROGRESS_DLG" path="progressDlg.xml"/>
 </Res>

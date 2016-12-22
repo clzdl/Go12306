@@ -151,6 +151,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CertCodeWnd.h" />
     <ClInclude Include="Code12306Cert.h" />
     <ClInclude Include="EditCombo.h" />
     <ClInclude Include="Go12306.h" />
@@ -164,6 +165,7 @@
     <ClInclude Include="OthFunc.h" />
     <ClInclude Include="Passenger.h" />
     <ClInclude Include="PassengerManagerUI.h" />
+    <ClInclude Include="PassengerTicket.h" />
     <ClInclude Include="ProgressDlg.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SkinFrame.h" />
@@ -174,6 +176,7 @@
     <ClInclude Include="TicketModel.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CertCodeWnd.cpp" />
     <ClCompile Include="Code12306Cert.cpp" />
     <ClCompile Include="EdtiCombo.cpp" />
     <ClCompile Include="Go12306.cpp" />
@@ -187,6 +190,7 @@
     <ClCompile Include="OthFunc.cpp" />
     <ClCompile Include="Passenger.cpp" />
     <ClCompile Include="PassengerManagerUI.cpp" />
+    <ClCompile Include="PassengerTicket.cpp" />
     <ClCompile Include="ProgressDlg.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
