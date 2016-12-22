@@ -7,18 +7,18 @@ class COrderTicketWnd : public WindowImplBase
 {
 public:
 
-	static int MessageBox(HWND hParent , CTicketModel *ticket)
+	static int MessageBox(HWND hParent , CTicketModel *ticket , CDuiString orderDate)
 	{
-		COrderTicketWnd* pWnd = new COrderTicketWnd(ticket);
+		COrderTicketWnd* pWnd = new COrderTicketWnd(ticket , orderDate);
 		pWnd->Create(hParent, _T("OrderTicketWnd"), WS_POPUP | WS_CLIPCHILDREN, WS_EX_TOOLWINDOW);
 		pWnd->CenterWindow();
 
 		return pWnd->ShowModal();
 	}
 
-	static void ShowMessageBox(HWND hParent, CTicketModel *ticket)
+	static void ShowMessageBox(HWND hParent, CTicketModel *ticket, CDuiString orderDate)
 	{
-		COrderTicketWnd* pWnd = new COrderTicketWnd(ticket);
+		COrderTicketWnd* pWnd = new COrderTicketWnd(ticket , orderDate);
 		pWnd->Create(hParent, _T("OrderTicketWnd"), UI_WNDSTYLE_FRAME, 0);
 		pWnd->CenterWindow();
 
@@ -27,7 +27,7 @@ public:
 
 public:
 
-	COrderTicketWnd(CTicketModel *ticket);
+	COrderTicketWnd(CTicketModel *ticket, CDuiString orderDate);
 
 	~COrderTicketWnd();
 
@@ -55,6 +55,9 @@ private:
 
 	void AddOrderTicketList(CPassenger *passenger);
 
+
+	void RefreshTicketSeatInfo();
+
 	CComboUI* CreateSeatTypeCombo(CTicketModel *ticket);
 
 	CComboUI* CreateTicketTypeCombo();
@@ -64,7 +67,10 @@ private:
 	CButtonUI* m_pRestoreBtn;
 	CListUI *m_pPassengerListView;
 
+
 	CListUI *m_pOrderListView;
+
+	CDuiString m_sOrderDate;
 
 	CTicketModel *m_pTicket;
 };

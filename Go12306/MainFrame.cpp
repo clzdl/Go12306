@@ -596,7 +596,7 @@ void CMainFrame::OrderTicketCb(TNotifyUI& msg)
 	CTicketModel *pTicket= &(m_vecTicket[index]);
 	
 
-	COrderTicketWnd::MessageBox(GetHWND() , pTicket);
+	COrderTicketWnd::MessageBox(GetHWND() , pTicket , m_pTicketLeaveTimeUI->GetText());
 }
 
 void CMainFrame::TrainAllChkBtnCb(TNotifyUI& msg)

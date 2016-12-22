@@ -10,8 +10,9 @@ DUI_BEGIN_MESSAGE_MAP(COrderTicketWnd, WindowImplBase)
 DUI_END_MESSAGE_MAP()
 
 
-COrderTicketWnd::COrderTicketWnd(CTicketModel *ticket)
-	:m_pTicket(ticket)
+COrderTicketWnd::COrderTicketWnd(CTicketModel *ticket , CDuiString orderDate)
+	:m_pTicket(ticket),
+	m_sOrderDate(orderDate)
 {
 
 }
@@ -47,6 +48,22 @@ void COrderTicketWnd::InitWindow()
 	m_pPassengerListView = static_cast<CListUI*>(m_pm.FindControl(_T("passengerListView")));
 	
 	m_pOrderListView = static_cast<CListUI*>(m_pm.FindControl(_T("orderListView")));
+
+	CLabelUI *pLabelUI = static_cast<CLabelUI*>(m_pm.FindControl(_T("ticketDate")));
+	pLabelUI->SetText(m_sOrderDate);
+
+	pLabelUI = static_cast<CLabelUI*>(m_pm.FindControl(_T("trainNo")));
+	pLabelUI->SetText(m_pTicket->GetStationTrainCode() + _T(" 次"));
+
+	pLabelUI = static_cast<CLabelUI*>(m_pm.FindControl(_T("begPlace")));
+	pLabelUI->SetText(m_pTicket->GetFromStationName() + _T(" 站(") + m_pTicket->GetStartTime() + _T(")"));
+
+	pLabelUI = static_cast<CLabelUI*>(m_pm.FindControl(_T("endPlace")));
+	pLabelUI->SetText(m_pTicket->GetToStationName() + _T(" 站(") + m_pTicket->GetArriveTime() + _T(")"));
+
+
+	RefreshTicketSeatInfo();
+
 
 	RefreshPassenger();
 }
@@ -351,4 +368,249 @@ void COrderTicketWnd::OnDeleteOrderTicket(TNotifyUI& msg)
 	m_pOrderListView->RemoveAt(index);
 
 
+}
+
+void COrderTicketWnd::RefreshTicketSeatInfo()
+{
+
+	CHorizontalLayoutUI* pSeatInfoHLayout = static_cast<CHorizontalLayoutUI*>(m_pm.FindControl(_T("seatInfo")));
+
+	CLabelUI *pTxtSeat = NULL;
+
+	if (m_pTicket->GetGrNum().Compare(_T("--")) )
+	{///高级软卧
+		pTxtSeat = new CLabelUI();
+		pTxtSeat->SetManager(&m_pm, NULL, false);
+		pTxtSeat->SetFixedWidth(150);
+
+		if (m_pTicket->GetGrNum().Compare(_T("无")))
+		{
+			pTxtSeat->SetFont(1);
+			pTxtSeat->SetText(CDuiString(_T("高级软卧 ")) + m_pTicket->GetGrNum() + _T("票"));
+		}
+		else
+		{
+			pTxtSeat->SetText(CDuiString(_T("高级软卧 ")) + m_pTicket->GetGrNum() + _T("票"));
+
+		}
+		
+		pSeatInfoHLayout->Add(pTxtSeat);
+		
+	}
+
+	if (m_pTicket->GetQtNum().Compare(_T("--")) )
+	{///其它
+
+		pTxtSeat = new CLabelUI();
+		pTxtSeat->SetManager(&m_pm, NULL, false);
+		pTxtSeat->SetFixedWidth(150);
+
+		if (m_pTicket->GetQtNum().Compare(_T("无")))
+		{
+			pTxtSeat->SetFont(1);
+			pTxtSeat->SetText(CDuiString(_T("其它 ")) + m_pTicket->GetQtNum() + _T("票"));
+		}
+		else
+		{
+			pTxtSeat->SetText(CDuiString(_T("其它 ")) + m_pTicket->GetQtNum() + _T("票"));
+
+		}
+
+		pSeatInfoHLayout->Add(pTxtSeat);
+
+	}
+
+	if (m_pTicket->GetRwNum().Compare(_T("--")) )
+	{///软卧
+
+		pTxtSeat = new CLabelUI();
+		pTxtSeat->SetManager(&m_pm, NULL, false);
+		pTxtSeat->SetFixedWidth(150);
+
+		if (m_pTicket->GetRwNum().Compare(_T("无")))
+		{
+			pTxtSeat->SetFont(1);
+			pTxtSeat->SetText(CDuiString(_T("软卧 ")) + m_pTicket->GetRwNum() + _T("票"));
+		}
+		else
+		{
+			pTxtSeat->SetText(CDuiString(_T("软卧 ")) + m_pTicket->GetRwNum() + _T("票"));
+
+		}
+
+		pSeatInfoHLayout->Add(pTxtSeat);
+
+	}
+
+	if (m_pTicket->GetRzNum().Compare(_T("--")))
+	{///软座
+
+		pTxtSeat = new CLabelUI();
+		pTxtSeat->SetManager(&m_pm, NULL, false);
+		pTxtSeat->SetFixedWidth(150);
+
+		if (m_pTicket->GetRzNum().Compare(_T("无")))
+		{
+			pTxtSeat->SetFont(1);
+			pTxtSeat->SetText(CDuiString(_T("软座 ")) + m_pTicket->GetRzNum() + _T("票"));
+		}
+		else
+		{
+			pTxtSeat->SetText(CDuiString(_T("软座 ")) + m_pTicket->GetRzNum() + _T("票"));
+
+		}
+
+		pSeatInfoHLayout->Add(pTxtSeat);
+	}
+
+	if (m_pTicket->GetTzNum().Compare(_T("--")))
+	{///特等座
+
+		pTxtSeat = new CLabelUI();
+		pTxtSeat->SetManager(&m_pm, NULL, false);
+		pTxtSeat->SetFixedWidth(150);
+
+		if (m_pTicket->GetTzNum().Compare(_T("无")))
+		{
+			pTxtSeat->SetFont(1);
+			pTxtSeat->SetText(CDuiString(_T("特等座 ")) + m_pTicket->GetTzNum() + _T("票"));
+		}
+		else
+		{
+			pTxtSeat->SetText(CDuiString(_T("特等座 ")) + m_pTicket->GetTzNum() + _T("票"));
+
+		}
+
+		pSeatInfoHLayout->Add(pTxtSeat);
+	}
+
+	if (m_pTicket->GetWzNum().Compare(_T("--")) )
+	{///无座
+
+		pTxtSeat = new CLabelUI();
+		pTxtSeat->SetManager(&m_pm, NULL, false);
+		pTxtSeat->SetFixedWidth(150);
+
+		if (m_pTicket->GetWzNum().Compare(_T("无")))
+		{
+			pTxtSeat->SetFont(1);
+			pTxtSeat->SetText(CDuiString(_T("无座 ")) + m_pTicket->GetWzNum() + _T("票"));
+		}
+		else
+		{
+			pTxtSeat->SetText(CDuiString(_T("无座 ")) + m_pTicket->GetWzNum() + _T("票"));
+
+		}
+
+		pSeatInfoHLayout->Add(pTxtSeat);
+	}
+
+	if (m_pTicket->GetYwNum().Compare(_T("--")) )
+	{///硬卧
+
+		pTxtSeat = new CLabelUI();
+		pTxtSeat->SetManager(&m_pm, NULL, false);
+		pTxtSeat->SetFixedWidth(150);
+
+		if (m_pTicket->GetYwNum().Compare(_T("无")))
+		{
+			pTxtSeat->SetFont(1);
+			pTxtSeat->SetText(CDuiString(_T("硬卧 ")) + m_pTicket->GetYwNum() + _T("票"));
+		}
+		else
+		{
+			pTxtSeat->SetText(CDuiString(_T("硬卧 ")) + m_pTicket->GetYwNum() + _T("票"));
+
+		}
+
+		pSeatInfoHLayout->Add(pTxtSeat);
+	}
+
+	if (m_pTicket->GetYzNum().Compare(_T("--")) )
+	{///硬座
+
+		pTxtSeat = new CLabelUI();
+		pTxtSeat->SetManager(&m_pm, NULL, false);
+		pTxtSeat->SetFixedWidth(150);
+
+		if (m_pTicket->GetYzNum().Compare(_T("无")))
+		{
+			pTxtSeat->SetFont(1);
+			pTxtSeat->SetText(CDuiString(_T("硬座 ")) + m_pTicket->GetYzNum() + _T("票"));
+		}
+		else
+		{
+			pTxtSeat->SetText(CDuiString(_T("硬座 ")) + m_pTicket->GetYzNum() + _T("票"));
+
+		}
+
+		pSeatInfoHLayout->Add(pTxtSeat);
+	}
+
+	if (m_pTicket->GetZeNum().Compare(_T("--")))
+	{///二等座
+
+		pTxtSeat = new CLabelUI();
+		pTxtSeat->SetManager(&m_pm, NULL, false);
+		pTxtSeat->SetFixedWidth(150);
+
+		if (m_pTicket->GetZeNum().Compare(_T("无")))
+		{
+			pTxtSeat->SetFont(1);
+			pTxtSeat->SetText(CDuiString(_T("二等座 ")) + m_pTicket->GetZeNum() + _T("票"));
+		}
+		else
+		{
+			pTxtSeat->SetText(CDuiString(_T("二等座 ")) + m_pTicket->GetZeNum() + _T("票"));
+
+		}
+
+		pSeatInfoHLayout->Add(pTxtSeat);
+	}
+
+
+	if (m_pTicket->GetZyNum().Compare(_T("--")) )
+	{///一等座
+
+		pTxtSeat = new CLabelUI();
+		pTxtSeat->SetManager(&m_pm, NULL, false);
+		pTxtSeat->SetFixedWidth(150);
+
+		if (m_pTicket->GetZyNum().Compare(_T("无")))
+		{
+			pTxtSeat->SetFont(1);
+			pTxtSeat->SetText(CDuiString(_T("一等座 ")) + m_pTicket->GetZyNum() + _T("票"));
+		}
+		else
+		{
+			pTxtSeat->SetText(CDuiString(_T("一等座 ")) + m_pTicket->GetZyNum() + _T("票"));
+
+		}
+
+		pSeatInfoHLayout->Add(pTxtSeat);
+	}
+
+	if (m_pTicket->GetSwzNum().Compare(_T("--")) )
+	{///商务座
+
+		pTxtSeat = new CLabelUI();
+		pTxtSeat->SetManager(&m_pm, NULL, false);
+		pTxtSeat->SetFixedWidth(150);
+
+		if (m_pTicket->GetSwzNum().Compare(_T("无")))
+		{
+			pTxtSeat->SetFont(1);
+			pTxtSeat->SetText(CDuiString(_T("商务座 ")) + m_pTicket->GetSwzNum() + _T("票"));
+		}
+		else
+		{
+			pTxtSeat->SetText(CDuiString(_T("商务座 ")) + m_pTicket->GetSwzNum() + _T("票"));
+
+		}
+
+		pSeatInfoHLayout->Add(pTxtSeat);
+	}
+
+
+	
 }

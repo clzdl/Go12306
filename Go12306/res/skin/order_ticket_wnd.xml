@@ -27,25 +27,22 @@
 		<Label height="1" bkimage="common/hor_line.png"/>
 
 
-    <Label text="列车信息" font="1" bkcolor="#FFFFFFFF"/>
+    <Label text="列车信息" font="1" bkcolor="#FF8B6914"/>
       
     <HorizontalLayout name="trainInfo" hscrollbar="true" height ="30" inset="10,2">
-      <Label text="2016-12-21（周三）" width="150"/>
-      <Label text="Z286次" width="80"/>
-      <Label text="石家庄站（14:33开）" width="150" />
+      <Label name="ticketDate" text="2016-12-21（周三）" width="100" font="1"/>
+      <Label name="trainNo" text="Z286次" width="80" font="1"/>
+      <Label name="begPlace" text="石家庄站(14:33开)" width="150" font="1" />
       <Label text="—" width="10" />
-      <Label text="北京西站（17:03到）" width="150" align="right"/>
+      <Label name="endPlace" text="北京西站(17:03到)" width="150" align="right" font="1"/>
     </HorizontalLayout>
 
     <HorizontalLayout name="seatInfo" hscrollbar="true" height ="30" inset="10,2">
-          <Label text="硬卧有票" width="150"/>
-          <Label text="硬座无票" width="150"/>
-          <Label text="软卧有票" width="150"/>
-          <Label text="无座有票" width="150"/>
+          
     </HorizontalLayout>
 
     <Label height="1" bkimage="common/hor_line.png"/>
-    <Label text="乘客信息" font="1" bkcolor="#FFFFFFFF"/>
+    <Label text="乘客信息" font="1" bkcolor="#FF8B6914"/>
     <HorizontalLayout >
 
       <VerticalLayout inset="1,1,1,1" width="350">
