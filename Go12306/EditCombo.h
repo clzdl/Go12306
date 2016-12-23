@@ -131,7 +131,6 @@ namespace DuiLib
 
 		void EditClose();
 
-
 	private:
 		CEditWnd* m_pWindow;
 		int m_iWindowStyls;

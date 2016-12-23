@@ -137,6 +137,7 @@ namespace DuiLib
 	{
 		m_pOwner->m_pComboWindow = NULL;
 		m_pOwner->m_uButtonState &= ~UISTATE_PUSHED;
+
 		m_pOwner->Invalidate();
 
 		delete this;
@@ -225,8 +226,6 @@ namespace DuiLib
 			::ScreenToClient(m_pm.GetPaintWindow(), &pt);
 			m_bHitItem = IsHitItem(pt);
 
-			
-
 		}
 		else if (uMsg == WM_LBUTTONUP) {
 			
@@ -255,7 +254,8 @@ namespace DuiLib
 				m_pOwner->SelectItem(m_iOldSel, true);
 				EnsureVisible(m_iOldSel);
 			case VK_RETURN:
-				PostMessage(WM_KILLFOCUS);
+				//PostMessage(WM_KILLFOCUS);
+				PostMessage(WM_CLOSE);
 				break;
 			default:
 				TEventUI event;
@@ -477,7 +477,7 @@ namespace DuiLib
 			m_pOwner->m_pManager->RemovePaintChildWnd(hWnd);
 		}
 
-		//m_pOwner->Invalidate();
+		m_pOwner->Invalidate();
 		delete this;
 	}
 
@@ -502,11 +502,27 @@ namespace DuiLib
 			}
 		}
 		else if (uMsg == WM_KEYDOWN && TCHAR(wParam) == VK_RETURN) {
+
+			if(m_pOwner->m_pComboWindow && IsWindow(m_pOwner->m_pComboWindow->GetHWND()))
+				m_pOwner->m_pComboWindow->PostMessage(WM_KEYDOWN, VK_RETURN);
+
+			PostMessage(WM_KILLFOCUS);
+
 			m_pOwner->m_pManager->SendNotify(m_pOwner, DUI_MSGTYPE_RETURN);
 		}
 		else if (uMsg == WM_KEYDOWN && TCHAR(wParam) == VK_TAB) {
 			if (m_pOwner->m_pManager->IsLayered()) {
 				m_pOwner->m_pManager->SetNextTabControl();
+			}
+		}
+		else if (uMsg == WM_KEYDOWN && (TCHAR(wParam) == VK_DOWN || TCHAR(wParam) == VK_UP ))
+		{
+			if (m_pOwner->m_pComboWindow && IsWindow(m_pOwner->m_pComboWindow->GetHWND()))
+			{
+				if (TCHAR(wParam) == VK_DOWN)
+					m_pOwner->m_pComboWindow->PostMessage(WM_MOUSEWHEEL, MAKEWPARAM(0,-1));
+				else
+					m_pOwner->m_pComboWindow->PostMessage(WM_MOUSEWHEEL, MAKEWPARAM(0, 1));
 			}
 		}
 
@@ -609,7 +625,8 @@ namespace DuiLib
 		m_iWindowStyls(0), 
 		m_dwTipValueColor(0xFFBAC0C5),
 		m_iCurSel(-1),
-		m_bResEditChg(false)
+		m_bResEditChg(false),
+		m_bScrollSelect(true)
 	{
 		SetTextPadding(CDuiRect(4, 3, 4, 3));
 		SetBkColor(0xFFFFFFFF);
@@ -768,6 +785,7 @@ namespace DuiLib
 			}
 			return;
 		}
+
 		CContainerUI::DoEvent(event);
 	}
 
@@ -1647,4 +1665,6 @@ namespace DuiLib
 	}
 
 }
+
+
 
