@@ -74,4 +74,9 @@ private:
 	CDuiString m_sOrderDate;
 
 	CTicketModel *m_pTicket;
+
+	std::string m_strToken;
+
+	std::string m_strLeftTicketString;
+	std::string m_strKeyCheckIsChange;
 };

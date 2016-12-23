@@ -144,6 +144,31 @@ private:
 
 };
 
+class CGetQueqeCountResult
+{
+public:
+	CGetQueqeCountResult() {}
+	~CGetQueqeCountResult() {}
+
+	void SetTicket(std:: string v) { m_strTicket = v; }
+	void SetOp2(std:: string v) { m_strOp2 = v; }
+	void SetCountT(std:: string v) { m_strCountT = v; }
+
+	std::string  GetTicket() { return m_strTicket; }
+	std::string  GetOp2() { return  m_strOp2; }
+	std::string  GetCountT() { return  m_strCountT ; }
+
+private:
+
+	std::string m_strTicket;     /// 逗号分隔串；如： n1,n2   ;  n1: 指定座位的余票，  n2: 无座票
+	std::string m_strOp2;     ///true: 目前排队人数已经超过余票张数，请您选择其他席别或车次 ； 
+	std::string m_strCountT;     //// op_2 = false ,  目前排队人数   
+
+
+
+
+};
+
 
 class Client12306Manager
 {
@@ -238,11 +263,20 @@ public:
 
 	/*@action:  初始化单程购票界面
 	*/
-	int InitDc();
+	int InitDc(std::string &token , std::string &leftTicketSgtring, std::string &keyCheckIsChange);
 
 	/*@action:  检查订单信息
 	*/
 	int CheckOrderInfo(std::vector<CPassengerTicket> &vecPT , CCheckOrderInfoResult &resOrderInfo);
+
+
+	/*@action:
+	*/
+	int getQueueCount(CTicketModel *ticket ,std::string token , std::string leftTicketString, std::string seatType , CGetQueqeCountResult &res);
+
+	/*@action:
+	*/
+	int ConfirmSingleForQueue(std::vector<CPassengerTicket> &vecPT , CTicketModel *ticket, std::string token, std::string leftTicketString, std::string keyCheckIsChg,std::string randCode="");
 
 private:
 
@@ -315,6 +349,9 @@ private:
 	*/
 	int ParsePassengerString(std::string res );
 
+	/*@action:
+	*/
+	void UriEncode(std::string str, std::string &out);
 
 	Client12306Manager();
 
@@ -350,6 +387,11 @@ private:
 
 	///乘客信息
 	std::map<std::string, CPassenger> m_mapPassenger;
+
+
+
+	static char *m_strMonAbbreviate[];
+	static char *m_strWeekAbbreviate[];
 };
 
 

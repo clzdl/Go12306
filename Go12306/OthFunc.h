@@ -52,3 +52,5 @@ int Gunzip(Byte *zdata, uLong nzdata , std::string &gunZipString);
 /*@action:
 */
 long String2Number(std::string str);
+
+

@@ -58,6 +58,7 @@ public:
 	void SetBtnTextInfo(CDuiString v) { m_strBtnTextInfo = v; }
 	void SetTrainDate(CDuiString v) { m_strTrainDate = v; }
 	void SetTicketType(_TICKET_TYPE v) { m_ticketType = v; }
+	void SetTrainLocation(CDuiString v) { m_strTrainLocation = v; }
 
 
 	CDuiString GetTrainNo() { return m_strTrainNo; }
@@ -110,6 +111,7 @@ public:
 	CDuiString GetTrainDate() { return m_strTrainDate; }
 
 	_TICKET_TYPE GetTicketType() { return m_ticketType; }
+	CDuiString GetTrainLocation() { return m_strTrainLocation; }
 
 private:
 
@@ -162,6 +164,7 @@ private:
 
 
 	CDuiString m_strTrainDate;				///³Ë³µÈÕÆÚ
+	CDuiString m_strTrainLocation;			
 
 	CDuiString m_strSecretStr;						////secretStr
 	CDuiString m_strBtnTextInfo;					///buttonTextInfo

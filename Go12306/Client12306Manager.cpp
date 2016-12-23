@@ -13,6 +13,10 @@ Context::Ptr Client12306Manager::m_ptrContext = NULL;
 
 std::string Client12306Manager::m_strDomain = "kyfw.12306.cn";
 
+
+char* Client12306Manager::m_strMonAbbreviate[] = {"Jan" , "Feb" , "Mar", "Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
+char* Client12306Manager::m_strWeekAbbreviate[] = { "Mon","Tue","Web","Thu","Fri","Sat","Sun"};
+
 Client12306Manager *Client12306Manager::Instance()
 {
 	if (m_objInstance == NULL)
@@ -34,7 +38,7 @@ Client12306Manager::Client12306Manager()
 	m_sessHttpsClient.setHost(m_strDomain);
 	m_sessHttpsClient.setKeepAlive(true);
 
-	m_headerDefault["Accept"] = "*/*";
+	m_headerDefault["Accept"] = "application/json, text/javascript,*/*; q=0.01";
 	m_headerDefault["Accept-Encoding"] = "gzip, deflate, br";
 	m_headerDefault["Accept-Language"] = "zh-CN,zh;q=0.8";
 	m_headerDefault["Content-Type"] = "application/x-www-form-urlencoded;charset=UTF-8";
@@ -74,7 +78,9 @@ std::string Client12306Manager::ExecPost(std::string service, std::map<string, s
 				body << "&";
 
 			std::string enStr;
-			URI::encode(it->second, "@,", enStr);
+			//URI::encode(it->second, "@,", enStr);
+
+			UriEncode(it->second, enStr);
 
 			body << it->first << "=" << enStr;
 		}
@@ -154,10 +160,15 @@ std::string Client12306Manager::ExecPostBySeq(std::string service, std::vector<C
 			if (it != param->begin())
 				body << "&";
 
-			std::string enStr = it->GetValue();
+			std::string enStr;
 
-			if(it->GetNeedEncode())
-				URI::encode(it->GetValue(), "@,", enStr);
+			if (it->GetNeedEncode())
+			{
+				//URI::encode(it->GetValue(), "@,", enStr);
+				UriEncode(it->GetValue(), enStr);
+			}
+			else
+				enStr = it->GetValue();
 
 			body << it->GetKey() << "=" << enStr;
 		}
@@ -752,6 +763,10 @@ int Client12306Manager::AssignJson2TicketObj(JSON::Object::Ptr queryDto, CTicket
 	tmpJObj = queryDto->get("swz_num");
 	if (!tmpJObj.isEmpty())
 		objTicket.SetSwzNum(Utf8ToUnicode(tmpJObj.toString()).c_str());
+
+	tmpJObj = queryDto->get("location_code");
+	if (!tmpJObj.isEmpty())
+		objTicket.SetTrainLocation(Utf8ToUnicode(tmpJObj.toString()).c_str());
 
 	return SUCCESS;
 }
@@ -1593,6 +1608,9 @@ int Client12306Manager::ParsePassengerString(std::string res)
 
 			passenger.SetPhoneNo(Utf8ToUnicode(pMobileNo.toString()).c_str());
 
+			Dynamic::Var pType = jPassengerObj->get("passenger_type");
+			passenger.SetType( Utf8ToUnicode(pType.toString()).c_str());
+
 			m_mapPassenger.insert(std::pair<std::string, CPassenger>(UnicodeToUtf8(passenger.GetCardNo().GetData()), passenger));
 		}
 	}
@@ -1734,7 +1752,7 @@ int Client12306Manager::SubmitOrderRequest(CTicketModel *ticket)
 }
 
 
-int Client12306Manager::InitDc()
+int Client12306Manager::InitDc(std::string &token , std::string &leftTicketSgtring , std::string &keyCheckIsChange)
 {
 	int iRetFlag = SUCCESS;
 	try
@@ -1747,6 +1765,36 @@ int Client12306Manager::InitDc()
 		Gunzip((Byte*)response.c_str(), response.length(), gunString);
 
 
+		int pos = gunString.find("globalRepeatSubmitToken");
+
+		int beg = gunString.find("'", pos + 23);
+
+		int end = gunString.find("'", beg + 1 );
+
+		token = gunString.substr(beg + 1 , end - beg -1 );
+
+
+
+
+		pos = gunString.find("'key_check_isChange'", end);
+
+		beg = gunString.find("'", pos + 20);
+
+		end = gunString.find("'", beg + 1);
+
+		keyCheckIsChange = gunString.substr(beg + 1, end - beg - 1);
+
+
+		pos = gunString.find("'leftTicketStr'", end);
+
+		beg = gunString.find("'", pos + 15);
+
+		end = gunString.find("'", beg + 1);
+
+		leftTicketSgtring = gunString.substr(beg + 1, end - beg - 1);
+
+
+		
 
 	}
 	catch (Poco::Exception &e)
@@ -1841,19 +1889,19 @@ int Client12306Manager::CheckOrderInfo(std::vector<CPassengerTicket> &vecPT , CC
 			return FAIL;
 		}
 
-		if (pObj->has("url"))
-		{
-			if (pObj->has("messages"))
-			{
-				Dynamic::Var jMsg = pObj->get("messages");
-				m_strLastErrInfo = jMsg.toString();
-			}
-
-			return FAIL;
-		}
+	
 
 		Dynamic::Var pData = pObj->get("data");
 		JSON::Object::Ptr jData = pData.extract<JSON::Object::Ptr>();
+
+
+		if (jData->has("submitStatus") && jData->get("submitStatus").toString() == "false")
+		{
+
+			m_strLastErrInfo = jData->get("errMsg").toString();
+			return FAIL;
+
+		}
 
 		resOrderInfo.SetIfShowPassCode(jData->get("ifShowPassCode"));
 		resOrderInfo.SetCanChooseBeds(jData->get("canChooseBeds"));
@@ -1873,4 +1921,270 @@ int Client12306Manager::CheckOrderInfo(std::vector<CPassengerTicket> &vecPT , CC
 	}
 
 	return iRetFlag;
+}
+
+int Client12306Manager::getQueueCount(CTicketModel *ticket , std::string token, std::string leftTicketString, std::string seatType, CGetQueqeCountResult &res)
+{
+	int iRetFlag = SUCCESS;
+	try
+	{
+		string strService = "/otn/confirmPassenger/getQueueCount";
+
+		std::vector<CParam> param;
+
+		//param.push_back(CParam("train_date", UnicodeToUtf8( ticket->GetTrainDate().GetData()) ));
+		int year, month, day;
+		sscanf( UnicodeToUtf8(ticket->GetTrainDate().GetData()).c_str(), "%d-%d-%d", &year, &month, &day);
+
+		Poco::LocalDateTime ldt;
+		ldt.assign(year, month, day);
+
+		std::string  trainDate;
+		trainDate += m_strWeekAbbreviate[ldt.dayOfWeek()];
+		trainDate += " ";
+		trainDate += m_strMonAbbreviate[ldt.month()-1];
+		trainDate += " ";
+		stringstream ssDay , ssYear;
+		ssDay << day;
+		trainDate += ssDay.str();
+		trainDate += " ";
+
+		ssYear << year;
+		trainDate += ssYear.str();
+		trainDate += " ";
+
+		trainDate += "00:00:00";
+		trainDate += " ";
+
+		trainDate += "GMT+0800";
+		trainDate += " ";
+
+		trainDate += "(China Standard Time)";
+
+		std::string enTrainDate;
+		UriEncode(trainDate,  enTrainDate);
+
+		param.push_back(CParam("train_date", enTrainDate));
+		param.push_back(CParam("train_no", UnicodeToUtf8(ticket->GetTrainNo().GetData())  ));
+		param.push_back(CParam("stationTrainCode", UnicodeToUtf8(ticket->GetStationTrainCode().GetData())));
+
+		param.push_back(CParam("seatType", seatType));
+		param.push_back(CParam("fromStationTelecode", UnicodeToUtf8(ticket->GetFromStationTelecode().GetData())));
+		param.push_back(CParam("toStationTelecode", UnicodeToUtf8(ticket->GetToStationTelecode().GetData())));
+		param.push_back(CParam("leftTicket", leftTicketString));
+
+		param.push_back(CParam("purpose_codes", "00"));
+		param.push_back(CParam("train_location", UnicodeToUtf8( ticket->GetTrainLocation().GetData() )));
+
+		param.push_back(CParam("_json_att", ""));
+		
+		param.push_back(CParam("REPEAT_SUBMIT_TOKEN", token));
+
+
+		std::map<string, string> header;
+		header["Referer"] = "https://kyfw.12306.cn/otn/confirmPassenger/initDc";
+
+		std::string response = ExecPostBySeq(strService, &param, &header);
+
+		std::string gunString;
+		Gunzip((Byte*)response.c_str(), response.length(), gunString);
+
+
+		JSON::Parser parser;
+		Dynamic::Var result;
+
+		result = parser.parse(gunString);
+
+		JSON::Object::Ptr pObj = result.extract<JSON::Object::Ptr>();
+
+		Dynamic::Var jStatus = pObj->get("status");
+
+		if (jStatus.toString() != "true")
+		{
+			DUI__Trace(Utf8ToUnicode(jStatus.toString()).c_str());
+			return FAIL;
+		}
+
+		if (pObj->has("url"))
+		{
+			if (pObj->has("messages"))
+			{
+				Dynamic::Var jMsg = pObj->get("messages");
+				m_strLastErrInfo = jMsg.toString();
+			}
+
+			return FAIL;
+		}
+
+		Dynamic::Var pData = pObj->get("data");
+		JSON::Object::Ptr jData = pData.extract<JSON::Object::Ptr>();
+
+		res.SetTicket(jData->get("ticket").toString());
+		res.SetOp2(jData->get("op_2").toString());
+		res.SetCountT(jData->get("countT").toString());
+
+	}
+	catch (Poco::Exception &e)
+	{
+		DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
+		return FAIL;
+	}
+
+	return iRetFlag;
+}
+
+void Client12306Manager::UriEncode(std::string str, std::string &out)
+{
+	const std::string ILLEGAL = "%<>{}|\\\"^`:+";
+
+	for (std::string::iterator it = str.begin(); it != str.end(); ++it)
+	{
+		unsigned char c = *it;
+		if ((c >= 'a' && c <= 'z') ||
+			(c >= 'A' && c <= 'Z') ||
+			(c >= '0' && c <= '9') ||
+			c == '-' || c == '_' ||
+			c == '.' || c == '~')
+		{
+			out += c;
+		}
+		else if (c == 0x20)
+			out += "+";
+		else if (c < 0x20 || c >= 0x7F || ILLEGAL.find(c) != std::string::npos)
+		{
+			char sHex[4] = {0};
+			char *ptr = sHex;
+			char *q = sHex;
+			do
+			{
+				unsigned int tmp = c;
+				c /= 0x10;   ///”““∆4Œª
+
+				*ptr++ = "FEDCBA9876543210123456789ABCDEF"[15 + (tmp - c * 0x10)];
+
+			} while (c);
+
+			*ptr-- = '\0';
+			////reverse
+			while (q < ptr)
+			{
+				char tmp = *ptr;
+				*ptr-- = *q;
+				*q++ = tmp;
+			}
+
+			out += "%";
+			out += sHex;
+
+		}
+		else out += c;
+
+	}	
+
+}
+
+
+int Client12306Manager::ConfirmSingleForQueue(std::vector<CPassengerTicket> &vecPT , CTicketModel *ticket, std::string token, std::string leftTicketString , std::string keyCheckIsChg,std::string randCode )
+{
+	int iRetFlag = SUCCESS;
+	try
+	{
+		string strService = "/otn/confirmPassenger/confirmSingleForQueue";
+
+		std::map<string, string> header;
+		header["Referer"] = "https://kyfw.12306.cn/otn/confirmPassenger/initDc";
+
+		std::vector<CParam> param;		
+
+
+
+		std::string passengerTicketString;
+		std::string oldPassengerString;
+
+		for (std::vector<CPassengerTicket>::iterator it = vecPT.begin(); it != vecPT.end(); ++it)
+		{
+			if (it != vecPT.begin())
+			{
+				passengerTicketString += "_";
+				oldPassengerString += "_";
+			}
+
+			passengerTicketString += UnicodeToUtf8(it->GetSeatType().GetData());
+			passengerTicketString += ",";
+			passengerTicketString += "0";
+			passengerTicketString += ",";
+			passengerTicketString += UnicodeToUtf8(it->GetTicketType().GetData());
+			passengerTicketString += ",";
+			passengerTicketString += UnicodeToUtf8(it->GetPassengerName().GetData());
+			passengerTicketString += ",";
+			passengerTicketString += UnicodeToUtf8(it->GetIdType().GetData());
+			passengerTicketString += ",";
+			passengerTicketString += UnicodeToUtf8(it->GetIdNo().GetData());
+			passengerTicketString += ",";
+			passengerTicketString += UnicodeToUtf8(it->GetMobileNo().GetData());
+			passengerTicketString += ",";
+			passengerTicketString += UnicodeToUtf8(it->GetSaveStatus().GetData());
+
+
+
+			oldPassengerString += UnicodeToUtf8(it->GetPassengerName().GetData());
+			oldPassengerString += ",";
+			oldPassengerString += UnicodeToUtf8(it->GetIdType().GetData());
+			oldPassengerString += ",";
+			oldPassengerString += UnicodeToUtf8(it->GetIdNo().GetData());
+			oldPassengerString += ",";
+			oldPassengerString += UnicodeToUtf8(it->GetPassengerType().GetData());
+
+		}
+
+
+		param.push_back(CParam("passengerTicketStr", passengerTicketString , true));
+		param.push_back(CParam("oldPassengerStr", oldPassengerString, true));
+
+		param.push_back(CParam("randCode", randCode));
+		param.push_back(CParam("purpose_codes", "00"));
+		param.push_back(CParam("key_check_isChange", keyCheckIsChg));
+		param.push_back(CParam("leftTicketStr", leftTicketString));
+		param.push_back(CParam("train_location", UnicodeToUtf8( ticket->GetTrainLocation().GetData())));
+		param.push_back(CParam("choose_seats",""));
+		param.push_back(CParam("seatDetailType", "000"));
+		param.push_back(CParam("roomType", "00"));
+		param.push_back(CParam("dwAll", "N"));
+		param.push_back(CParam("_json_att", ""));
+		param.push_back(CParam("REPEAT_SUBMIT_TOKEN", token));
+		
+		std::string response = ExecPostBySeq(strService, &param, &header);
+
+		std::string gunString;
+		Gunzip((Byte*)response.c_str(), response.length(), gunString);
+	
+		JSON::Parser parser;
+		Dynamic::Var result;
+
+		result = parser.parse(gunString);
+
+		JSON::Object::Ptr pObj = result.extract<JSON::Object::Ptr>();
+
+		Dynamic::Var jStatus = pObj->get("status");
+
+		if (jStatus.toString() != "true")
+		{
+			DUI__Trace(Utf8ToUnicode(jStatus.toString()).c_str());
+			Dynamic::Var pData = pObj->get("data");
+
+			m_strLastErrInfo = pData.toString();
+
+			return FAIL;
+		}
+
+	}
+	catch (Poco::Exception &e)
+	{
+		DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
+		return FAIL;
+	}
+
+	return iRetFlag;
+
+
 }

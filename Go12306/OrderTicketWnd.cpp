@@ -84,7 +84,7 @@ void COrderTicketWnd::InitWindow()
 	}
 
 
-	if (SUCCESS != Client12306Manager::Instance()->InitDc())
+	if (SUCCESS != Client12306Manager::Instance()->InitDc(m_strToken , m_strLeftTicketString , m_strKeyCheckIsChange))
 	{
 		CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
 		PostMessage(WM_CLOSE);
@@ -214,6 +214,7 @@ void COrderTicketWnd::AddOrderTicketList(CPassenger *passenger)
 	CLabelUI *txtName = new CLabelUI();
 	txtName->SetAttribute(_T("align") , _T("center"));
 	txtName->SetText(passenger->GetName());
+	txtName->SetUserData(passenger->GetType());
 	pListItem->Add(txtName);
 
 	///证件类型
@@ -671,7 +672,7 @@ void COrderTicketWnd::OnTicketOrderSubmit(TNotifyUI& msg)
 		///姓名
 		CLabelUI *pTxtName = static_cast<CLabelUI*>(pEleContainer->GetItemAt(2));
 		pt.SetPassengerName(pTxtName->GetText());
-
+		pt.SetPassengerType(pTxtName->GetUserData());
 
 		///证件类型
 		CLabelUI *pTxtIdType = static_cast<CLabelUI*>(pEleContainer->GetItemAt(3));
@@ -682,10 +683,12 @@ void COrderTicketWnd::OnTicketOrderSubmit(TNotifyUI& msg)
 		pt.SetIdNo(pTxtIdNo->GetText());
 
 		///手机号码
-		CLabelUI *pMobileNo = static_cast<CLabelUI*>(pEleContainer->GetItemAt(4));
+		CLabelUI *pMobileNo = static_cast<CLabelUI*>(pEleContainer->GetItemAt(5));
 		pt.SetMobileNo(pMobileNo->GetText());
 
 		pt.SetSaveStatus(_T("N"));
+
+		
 
 
 		vecPT.push_back(pt);
@@ -722,5 +725,43 @@ void COrderTicketWnd::OnTicketOrderSubmit(TNotifyUI& msg)
 
 		}
 	}
+
+
+	///
+
+	CGetQueqeCountResult queRes;
+	if (SUCCESS != Client12306Manager::Instance()->getQueueCount(m_pTicket , m_strToken , m_strLeftTicketString, UnicodeToUtf8( vecPT[0].GetSeatType().GetData()), queRes))
+	{
+		CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
+		return;
+	}
+
+	if (queRes.GetOp2() == "true")
+	{
+		CMsgWnd::MessageBox(GetHWND(), _T("提示"),_T("目前排队人数已经超过余票张数，请您选择其他席别或车次"));
+		return;
+	}
+	else
+	{
+		if ( atoi(queRes.GetCountT().c_str()) > 0)
+		{
+			CDuiString tmp;
+			tmp.Format(_T("目前排队人数 %s 人") , Utf8ToUnicode(queRes.GetCountT()).c_str());
+			CMsgWnd::MessageBox(GetHWND(), _T("提示"), tmp);
+		}
+
+	}
+
+
+	/////
+	if (SUCCESS != Client12306Manager::Instance()->ConfirmSingleForQueue(vecPT , m_pTicket, m_strToken, m_strLeftTicketString, m_strKeyCheckIsChange))
+	{
+		CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
+		return;
+	}
+
+
+	CMsgWnd::MessageBox(GetHWND(), _T("提示"), _T("恭喜您，订票成功！"));
+
 
 }

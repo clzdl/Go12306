@@ -12,13 +12,14 @@ public:
 	void SetCardTypeName(CDuiString v) { m_sCardTypeName = v; }
 	void SetCardNo(CDuiString v) { m_sCardNo = v; }
 	void SetPhoneNo(CDuiString v) { m_sPhoneNo = v; }
-
+	void SetType(CDuiString v) { m_sType = v; }
 
 	CDuiString GetName() { return m_sName; }
 	CDuiString GetCardType() { return m_sCardType; }
 	CDuiString GetCardTypeName() { return m_sCardTypeName; }
 	CDuiString GetCardNo() { return  m_sCardNo; }
 	CDuiString GetPhoneNo() { return m_sPhoneNo; }
+	CDuiString GetType() { return m_sType; }
 
 private:
 
@@ -27,4 +28,5 @@ private:
 	CDuiString m_sCardTypeName;
 	CDuiString m_sCardNo;
 	CDuiString m_sPhoneNo;
+	CDuiString m_sType;   
 };
