@@ -99,6 +99,9 @@
     <ClInclude Include="CertCodeWnd.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="OrderWaitTimeWnd.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -158,6 +161,9 @@
     <ClCompile Include="CertCodeWnd.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="OrderWaitTimeWnd.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Go12306.rc">
@@ -192,6 +198,9 @@
       <Filter>资源文件</Filter>
     </Xml>
     <Xml Include="res\skin\login.xml">
+      <Filter>资源文件</Filter>
+    </Xml>
+    <Xml Include="res\skin\order_wait_time_wnd.xml">
       <Filter>资源文件</Filter>
     </Xml>
   </ItemGroup>

@@ -4,6 +4,8 @@
 #include "OthFunc.h"
 #include "MsgWnd.h"
 #include "CertCodeWnd.h"
+#include "OrderWaitTimeWnd.h"
+
 
 DUI_BEGIN_MESSAGE_MAP(COrderTicketWnd, WindowImplBase)
 	DUI_ON_MSGTYPE(DUI_MSGTYPE_CLICK, OnClick)
@@ -652,7 +654,7 @@ void COrderTicketWnd::OnTicketOrderSubmit(TNotifyUI& msg)
 
 	std::vector<CPassengerTicket> vecPT;
 
-	for(int i = 0 ; i < iCnt ; ++i)
+	for (int i = 0; i < iCnt; ++i)
 	{
 		CPassengerTicket pt;
 
@@ -688,135 +690,122 @@ void COrderTicketWnd::OnTicketOrderSubmit(TNotifyUI& msg)
 
 		pt.SetSaveStatus(_T("N"));
 
-		
+
 
 
 		vecPT.push_back(pt);
 	}
-	CCheckOrderInfoResult result;
-	if (SUCCESS != Client12306Manager::Instance()->CheckOrderInfo(vecPT, result))
-	{
-		CMsgWnd::MessageBox(GetHWND(), _T("提示") , Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
-		return;
-	}
 
-	if (result.GetSubmitStatus() != "true" && result.GetSubmitStatus() != "TRUE")
-	{
-		CMsgWnd::MessageBox(GetHWND(), _T("提示"), _T("出票失败"));
+	int iRet = FAIL;
 
-		return;
-
-	}
-
-	char randCode[128] = { 0 };
-	if (result.GetIfShowPassCode() == "Y")
-	{///需要显示验证码
-
-		std::vector<CDuiPoint> selPoint;
-		switch (CCertCodeWnd::MessageBox(GetHWND(), _T("请输入验证码") , selPoint))
-		{
-			case MSGID_OK:
-				///
-				if (selPoint.empty())
-				{
-					CMsgWnd::MessageBox(GetHWND(), _T("提示"),_T("验证码未选择"));
-
-					return;
-				}
-
-				
-				for (std::vector<CDuiPoint>::iterator it = selPoint.begin(); it != selPoint.end(); ++it)
-				{
-					if (it == selPoint.begin())
-						sprintf(randCode, "%d,%d", it->x, it->y);
-					else
-						sprintf(randCode, "%s,%d,%d", randCode, it->x, it->y);
-				}
-
-
-				break;
-			case MSGID_CANCEL:
-				PostQuitMessage(0L);
-				break;
-
-		}
-	}
-
-
-	///
-
-	CGetQueqeCountResult queRes;
-	if (SUCCESS != Client12306Manager::Instance()->getQueueCount(m_pTicket , m_strToken , m_strLeftTicketString, UnicodeToUtf8( vecPT[0].GetSeatType().GetData()), queRes))
-	{
-		CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
-		return;
-	}
-
-	if (queRes.GetOp2() == "true")
-	{
-		CMsgWnd::MessageBox(GetHWND(), _T("提示"),_T("目前排队人数已经超过余票张数，请您选择其他席别或车次"));
-		return;
-	}
-	else
-	{
-		if ( atoi(queRes.GetCountT().c_str()) > 0)
-		{
-			CDuiString tmp;
-			tmp.Format(_T("目前排队人数 %s 人") , Utf8ToUnicode(queRes.GetCountT()).c_str());
-			CMsgWnd::MessageBox(GetHWND(), _T("提示"), tmp);
-		}
-
-	}
-
-
-	/////
-	if (SUCCESS != Client12306Manager::Instance()->ConfirmSingleForQueue(vecPT , m_pTicket, m_strToken, m_strLeftTicketString, m_strKeyCheckIsChange , randCode))
-	{
-		CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
-		return;
-	}
-
-
-	////
-	bool bBreak = false;
-	std::string orderNo;
 	do
 	{
-		bBreak = false;
-		CQueryOrderWaitTimeResult orderWaitTimeResult;
-		if (SUCCESS != Client12306Manager::Instance()->QueryOrderWaitTime(m_strToken, orderWaitTimeResult))
+		CCheckOrderInfoResult result;
+		if (SUCCESS != Client12306Manager::Instance()->CheckOrderInfo(vecPT, result))
 		{
 			CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
-			return;
+			break;
 		}
 
-		if (orderWaitTimeResult.GetQueryOrderWaitTimeStatus() != "true" && orderWaitTimeResult.GetQueryOrderWaitTimeStatus() != "TRUE")
+		if (result.GetSubmitStatus() != "true" && result.GetSubmitStatus() != "TRUE")
 		{
-			CMsgWnd::MessageBox(GetHWND(), _T("提示"), _T("请登录"));
-			return;
+			CMsgWnd::MessageBox(GetHWND(), _T("提示"), _T("出票失败"));
+
+			break;
+
 		}
 
-		if (orderWaitTimeResult.GetWaitTime() < 0 )
+		char randCode[128] = { 0 };
+		if (result.GetIfShowPassCode() == "Y")
+		{///需要显示验证码
+
+			std::vector<CDuiPoint> selPoint;
+			if (MSGID_CANCEL == CCertCodeWnd::MessageBox(GetHWND(), _T("请输入验证码"), selPoint))
+				break;
+
+
+			///
+			if (selPoint.empty())
+			{
+				CMsgWnd::MessageBox(GetHWND(), _T("提示"), _T("验证码未选择"));
+
+				break;
+			}
+
+
+			for (std::vector<CDuiPoint>::iterator it = selPoint.begin(); it != selPoint.end(); ++it)
+			{
+				if (it == selPoint.begin())
+					sprintf(randCode, "%d,%d", it->x, it->y);
+				else
+					sprintf(randCode, "%s,%d,%d", randCode, it->x, it->y);
+			}
+
+		}
+
+
+		///
+
+		CGetQueqeCountResult queRes;
+		if (SUCCESS != Client12306Manager::Instance()->getQueueCount(m_pTicket, m_strToken, m_strLeftTicketString, UnicodeToUtf8(vecPT[0].GetSeatType().GetData()), queRes))
 		{
-			orderNo = orderWaitTimeResult.GetOrderId();
-			bBreak = true;
+			CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
+			break;
+		}
+
+		if (queRes.GetOp2() == "true")
+		{
+			CMsgWnd::MessageBox(GetHWND(), _T("提示"), _T("目前排队人数已经超过余票张数，请您选择其他席别或车次"));
+			break;
+		}
+		else
+		{
+			if (atoi(queRes.GetCountT().c_str()) > 0)
+			{
+				CDuiString tmp;
+				tmp.Format(_T("目前排队人数 %s 人"), Utf8ToUnicode(queRes.GetCountT()).c_str());
+				CMsgWnd::MessageBox(GetHWND(), _T("提示"), tmp);
+			}
 
 		}
 
-		Sleep(2000);
 
-	} while (!bBreak);
-	
-	if (SUCCESS != Client12306Manager::Instance()->ResultOrderForDcQueue(orderNo,m_strToken))
+		/////
+		if (SUCCESS != Client12306Manager::Instance()->ConfirmSingleForQueue(vecPT, m_pTicket, m_strToken, m_strLeftTicketString, m_strKeyCheckIsChange, randCode))
+		{
+			CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
+			break;
+		}
+
+
+		COrderWaitTimeWnd *pWaitTimeWnd = COrderWaitTimeWnd::GetInstance(GetHWND(), _T("稍等片刻"), m_strToken);
+
+		std::auto_ptr<COrderWaitTimeWnd> ptrWnd(pWaitTimeWnd);
+
+		if (SUCCESS != ptrWnd->ShowModal())
+		{
+			CMsgWnd::MessageBox(GetHWND(), _T("提示"), ptrWnd->GetErrString());
+			break;
+		}
+
+
+		iRet = SUCCESS;
+
+
+
+
+	} while (false);
+
+	switch(iRet)
 	{
-		CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
-		return;
+		case SUCCESS:
+			CMsgWnd::MessageBox(GetHWND(), _T("提示"), _T("恭喜您，订票成功！"));
+			break;
+		default:
+			CMsgWnd::MessageBox(GetHWND(), _T("提示"), _T("订票失败，不要难过，从头再来"));
+			break;
 	}
 
-	
-
-
-	CMsgWnd::MessageBox(GetHWND(), _T("提示"), _T("恭喜您，订票成功！"));
-
+	Close();
 
 }

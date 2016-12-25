@@ -173,7 +173,7 @@ private:
 class CQueryOrderWaitTimeResult
 {
 public:
-	CQueryOrderWaitTimeResult() {}
+	CQueryOrderWaitTimeResult() :m_iWaitTime(0), m_iWaitCount(0){}
 	~CQueryOrderWaitTimeResult() {}
 
 	void SetQueryOrderWaitTimeStatus(std::string v) { m_strQueryOrderWaitTimeStatus = v; }
@@ -191,6 +191,17 @@ public:
 	int GetWaitCount() { return m_iWaitCount; }
 	std::string GetTourFlag() { return m_strTourFlag; }
 	std::string GetOrderId() { return m_strOrderId; }
+
+	void Init()
+	{
+		m_strQueryOrderWaitTimeStatus.clear();
+		m_strCount.clear();
+		m_iWaitTime = 0;
+		m_strRequestId.clear();
+		m_iWaitCount = 0;
+		m_strTourFlag.clear();
+		m_strOrderId.clear();
+	}
 
 private:
 	std::string m_strQueryOrderWaitTimeStatus;

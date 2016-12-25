@@ -9,7 +9,7 @@
       <Button name="closebtn" width="39" height="20" tooltip="关闭" normalimage="file='sysbtn/btn_close_normal.png'" hotimage="file='sysbtn/btn_close_highlight.png'" pushedimage="file='sysbtn/btn_close_down.png'"/>
     </HorizontalLayout>
     <VerticalLayout inset="20,10,20,10">
-      <Label name="MessageText"  font="1" align="left" valign="vcenter"/>
+      <Label name="MessageText" wordbreak="true" font="1" align="left"/>
     </VerticalLayout>
     <HorizontalLayout height="60" inset="10,10,10,10">
       <Control />

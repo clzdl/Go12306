@@ -162,6 +162,7 @@
     <ClInclude Include="OrderManagerUI.h" />
     <ClInclude Include="OrderModel.h" />
     <ClInclude Include="OrderTicketWnd.h" />
+    <ClInclude Include="OrderWaitTimeWnd.h" />
     <ClInclude Include="OthFunc.h" />
     <ClInclude Include="Passenger.h" />
     <ClInclude Include="PassengerManagerUI.h" />
@@ -187,6 +188,7 @@
     <ClCompile Include="OrderManagerUI.cpp" />
     <ClCompile Include="OrderModel.cpp" />
     <ClCompile Include="OrderTicketWnd.cpp" />
+    <ClCompile Include="OrderWaitTimeWnd.cpp" />
     <ClCompile Include="OthFunc.cpp" />
     <ClCompile Include="Passenger.cpp" />
     <ClCompile Include="PassengerManagerUI.cpp" />
@@ -218,6 +220,7 @@
     </Xml>
     <Xml Include="res\skin\order_manager_pannel.xml" />
     <Xml Include="res\skin\order_ticket_wnd.xml" />
+    <Xml Include="res\skin\order_wait_time_wnd.xml" />
     <Xml Include="res\skin\ticket_query_pannel.xml" />
     <Xml Include="res\skin\user_manager_pannel.xml" />
   </ItemGroup>
