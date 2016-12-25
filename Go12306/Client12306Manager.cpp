@@ -2002,17 +2002,11 @@ int Client12306Manager::getQueueCount(CTicketModel *ticket , std::string token, 
 		if (jStatus.toString() != "true")
 		{
 			DUI__Trace(Utf8ToUnicode(jStatus.toString()).c_str());
-			return FAIL;
-		}
-
-		if (pObj->has("url"))
-		{
 			if (pObj->has("messages"))
 			{
 				Dynamic::Var jMsg = pObj->get("messages");
 				m_strLastErrInfo = jMsg.toString();
 			}
-
 			return FAIL;
 		}
 
@@ -2185,6 +2179,124 @@ int Client12306Manager::ConfirmSingleForQueue(std::vector<CPassengerTicket> &vec
 	}
 
 	return iRetFlag;
+}
 
 
+int Client12306Manager::QueryOrderWaitTime(std::string token, CQueryOrderWaitTimeResult &res)
+{
+	int iRetFlag = SUCCESS;
+	try
+	{
+		string strService = "/otn/confirmPassenger/queryOrderWaitTime";
+
+		std::map<string, string> header;
+		header["Referer"] = "https://kyfw.12306.cn/otn/confirmPassenger/initDc";
+
+		std::map<std::string, std::string> param;
+
+		long rand = GetTickCount();
+
+		stringstream  ss;
+		ss << rand;
+
+
+		param["random"] = ss.str();
+		param["tourFlag"] = "dc";
+		param["_json_att"] = "";
+		param["REPEAT_SUBMIT_TOKEN"] = token;
+		
+
+		
+
+		std::string response = ExecGet(strService, &param, &header);
+
+		std::string gunString;
+		Gunzip((Byte*)response.c_str(), response.length(), gunString);
+
+
+
+		JSON::Parser parser;
+		Dynamic::Var result;
+
+		result = parser.parse(gunString);
+
+		JSON::Object::Ptr pObj = result.extract<JSON::Object::Ptr>();
+
+		Dynamic::Var jStatus = pObj->get("status");
+
+		if (jStatus.toString() != "true")
+		{
+			DUI__Trace(Utf8ToUnicode(jStatus.toString()).c_str());
+			Dynamic::Var pData = pObj->get("data");
+
+			m_strLastErrInfo = pData.toString();
+
+			return FAIL;
+		}
+
+		Dynamic::Var vData = pObj->get("data");
+
+		JSON::Object::Ptr jData = vData.extract<JSON::Object::Ptr>();
+
+		
+		res.SetQueryOrderWaitTimeStatus(jData->get("queryOrderWaitTimeStatus").toString());
+		res.SetCount(jData->get("count").toString());
+		res.SetWaitTime(jData->get("waitTime").convert<int>());
+		res.SetRequestId(jData->get("requestId").toString());
+		res.SetWaitCount(jData->get("waitCount").convert<int>());
+		res.SetTourFlag(jData->get("tourFlag").toString());
+		res.SetOrderId(jData->get("orderId").toString());
+
+	
+
+	}
+	catch (Poco::Exception &e)
+	{
+		DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
+		return FAIL;
+	}
+
+	return iRetFlag;
+
+}
+
+int Client12306Manager::ResultOrderForDcQueue(std::string orderNo, std::string token)
+{
+
+	int iRetFlag = SUCCESS;
+	try
+	{
+		string strService = "/otn/confirmPassenger/resultOrderForDcQueue";
+
+		std::map<string, string> header;
+		header["Referer"] = "https://kyfw.12306.cn/otn/confirmPassenger/initDc";
+
+		std::map<std::string, std::string> param;
+
+
+
+		param["orderSequence_no"] = orderNo;
+		param["tourFlag"] = "dc";
+		param["_json_att"] = "";
+		param["REPEAT_SUBMIT_TOKEN"] = token;
+
+
+
+
+		std::string response = ExecPost(strService, &param, &header);
+
+		std::string gunString;
+		Gunzip((Byte*)response.c_str(), response.length(), gunString);
+
+
+
+	}
+	catch (Poco::Exception &e)
+	{
+		DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
+		return FAIL;
+	}
+
+	return iRetFlag;
+	
 }

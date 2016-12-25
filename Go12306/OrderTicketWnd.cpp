@@ -700,7 +700,15 @@ void COrderTicketWnd::OnTicketOrderSubmit(TNotifyUI& msg)
 		return;
 	}
 
+	if (result.GetSubmitStatus() != "true" && result.GetSubmitStatus() != "TRUE")
+	{
+		CMsgWnd::MessageBox(GetHWND(), _T("提示"), _T("出票失败"));
 
+		return;
+
+	}
+
+	char randCode[128] = { 0 };
 	if (result.GetIfShowPassCode() == "Y")
 	{///需要显示验证码
 
@@ -716,6 +724,14 @@ void COrderTicketWnd::OnTicketOrderSubmit(TNotifyUI& msg)
 					return;
 				}
 
+				
+				for (std::vector<CDuiPoint>::iterator it = selPoint.begin(); it != selPoint.end(); ++it)
+				{
+					if (it == selPoint.begin())
+						sprintf(randCode, "%d,%d", it->x, it->y);
+					else
+						sprintf(randCode, "%s,%d,%d", randCode, it->x, it->y);
+				}
 
 
 				break;
@@ -754,11 +770,50 @@ void COrderTicketWnd::OnTicketOrderSubmit(TNotifyUI& msg)
 
 
 	/////
-	if (SUCCESS != Client12306Manager::Instance()->ConfirmSingleForQueue(vecPT , m_pTicket, m_strToken, m_strLeftTicketString, m_strKeyCheckIsChange))
+	if (SUCCESS != Client12306Manager::Instance()->ConfirmSingleForQueue(vecPT , m_pTicket, m_strToken, m_strLeftTicketString, m_strKeyCheckIsChange , randCode))
 	{
 		CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
 		return;
 	}
+
+
+	////
+	bool bBreak = false;
+	std::string orderNo;
+	do
+	{
+		bBreak = false;
+		CQueryOrderWaitTimeResult orderWaitTimeResult;
+		if (SUCCESS != Client12306Manager::Instance()->QueryOrderWaitTime(m_strToken, orderWaitTimeResult))
+		{
+			CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
+			return;
+		}
+
+		if (orderWaitTimeResult.GetQueryOrderWaitTimeStatus() != "true" && orderWaitTimeResult.GetQueryOrderWaitTimeStatus() != "TRUE")
+		{
+			CMsgWnd::MessageBox(GetHWND(), _T("提示"), _T("请登录"));
+			return;
+		}
+
+		if (orderWaitTimeResult.GetWaitTime() < 0 )
+		{
+			orderNo = orderWaitTimeResult.GetOrderId();
+			bBreak = true;
+
+		}
+
+		Sleep(2000);
+
+	} while (!bBreak);
+	
+	if (SUCCESS != Client12306Manager::Instance()->ResultOrderForDcQueue(orderNo,m_strToken))
+	{
+		CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
+		return;
+	}
+
+	
 
 
 	CMsgWnd::MessageBox(GetHWND(), _T("提示"), _T("恭喜您，订票成功！"));

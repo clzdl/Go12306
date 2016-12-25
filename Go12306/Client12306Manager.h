@@ -170,6 +170,39 @@ private:
 };
 
 
+class CQueryOrderWaitTimeResult
+{
+public:
+	CQueryOrderWaitTimeResult() {}
+	~CQueryOrderWaitTimeResult() {}
+
+	void SetQueryOrderWaitTimeStatus(std::string v) { m_strQueryOrderWaitTimeStatus = v; }
+	void SetCount(std::string v) { m_strCount = v; }
+	void SetWaitTime(int v) { m_iWaitTime = v; }
+	void SetRequestId(std::string v) { m_strRequestId = v; }
+	void SetWaitCount(int v) { m_iWaitCount = v; }
+	void SetTourFlag(std::string v) { m_strTourFlag = v; }
+	void SetOrderId(std::string v) { m_strOrderId = v; }
+
+	std::string GetQueryOrderWaitTimeStatus() { return m_strQueryOrderWaitTimeStatus ; }
+	std::string GetCount() { return m_strCount; }
+	int GetWaitTime() { return m_iWaitTime; }
+	std::string GetRequestId() { return m_strRequestId; }
+	int GetWaitCount() { return m_iWaitCount; }
+	std::string GetTourFlag() { return m_strTourFlag; }
+	std::string GetOrderId() { return m_strOrderId; }
+
+private:
+	std::string m_strQueryOrderWaitTimeStatus;
+	std::string m_strCount;
+	int m_iWaitTime;
+	std::string m_strRequestId;
+	int m_iWaitCount;
+	std::string m_strTourFlag;
+	std::string m_strOrderId;
+
+};
+
 class Client12306Manager
 {
 public:
@@ -277,6 +310,14 @@ public:
 	/*@action:
 	*/
 	int ConfirmSingleForQueue(std::vector<CPassengerTicket> &vecPT , CTicketModel *ticket, std::string token, std::string leftTicketString, std::string keyCheckIsChg,std::string randCode="");
+	
+	/*@acition:
+	*/
+	int QueryOrderWaitTime(std::string token , CQueryOrderWaitTimeResult &res);
+
+	/*@action:
+	*/
+	int ResultOrderForDcQueue(std::string orderNo , std::string token);
 
 private:
 
