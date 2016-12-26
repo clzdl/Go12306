@@ -50,6 +50,10 @@ private:
 	*/
 	void QueryOrderWaitTime();
 
+	/*@action:
+	*/
+	void RefreshShowText();
+
 	CButtonUI* m_pCloseBtn;
 	CButtonUI* m_pMaxBtn;
 	CButtonUI* m_pRestoreBtn;

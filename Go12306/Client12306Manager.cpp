@@ -65,6 +65,7 @@ Client12306Manager& Client12306Manager::operator =(const Client12306Manager &hcm
 
 std::string Client12306Manager::ExecPost(std::string service, std::map<string, string> *param, std::map<string, string> *header)
 {
+	m_strLastErrInfo.clear();
 	HTTPRequest request(HTTPRequest::HTTP_POST, service , Net::HTTPMessage::HTTP_1_1);
 
 	std::stringstream body;
@@ -148,6 +149,7 @@ std::string Client12306Manager::ExecPost(std::string service, std::map<string, s
 
 std::string Client12306Manager::ExecPostBySeq(std::string service, std::vector<CParam> *param , std::map<string, string> *header)
 {
+	m_strLastErrInfo.clear();
 	HTTPRequest request(HTTPRequest::HTTP_POST, service, Net::HTTPMessage::HTTP_1_1);
 
 	std::stringstream body;
@@ -235,6 +237,7 @@ std::string Client12306Manager::ExecPostBySeq(std::string service, std::vector<C
 
 std::string Client12306Manager::ExecGet(std::string service, std::map<string, string> *param,std::map<string, string> *header)
 {
+	m_strLastErrInfo.clear();
 	if (param && !param->empty())
 	{
 		service += "?";
@@ -1725,21 +1728,18 @@ int Client12306Manager::SubmitOrderRequest(CTicketModel *ticket)
 
 		if (jStatus.toString() != "true")
 		{
-			DUI__Trace(Utf8ToUnicode(jStatus.toString()).c_str());
-			return FAIL;
-		}
-
-		if (pObj->has("url"))
-		{
+	
 			if (pObj->has("messages"))
 			{
-				Dynamic::Var jMsg = pObj->get("messages");
+				Dynamic::Var jMsg = pObj->getArray("messages")->get(0);
+
 				m_strLastErrInfo = jMsg.toString();
+
+				DUI__Trace(Utf8ToUnicode(m_strLastErrInfo).c_str());
 			}
 
 			return FAIL;
 		}
-
 
 	}
 	catch (Poco::Exception &e)

@@ -75,27 +75,18 @@ LRESULT COrderWaitTimeWnd::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM 
 	case WM_TIMER:
 		if (wParam == WAIT_TIMER_ID) {
 
-			::KillTimer(GetHWND() , WAIT_TIMER_ID);
-			
 			--m_iDispatchTime;
+			RefreshShowText();
 
 			if (m_iDispatchTime > m_iNextRequestTime)
 				return 0;
 		
+			::KillTimer(GetHWND(), WAIT_TIMER_ID);
+
 			m_orderWaitTimeResult.Init();
 
 			QueryOrderWaitTime();
 			
-			///等待时间结束，
-			if (SUCCESS != Client12306Manager::Instance()->ResultOrderForDcQueue(m_orderWaitTimeResult.GetOrderId(), m_tokenString))
-			{
-				m_sErrInfo = Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str();
-
-				Close(FAIL);
-			}
-
-			Close(SUCCESS);
-
 			return 0;
 		}
 		break;
@@ -137,6 +128,9 @@ void COrderWaitTimeWnd::InitilizeTimer()
 	iTmp = m_iDispatchTime - iTmp;
 
 	m_iNextRequestTime = iTmp <= 0 ? 1 : iTmp;
+
+
+
 }
 
 
@@ -151,5 +145,31 @@ void COrderWaitTimeWnd::QueryOrderWaitTime()
 	if (m_orderWaitTimeResult.GetWaitTime() > 0)
 	{
 		InitilizeTimer();
+
+		RefreshShowText();
+		return;
 	}
+
+	///等待时间结束，
+	if (SUCCESS != Client12306Manager::Instance()->ResultOrderForDcQueue(m_orderWaitTimeResult.GetOrderId(), m_tokenString))
+	{
+		m_sErrInfo = Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str();
+
+		Close(FAIL);
+	}
+
+	Close(SUCCESS);
+
+
+}
+
+void COrderWaitTimeWnd::RefreshShowText()
+{
+	CLabelUI* pMsg = static_cast<CLabelUI*>(m_pm.FindControl(_T("MessageText")));
+
+	CDuiString sMsg;
+	sMsg.Format(_T("剩余等待时间 %d 秒......") , m_iDispatchTime);
+
+	pMsg->SetText(sMsg);
+
 }
