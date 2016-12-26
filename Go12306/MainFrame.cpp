@@ -17,6 +17,9 @@
 #include "OrderTicketWnd.h"
 
 
+#define   TIMER_QUERY_ID		WM_APP+1000
+
+
 static const std::string config ="logging.loggers.root.channel = c2\n"
 								"logging.loggers.root.level = information\n"		
 								"logging.channels.c2.class = FileChannel\n"
@@ -51,12 +54,15 @@ DUI_END_MESSAGE_MAP()
 
 
 CMainFrame::CMainFrame()
-:m_bAllTrainType(true),
- m_tWorker(new CTicketWorker(this)),
- m_tOrderWorker(new COrderWorker(this)),
- m_pOrderManagerUI(NULL),
- m_pTicketManagerUI(NULL),
- m_pPassengerManagerUI(NULL)
+	:m_bAllTrainType(true),
+	m_tWorker(new CTicketWorker(this)),
+	m_tOrderWorker(new COrderWorker(this)),
+	m_pOrderManagerUI(NULL),
+	m_pTicketManagerUI(NULL),
+	m_pPassengerManagerUI(NULL),
+	m_iBaseTime(50),
+	m_iWaitTime(0),
+	m_bPoolFlag(false)
 {}
 
 CControlUI* CMainFrame::CreateControl(LPCTSTR pstrClass)
@@ -90,6 +96,9 @@ void CMainFrame::InitWindow()
 	
 	m_pTikcetAdult = static_cast<COptionUI*>(m_pm.FindControl(_T("ticketAdult")));
 	m_pTikcetStudent = static_cast<COptionUI*>(m_pm.FindControl(_T("ticketStudent")));
+
+	m_pPollQueryTag = static_cast<CCheckBoxUI*>(m_pm.FindControl(_T("pollQueryTag")));
+	m_btnQueryTicket = static_cast<CButtonUI*>(m_pm.FindControl(_T("btnTicketQuery")));
 
 	////日志初始化
 	std::istringstream istr(config);
@@ -230,7 +239,16 @@ LRESULT CMainFrame::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam,
 	}
 	else if (uMsg == WM_TIMER)
 	{
-		bHandled = FALSE;
+		if (wParam == TIMER_QUERY_ID)
+		{
+			--m_iWaitTime;
+			CDuiString showText;
+			showText.Format(_T("%d.%d"), (m_iBaseTime - m_iWaitTime) / 10, (m_iBaseTime - m_iWaitTime) % 10);
+
+			m_btnQueryTicket->SetText(CDuiString(_T("查询")) + _T("[") + showText + _T("]"));
+
+			
+		}
 	}
 	else if (uMsg == WM_MENUCLICK)
 	{
@@ -388,14 +406,33 @@ void CMainFrame::Notify(TNotifyUI& msg)
 
 int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString travelTime , _TICKET_TYPE ticketType)
 {
+	if (!m_pPollQueryTag->GetCheck())
+	{
+		m_pProgressDlg = CProgressDlg::CreateDlg(this->GetHWND());
 
-	m_pProgressDlg = CProgressDlg::CreateDlg(this->GetHWND());
-	
-	m_tWorker->SetVecTicket(&m_vecTicket);
-	m_tWorker->SetQueryParam(begPlace, endPlace, travelTime, ticketType);
-	m_tpWorker.start(*m_tWorker);
-	m_pProgressDlg->ShowModal();
+		m_tWorker->SetVecTicket(&m_vecTicket);
+		m_tWorker->SetQueryParam(begPlace, endPlace, travelTime, ticketType);
+		m_tpWorker.start(*m_tWorker);
+		m_pProgressDlg->ShowModal();
+	}
+	else
+	{
+		
 
+		m_bPoolFlag = !m_bPoolFlag;
+
+		if (m_bPoolFlag)
+		{
+			///启动定时器，执行定时查询任务
+			m_iWaitTime = 50;
+			::SetTimer(GetHWND(), TIMER_QUERY_ID, 100, NULL);
+		}
+		else
+		{
+			::KillTimer(GetHWND(),TIMER_QUERY_ID);
+			m_btnQueryTicket->SetText(_T("查询"));
+		}
+	}
 		
 	return 0;
 }
@@ -612,6 +649,8 @@ void CMainFrame::TicketPlaceChgCb(TNotifyUI& msg)
 
 void CMainFrame::OrderTicketCb(TNotifyUI& msg)
 {
+
+
 	CButtonUI *orderTicket = static_cast<CButtonUI*>(msg.pSender);
 	int index = _wtoi(orderTicket->GetUserData().GetData());
 	

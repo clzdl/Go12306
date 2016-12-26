@@ -163,7 +163,8 @@ private:
 
 	COptionUI *m_pTikcetAdult;
 	COptionUI *m_pTikcetStudent;
-
+	CCheckBoxUI *m_pPollQueryTag;
+	CButtonUI *m_btnQueryTicket;
 
 	
 		 
@@ -188,6 +189,9 @@ private:
 
 	CProgressDlg* m_pProgressDlg;
 
+	int m_iWaitTime;
+	const int m_iBaseTime;
+	bool m_bPoolFlag;
 };
 
 
