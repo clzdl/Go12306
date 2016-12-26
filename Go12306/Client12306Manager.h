@@ -33,6 +33,11 @@
 #include "Poco/JSON/Query.h"
 #include "Poco/JSON/PrintHandler.h"
 #include "Poco/URI.h"
+#include "Poco/Util/LoggingConfigurator.h"
+#include "Poco/Util/PropertyFileConfiguration.h"
+#include "Poco/Logger.h"
+
+
 
 #include "TicketModel.h"
 #include "OrderModel.h"
@@ -53,7 +58,9 @@ using Poco::Net::KeyConsoleHandler;
 using Poco::Net::ConsoleCertificateHandler;
 using Poco::Net::ConsoleCertificateHandler;
 using Poco::URI;
-
+using Poco::Util::LoggingConfigurator;
+using Poco::Util::PropertyFileConfiguration;
+using Poco::Logger;
 
 
 using namespace Poco::Dynamic;

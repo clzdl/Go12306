@@ -36,6 +36,8 @@ public:
 
 	virtual BOOL Receive(SkinChangedParam param);
 
+	static void Log(std::string msg);
+
 	/////////////////////////////////////////////////////////////////////////
 public:
 	virtual HRESULT STDMETHODCALLTYPE UpdateUI(void)
@@ -185,6 +187,7 @@ private:
 
 
 	CProgressDlg* m_pProgressDlg;
+
 };
 
 

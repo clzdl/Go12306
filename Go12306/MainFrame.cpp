@@ -17,6 +17,18 @@
 #include "OrderTicketWnd.h"
 
 
+static const std::string config ="logging.loggers.root.channel = c2\n"
+								"logging.loggers.root.level = information\n"		
+								"logging.channels.c2.class = FileChannel\n"
+								"logging.channels.c2.path = GO12306.log\n"
+								"logging.channels.c2.formatter = f1\n"
+								"logging.channels.c2.rotation = daily\n"
+								"logging.channels.c2.archive = timestamp\n"
+								"logging.formatters.f1.class = PatternFormatter\n"
+								"logging.formatters.f1.pattern =  %Y-%m-%d %H:%M:%S.%i [%P:%I]:%q:%t\n"
+								"logging.formatters.f1.times = local\n";
+
+
 
 DUI_BEGIN_MESSAGE_MAP(CMainFrame, WindowImplBase)
 	DUI_ON_CLICK_CTRNAME(_T("btnTicketQuery"), TicketQueryCb)
@@ -79,8 +91,18 @@ void CMainFrame::InitWindow()
 	m_pTikcetAdult = static_cast<COptionUI*>(m_pm.FindControl(_T("ticketAdult")));
 	m_pTikcetStudent = static_cast<COptionUI*>(m_pm.FindControl(_T("ticketStudent")));
 
-	////
+	////日志初始化
+	std::istringstream istr(config);
+	AutoPtr<PropertyFileConfiguration> pConfig = new PropertyFileConfiguration(istr);
 
+	LoggingConfigurator configurator;
+	configurator.configure(pConfig);
+
+	
+	CMainFrame::Log("akdjflasdjflakdjkf");
+
+
+	////
 	Client12306Manager::Instance()->LoginInit();
 
 	Client12306Manager::Instance()->Query12306StationName();
@@ -717,6 +739,15 @@ void CMainFrame::TxtChgEndPlaceCb(TNotifyUI& msg)
 	std::vector<CStation*> vecStation = Client12306Manager::Instance()->GetStation(sFind);
 
 	StationComboRefresh(m_pEndPlaceCombo, vecStation);
+}
+
+void CMainFrame::Log(std::string msg)
+{
+	static Logger& root = Logger::get("");
+
+	root.information(msg);
+
+	
 }
 
 ///////////////////////
