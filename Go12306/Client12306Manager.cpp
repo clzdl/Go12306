@@ -2290,6 +2290,38 @@ int Client12306Manager::ResultOrderForDcQueue(std::string orderNo, std::string t
 
 
 
+
+		JSON::Parser parser;
+		Dynamic::Var result;
+
+		result = parser.parse(gunString);
+
+		JSON::Object::Ptr pObj = result.extract<JSON::Object::Ptr>();
+
+		Dynamic::Var jStatus = pObj->get("status");
+
+		if (jStatus.toString() != "true")
+		{
+			DUI__Trace(Utf8ToUnicode(jStatus.toString()).c_str());
+			Dynamic::Var pData = pObj->get("data");
+
+			m_strLastErrInfo = pData.toString();
+
+			return FAIL;
+		}
+
+		Dynamic::Var vData = pObj->get("data");
+
+		JSON::Object::Ptr jData = vData.extract<JSON::Object::Ptr>();
+
+
+		if (jData->get("submitStatus").toString() != "true" &&
+			jData->get("submitStatus").toString() != "TRUE")
+		{
+			m_strLastErrInfo = "ÏÂµ¥Ê§°Ü";
+			return FAIL;
+		}
+
 	}
 	catch (Poco::Exception &e)
 	{
