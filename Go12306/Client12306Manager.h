@@ -226,6 +226,10 @@ class Client12306Manager
 public:
 	static Client12306Manager *Instance();
 
+
+	/*@action:
+	*/
+	int LeftTicketInit();
 	/*@action: 查询余票
 	*@parameter:
 	*	begPlace:入参， 车站代码：  SJP  石家庄
@@ -447,7 +451,8 @@ private:
 	///乘客信息
 	std::map<std::string, CPassenger> m_mapPassenger;
 
-
+	std::string m_strCtx12306;    ///12306项目根目录
+	std::string m_strLeftTicketUrl;
 
 	static char *m_strMonAbbreviate[];
 	static char *m_strWeekAbbreviate[];

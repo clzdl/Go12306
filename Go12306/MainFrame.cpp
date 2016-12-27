@@ -98,6 +98,12 @@ void CMainFrame::InitWindow()
 
 	Client12306Manager::Instance()->Query12306StationName();
 
+	if (SUCCESS != Client12306Manager::Instance()->LeftTicketInit())
+	{
+		CMsgWnd::MessageBox(GetHWND(), _T("ÌבÊ¾"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
+		return ;
+	}
+
 
 	StationComboRefresh(m_pBegPlaceCombo, Client12306Manager::Instance()->Get12306Station());
 
@@ -406,6 +412,7 @@ void CMainFrame::Notify(TNotifyUI& msg)
 
 int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString travelTime , _TICKET_TYPE ticketType)
 {
+
 	if (!m_pPollQueryTag->GetCheck())
 	{
 		m_pProgressDlg = CProgressDlg::CreateDlg(this->GetHWND());

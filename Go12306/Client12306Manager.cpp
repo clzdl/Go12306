@@ -394,9 +394,54 @@ int Client12306Manager::QueryTicketLog(std::string begPlace, std::string endPlac
 
 	return SUCCESS;
 }
+int Client12306Manager::LeftTicketInit()
+{
+	int iRet = SUCCESS;
 
 
-int Client12306Manager::QueryLeftTicket(std::string begPlace, std::string endPlace, std::string travelTime , std::vector<CTicketModel> &vecTicket, _TICKET_TYPE ticketType)
+	try
+	{
+
+		string strService = "/otn/leftTicket/init?";
+
+		
+
+		std::string strOrgRes = ExecGet(strService);
+
+
+
+		std::string strGunString;
+		Gunzip((byte*)const_cast<char*>(strOrgRes.c_str()), strOrgRes.length(), strGunString);
+
+		int pos = strGunString.find("ctx");
+
+		int beg = strGunString.find("'", pos + 14);
+
+		int end = strGunString.find("'", beg + 1);
+
+		m_strCtx12306 = strGunString.substr(beg + 1, end - beg - 1);
+
+		pos = strGunString.find("CLeftTicketUrl" , end);
+
+		beg = strGunString.find("'", pos + 14);
+
+		end = strGunString.find("'", beg + 1);
+
+		m_strLeftTicketUrl = strGunString.substr(beg + 1, end - beg - 1);
+
+	}
+	catch (Poco::Exception &e)
+	{
+		CLog::GetInstance()->Log(e.displayText());
+		m_strLastErrInfo = e.displayText();
+		return FAIL;
+	}
+
+	return iRet;
+
+}
+
+int Client12306Manager::QueryLeftTicket( std::string begPlace, std::string endPlace, std::string travelTime , std::vector<CTicketModel> &vecTicket, _TICKET_TYPE ticketType)
 {
 	int iRet = SUCCESS;
 
@@ -410,7 +455,7 @@ int Client12306Manager::QueryLeftTicket(std::string begPlace, std::string endPla
 	try
 	{
 
-		string strService = "/otn/leftTicket/queryA?";
+		string strService = "/otn/" + m_strLeftTicketUrl +"?";
 
 		///train_date   YYYY-mm-dd
 		strService += "leftTicketDTO.train_date=";
