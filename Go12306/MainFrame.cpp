@@ -47,6 +47,7 @@ CMainFrame::CMainFrame()
 	:m_bAllTrainType(true),
 	m_tWorker(new CTicketWorker(this)),
 	m_tOrderWorker(new COrderWorker(this)),
+	m_tPollTicketWorker(new CPollTicketWorker(this)),
 	m_pOrderManagerUI(NULL),
 	m_pTicketManagerUI(NULL),
 	m_pPassengerManagerUI(NULL),
@@ -247,7 +248,8 @@ LRESULT CMainFrame::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam,
 
 				m_btnQueryTicket->SetText(showText);
 
-				///
+				///执行刷票动作
+				PollTicketProcess();
 				
 				m_iWaitTime = m_iBaseTime;
 				::SetTimer(GetHWND(), TIMER_QUERY_ID, 100, NULL);
@@ -342,6 +344,16 @@ LRESULT CMainFrame::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam,
 		return 0;
 
 	}
+	else if (uMsg == WM_POLL_TICKET_PROCESS)
+	{
+		bHandled = TRUE;
+		if ((int)wParam != SUCCESS)
+		{
+			CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
+		}
+		else
+			RefreshTicketListView();
+	}
 	
 	
 	bHandled = FALSE;
@@ -433,11 +445,21 @@ int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString
 			///启动定时器，执行定时查询任务
 			m_iWaitTime = 50;
 			::SetTimer(GetHWND(), TIMER_QUERY_ID, 100, NULL);
+
+			m_sBegPlace = begPlace;
+			m_sEndPlace = endPlace;
+			m_sTravelTime = travelTime;
+			m_ticketType = ticketType;
 		}
 		else
 		{
 			::KillTimer(GetHWND(),TIMER_QUERY_ID);
 			m_btnQueryTicket->SetText(_T("查询"));
+
+			m_sBegPlace.Empty();
+			m_sEndPlace.Empty();
+			m_sTravelTime.Empty();
+			m_ticketType = _ADULT;
 		}
 	}
 		
@@ -790,6 +812,30 @@ void CMainFrame::TxtChgEndPlaceCb(TNotifyUI& msg)
 	std::vector<CStation*> vecStation = Client12306Manager::Instance()->GetStation(sFind);
 
 	StationComboRefresh(m_pEndPlaceCombo, vecStation);
+}
+
+int CMainFrame::PollTicketProcess()
+{
+	m_pProgressDlg = CProgressDlg::CreateDlg(this->GetHWND());
+
+	m_tPollTicketWorker->SetVecTicket(&m_vecTicket);
+	m_tPollTicketWorker->SetQueryParam(m_sBegPlace, m_sEndPlace, m_sTravelTime, m_ticketType);
+	m_tpWorker.start(*m_tPollTicketWorker);
+	m_pProgressDlg->ShowModal();
+
+	return SUCCESS;
+}
+
+
+void CMainFrame::OnPollTicketProcessCb(TNotifyUI& msg)
+{
+	if ((int)msg.wParam != SUCCESS)
+	{
+		CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
+	}
+	else
+		RefreshTicketListView();
+
 }
 
 

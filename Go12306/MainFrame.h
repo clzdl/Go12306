@@ -99,7 +99,7 @@ public:
 	void TxtChgBegPlaceCb(TNotifyUI& msg);
 	void TxtChgEndPlaceCb(TNotifyUI& msg);
 
-	
+	void OnPollTicketProcessCb(TNotifyUI& msg);
 	
 
 	CPaintManagerUI* GetPaintManagerUI() { return &m_pm; }
@@ -134,10 +134,13 @@ private:
 	*/
 	int RefreshMyOrderListView();
 
-	/*@action:
+	/*@action:Õ¾µãË¢ÐÂ
 	*/
 	int StationComboRefresh(CEditComboUI *pEditComboUI , std::vector<CStation*> &vec);
 
+	/*@action:
+	*/
+	int PollTicketProcess();
 
 
 	CButtonUI* m_pCloseBtn;
@@ -180,6 +183,8 @@ private:
 
 	COrderWorker *m_tOrderWorker;
 
+	CPollTicketWorker *m_tPollTicketWorker;
+
 	COrderManagerUI *m_pOrderManagerUI;
 	CTicketManager *m_pTicketManagerUI;
 	CPassengerManagerUI *m_pPassengerManagerUI;
@@ -190,5 +195,12 @@ private:
 	int m_iWaitTime;
 	const int m_iBaseTime;
 	bool m_bPoolFlag;
+
+
+	CDuiString m_sBegPlace;
+	CDuiString m_sEndPlace;
+	CDuiString m_sTravelTime;
+	_TICKET_TYPE m_ticketType;
+
 };
 

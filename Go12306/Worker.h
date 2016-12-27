@@ -82,3 +82,41 @@ private:
 
 
 };
+
+
+////myorder worker
+class CPollTicketWorker : public Runnable
+{
+public:
+	CPollTicketWorker(CMainFrame *mainFrame);
+	~CPollTicketWorker();
+
+	void run();
+
+
+	void SetVecTicket(std::vector<CTicketModel>  *vecTicket)
+	{
+		m_vecTicket = vecTicket;
+	}
+
+
+	void SetQueryParam(CDuiString begPlace, CDuiString endPlace, CDuiString travelTime, _TICKET_TYPE ticketType)
+	{
+		m_strBegPlace = begPlace;
+		m_strEndPlace = endPlace;
+		m_strTravelTime = travelTime;
+		m_ticketType = ticketType;
+	}
+
+private:
+	CDuiString  m_strBegPlace;
+	CDuiString  m_strEndPlace;
+	CDuiString  m_strTravelTime;
+	_TICKET_TYPE m_ticketType;
+
+	std::vector<CTicketModel> *m_vecTicket;
+
+	CMainFrame *m_mainFrame;
+
+
+};

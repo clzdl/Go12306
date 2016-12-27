@@ -73,4 +73,39 @@ void COrderWorker::run()
 }
 
 
+///////////////////////
+CPollTicketWorker::CPollTicketWorker(CMainFrame *mainFrame)
+	:m_mainFrame(mainFrame)
+{
+
+}
+CPollTicketWorker::~CPollTicketWorker()
+{
+
+}
+
+void CPollTicketWorker::run()
+{
+	while (1)
+	{
+		m_vecTicket->clear();
+		int iRetFlag = Client12306Manager::Instance()->QueryLeftTicket(UnicodeToUtf8(m_strBegPlace.GetData()),
+			UnicodeToUtf8(m_strEndPlace.GetData()),
+			UnicodeToUtf8(m_strTravelTime.GetData()),
+			*m_vecTicket);
+
+
+		SendMessage(m_mainFrame->GetHWND(), WM_PROGRESS_CLOSE, NULL, NULL);
+
+
+		SendMessage(m_mainFrame->GetHWND(), WM_POLL_TICKET_PROCESS, iRetFlag, NULL);
+
+		break;
+
+	}
+
+
+}
+
+
 
