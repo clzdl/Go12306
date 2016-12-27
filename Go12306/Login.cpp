@@ -148,8 +148,8 @@ void CLoginWnd::Login(TNotifyUI& msg)
 
 	if (!flag)
 	{
-		m_code12306UI->Refresh();
 		CMsgWnd::MessageBox(GetHWND(), _T("ÌáÊ¾"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
+		m_code12306UI->Refresh();
 		return;
 
 	}

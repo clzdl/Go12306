@@ -17,7 +17,7 @@
     <Control/>
     <CheckBox name="pollQueryTag" text="刷票" width="60"  align="left" textpadding="24,0,0,0" normalimage="file='common/unchecked.png' source='0,0,20,20' dest='0,4,20,24'" selectedimage="file='common/checked.png' source='00,0,20,20' dest='0,4,20,24'"/>
     
-		<Button name="btnTicketQuery" text="查询" align="left" textcolor="#FF000000" style="btn_style" width="100" textpadding="20,0,0,0" foreimage="dest='4,7,20,23' res='other/icon.png'" />
+		<Button name="btnTicketQuery" text="查询" align="left" textcolor="#FF000000" style="btn_style" width="100" textpadding="20,0,0,0" foreimage="dest='4,7,20,23' res='common/SearchIcon.png'" />
 	</HorizontalLayout>
 
 	<HorizontalLayout height="30" childpadding="1" bordersize="1,1,1,1" bordercolor="#F" >

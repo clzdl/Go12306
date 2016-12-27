@@ -5,6 +5,7 @@
 #include <fstream>
 #include "OthFunc.h"
 #include "MainFrame.h"
+#include "Log.h"
 
 
 
@@ -118,10 +119,10 @@ std::string Client12306Manager::ExecPost(std::string service, std::map<string, s
 
 		///请求头
 		//DUI__Trace(_T(" %s "), Utf8ToUnicode(ss.str()).c_str());
-		CMainFrame::Log(ss.str());
+		CLog::GetInstance()->Log(ss.str());
 		///请求体
 		//DUI__Trace(_T(" %s "), Utf8ToUnicode(utf8Body).c_str());
-		CMainFrame::Log(utf8Body);
+		CLog::GetInstance()->Log(utf8Body);
 	}
 
 	std::ostream &os = m_sessHttpsClient.sendRequest(request);
@@ -141,9 +142,10 @@ std::string Client12306Manager::ExecPost(std::string service, std::map<string, s
 
 		///输出相应头
 		//DUI__Trace(_T(" %s "), Utf8ToUnicode(ss.str()).c_str());
-		CMainFrame::Log(ss.str());
+		CLog::GetInstance()->Log(ss.str());
 		
 		///输出相应体
+		CLog::GetInstance()->Log(ostr.str());
 		//DUI__Trace(_T(" %s "), Utf8ToUnicode(ostr.str()).c_str());
 	}
 
@@ -210,11 +212,11 @@ std::string Client12306Manager::ExecPostBySeq(std::string service, std::vector<C
 
 		///请求头
 		//DUI__Trace(_T(" %s "), Utf8ToUnicode(ss.str()).c_str());
-		CMainFrame::Log(ss.str());
+		CLog::GetInstance()->Log(ss.str());
 		///请求体
 		DUI__Trace(_T(" %s "), Utf8ToUnicode(utf8Body).c_str());
 
-		CMainFrame::Log(utf8Body);
+		CLog::GetInstance()->Log(utf8Body);
 	}
 
 	std::ostream &os = m_sessHttpsClient.sendRequest(request);
@@ -234,7 +236,7 @@ std::string Client12306Manager::ExecPostBySeq(std::string service, std::vector<C
 
 		///输出相应头
 		//DUI__Trace(_T(" %s "), Utf8ToUnicode(ss.str()).c_str());
-		CMainFrame::Log(ss.str());
+		CLog::GetInstance()->Log(ss.str());
 
 		///输出相应体
 		//DUI__Trace(_T(" %s "), Utf8ToUnicode(ostr.str()).c_str());
@@ -289,7 +291,7 @@ std::string Client12306Manager::ExecGet(std::string service, std::map<string, st
 
 		///请求头
 		//DUI__Trace(_T(" %s "), Utf8ToUnicode(ss.str()).c_str());
-		CMainFrame::Log(ss.str());
+		CLog::GetInstance()->Log(ss.str());
 	}
 
 	m_sessHttpsClient.sendRequest(request);
@@ -318,7 +320,7 @@ std::string Client12306Manager::ExecGet(std::string service, std::map<string, st
 
 		///输出相应头
 		//DUI__Trace(_T(" %s "), Utf8ToUnicode(ss.str()).c_str());
-		CMainFrame::Log(ss.str());
+		CLog::GetInstance()->Log(ss.str());
 
 		///输出相应体
 		//DUI__Trace(_T(" %s "), Utf8ToUnicode(ostr.str()).c_str());
@@ -385,7 +387,8 @@ int Client12306Manager::QueryTicketLog(std::string begPlace, std::string endPlac
 	}
 	catch (Poco::Exception &e)
 	{
-		DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
+		//DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
+		CLog::GetInstance()->Log(e.displayText());
 		return FAIL;
 	}
 
@@ -456,7 +459,7 @@ int Client12306Manager::QueryLeftTicket(std::string begPlace, std::string endPla
 	catch (Poco::Exception &e)
 	{
 		//DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
-		CMainFrame::Log(e.displayText());
+		CLog::GetInstance()->Log(e.displayText());
 		m_strLastErrInfo = Gbk2Utf8("结果返回错误");
 		return FAIL;
 	}
@@ -536,8 +539,8 @@ int Client12306Manager::JsonParseTicket(std::string jsonString , std::string tra
 	catch (Poco::Exception &e)
 	{
 		//DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
-		CMainFrame::Log(e.displayText());
-		m_strLastErrInfo = Gbk2Utf8("结果返回错误");
+		CLog::GetInstance()->Log(e.displayText());
+		m_strLastErrInfo = e.displayText();
 		return FAIL;
 	}
 
@@ -803,7 +806,7 @@ int Client12306Manager::LoginInit()
 	catch (Poco::Exception &e)
 	{
 		//DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
-		CMainFrame::Log(e.displayText());
+		CLog::GetInstance()->Log(e.displayText());
 		return FAIL;
 	}
 	return SUCCESS;
@@ -840,7 +843,7 @@ int Client12306Manager::QueryPassCode(std::string moduleName , std::string &byte
 	catch (Poco::Exception &e)
 	{
 		//DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
-		CMainFrame::Log(e.displayText());
+		CLog::GetInstance()->Log(e.displayText());
 		return FAIL;
 	}
 	return SUCCESS;
@@ -877,7 +880,7 @@ int Client12306Manager::AnsynValidPassCode(std::vector<CDuiPoint> &selPoints , s
 	catch (Poco::Exception &e)
 	{
 		//DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
-		CMainFrame::Log(e.displayText());
+		CLog::GetInstance()->Log(e.displayText());
 		return FAIL;
 	}
 
@@ -949,7 +952,7 @@ int Client12306Manager::AnsysLoginSugguest(std::string userName, std::string use
 	catch (Poco::Exception &e)
 	{
 		//DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
-		CMainFrame::Log(e.displayText());
+		CLog::GetInstance()->Log(e.displayText());
 		m_strLastErrInfo = e.displayText();
 
 		return FAIL;
@@ -1040,7 +1043,7 @@ int Client12306Manager::UserLogin(std::string &res)
 	catch (Poco::Exception &e)
 	{
 		//DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
-		CMainFrame::Log(e.displayText());
+		CLog::GetInstance()->Log(e.displayText());
 		return FAIL;
 	}
 
@@ -1062,13 +1065,13 @@ int Client12306Manager::InitMy12306(std::string &res)
 
 		//DUI__Trace(_T("%s"), Utf8ToUnicode(res).c_str());
 
-		CMainFrame::Log(res);
+		CLog::GetInstance()->Log(res);
 		
 	}
 	catch (Poco::Exception &e)
 	{
 		//DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
-		CMainFrame::Log(e.displayText());
+		CLog::GetInstance()->Log(e.displayText());
 		return FAIL;
 	}
 
@@ -1111,7 +1114,7 @@ int Client12306Manager::QueryMyOrder(std::string startDate, std::string endDate 
 	catch (Poco::Exception &e)
 	{
 		//DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
-		CMainFrame::Log(e.displayText());
+		CLog::GetInstance()->Log(e.displayText());
 		return FAIL;
 	}
 
@@ -1181,7 +1184,7 @@ int Client12306Manager::JsonParseOrder(std::string jsonString, std::map<std::str
 	}
 	catch (Exception &e)
 	{
-		CMainFrame::Log(e.displayText());
+		CLog::GetInstance()->Log(e.displayText());
 		m_strLastErrInfo = e.displayText();
 		return FAIL;
 	}
@@ -1239,7 +1242,7 @@ int Client12306Manager::AssignJson2OrderObj(JSON::Object::Ptr jOrderDTOData, COr
 	}
 	catch (Exception &e)
 	{
-		CMainFrame::Log(e.displayText());
+		CLog::GetInstance()->Log(e.displayText());
 		m_strLastErrInfo = e.displayText();
 		return FAIL;
 	}
@@ -1290,7 +1293,7 @@ int Client12306Manager::AssignJson2OrderTicketObj(JSON::Object::Ptr jOrderTicket
 	}
 	catch (Exception &e)
 	{
-		CMainFrame::Log(e.displayText());
+		CLog::GetInstance()->Log(e.displayText());
 		m_strLastErrInfo = e.displayText();
 		return FAIL;
 	}
@@ -1361,7 +1364,7 @@ int Client12306Manager::Query12306StationName()
 	catch (Poco::Exception &e)
 	{
 		//DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
-		CMainFrame::Log(e.displayText());
+		CLog::GetInstance()->Log(e.displayText());
 		m_strLastErrInfo = e.displayText();
 		return FAIL;
 	}
@@ -1559,7 +1562,7 @@ int Client12306Manager::QueryPassenger()
 	{
 		//DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
 
-		CMainFrame::Log(e.displayText());
+		CLog::GetInstance()->Log(e.displayText());
 
 		return FAIL;
 	}
@@ -1647,7 +1650,7 @@ int Client12306Manager::ParsePassengerString(std::string res)
 	}
 	catch (Exception &e)
 	{
-		CMainFrame::Log(e.displayText());
+		CLog::GetInstance()->Log(e.displayText());
 		m_strLastErrInfo = e.displayText();
 		return FAIL;
 	}
@@ -1713,7 +1716,7 @@ int Client12306Manager::CheckUser()
 	catch (Poco::Exception &e)
 	{
 		//DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
-		CMainFrame::Log(e.displayText());
+		CLog::GetInstance()->Log(e.displayText());
 		m_strLastErrInfo = e.displayText();
 		return FAIL;
 	}
@@ -1775,7 +1778,7 @@ int Client12306Manager::SubmitOrderRequest(CTicketModel *ticket)
 	catch (Poco::Exception &e)
 	{
 		//DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
-		CMainFrame::Log(e.displayText());
+		CLog::GetInstance()->Log(e.displayText());
 		m_strLastErrInfo = e.displayText();
 		return FAIL;
 	}
@@ -1832,7 +1835,7 @@ int Client12306Manager::InitDc(std::string &token , std::string &leftTicketSgtri
 	catch (Poco::Exception &e)
 	{
 		//DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
-		CMainFrame::Log(e.displayText());
+		CLog::GetInstance()->Log(e.displayText());
 		m_strLastErrInfo = e.displayText();
 		return FAIL;
 	}
@@ -1951,7 +1954,7 @@ int Client12306Manager::CheckOrderInfo(std::vector<CPassengerTicket> &vecPT , CC
 	catch (Poco::Exception &e)
 	{
 		//DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
-		CMainFrame::Log(e.displayText());
+		CLog::GetInstance()->Log(e.displayText());
 		m_strLastErrInfo = e.displayText();
 		return FAIL;
 	}
@@ -2057,7 +2060,7 @@ int Client12306Manager::getQueueCount(CTicketModel *ticket , std::string token, 
 	catch (Poco::Exception &e)
 	{
 		//DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
-		CMainFrame::Log(e.displayText());
+		CLog::GetInstance()->Log(e.displayText());
 		m_strLastErrInfo = e.displayText();
 		return FAIL;
 	}
@@ -2213,7 +2216,7 @@ int Client12306Manager::ConfirmSingleForQueue(std::vector<CPassengerTicket> &vec
 	catch (Poco::Exception &e)
 	{
 		//DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
-		CMainFrame::Log(e.displayText());
+		CLog::GetInstance()->Log(e.displayText());
 
 		m_strLastErrInfo = e.displayText();
 
@@ -2295,7 +2298,7 @@ int Client12306Manager::QueryOrderWaitTime(std::string token, CQueryOrderWaitTim
 	catch (Poco::Exception &e)
 	{
 		//DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
-		CMainFrame::Log(e.displayText());
+		CLog::GetInstance()->Log(e.displayText());
 
 		return FAIL;
 	}
@@ -2370,7 +2373,7 @@ int Client12306Manager::ResultOrderForDcQueue(std::string orderNo, std::string t
 	catch (Poco::Exception &e)
 	{
 		//DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
-		CMainFrame::Log(e.displayText());
+		CLog::GetInstance()->Log(e.displayText());
 		m_strLastErrInfo = e.displayText();
 		return FAIL;
 	}

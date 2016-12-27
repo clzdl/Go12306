@@ -20,16 +20,6 @@
 #define   TIMER_QUERY_ID		WM_APP+1000
 
 
-static const std::string config ="logging.loggers.root.channel = c2\n"
-								"logging.loggers.root.level = information\n"		
-								"logging.channels.c2.class = FileChannel\n"
-								"logging.channels.c2.path = GO12306.log\n"
-								"logging.channels.c2.formatter = f1\n"
-								"logging.channels.c2.rotation = daily\n"
-								"logging.channels.c2.archive = timestamp\n"
-								"logging.formatters.f1.class = PatternFormatter\n"
-								"logging.formatters.f1.pattern =  %Y-%m-%d %H:%M:%S.%i [%P:%I]:%q:%t\n"
-								"logging.formatters.f1.times = local\n";
 
 
 
@@ -100,15 +90,7 @@ void CMainFrame::InitWindow()
 	m_pPollQueryTag = static_cast<CCheckBoxUI*>(m_pm.FindControl(_T("pollQueryTag")));
 	m_btnQueryTicket = static_cast<CButtonUI*>(m_pm.FindControl(_T("btnTicketQuery")));
 
-	////日志初始化
-	std::istringstream istr(config);
-	AutoPtr<PropertyFileConfiguration> pConfig = new PropertyFileConfiguration(istr);
-
-	LoggingConfigurator configurator;
-	configurator.configure(pConfig);
-
 	
-	CMainFrame::Log("akdjflasdjflakdjkf");
 
 
 	////
@@ -242,11 +224,29 @@ LRESULT CMainFrame::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam,
 		if (wParam == TIMER_QUERY_ID)
 		{
 			--m_iWaitTime;
-			CDuiString showText;
-			showText.Format(_T("%d.%d"), (m_iBaseTime - m_iWaitTime) / 10, (m_iBaseTime - m_iWaitTime) % 10);
+			
+			if (m_iWaitTime > 0)
+			{
+				CDuiString showText;
+				showText.Format(_T("%d.%d"), (m_iBaseTime - m_iWaitTime) / 10, (m_iBaseTime - m_iWaitTime) % 10);
 
-			m_btnQueryTicket->SetText(CDuiString(_T("查询")) + _T("[") + showText + _T("]"));
+				m_btnQueryTicket->SetText(showText + CDuiString(_T("秒后刷新")));
+			}
+			else
+			{
+				///执行刷新动作
+				::KillTimer(GetHWND(), TIMER_QUERY_ID);
 
+				CDuiString showText = _T("正在刷新请稍等");
+
+				m_btnQueryTicket->SetText(showText);
+
+				///
+				
+				m_iWaitTime = m_iBaseTime;
+				::SetTimer(GetHWND(), TIMER_QUERY_ID, 100, NULL);
+
+			}
 			
 		}
 	}
@@ -616,6 +616,11 @@ void CMainFrame::TicketPlaceChgCb(TNotifyUI& msg)
 	CDuiString  begStationCode = m_pBegPlaceCombo->GetUserData();
 	CDuiString  endStationCode = m_pEndPlaceCombo->GetUserData();
 
+	if (begStationCode.IsEmpty() || endStationCode.IsEmpty())
+	{
+		CMsgWnd::MessageBox(GetHWND(), _T("提示"), _T("请先选择始发/目的地！"));
+		return;
+	}
 
 	CStation *begStation = Client12306Manager::Instance()->GetStationByCode(UnicodeToUtf8(begStationCode.GetData()));
 
@@ -779,85 +784,5 @@ void CMainFrame::TxtChgEndPlaceCb(TNotifyUI& msg)
 
 	StationComboRefresh(m_pEndPlaceCombo, vecStation);
 }
-
-void CMainFrame::Log(std::string msg)
-{
-	static Logger& root = Logger::get("");
-
-	root.information(msg);
-
-	
-}
-
-///////////////////////
-CTicketWorker::CTicketWorker(CMainFrame *mainFrame)
-	:m_mainFrame(mainFrame)
-{
-
-}
-CTicketWorker::~CTicketWorker()
-{
-
-}
-
-void CTicketWorker::run()
-{
-	while (1)
-	{
-		m_vecTicket->clear();
-
-
-		int iRetFlag = Client12306Manager::Instance()->QueryLeftTicket(UnicodeToUtf8(m_strBegPlace.GetData()),
-														UnicodeToUtf8(m_strEndPlace.GetData()),
-														UnicodeToUtf8(m_strTravelTime.GetData()), 
-																		*m_vecTicket, m_ticketType);
-
-
-		SendMessage(m_mainFrame->GetHWND(), WM_PROGRESS_CLOSE, NULL, NULL);
-		SendMessage(m_mainFrame->GetHWND(), WM_TICKET_QUERY, iRetFlag, NULL);
-
-		break;
-
-	}
-}
-
-
-///////////////////////
-COrderWorker::COrderWorker(CMainFrame *mainFrame)
-	:m_mainFrame(mainFrame)
-{
-
-}
-COrderWorker::~COrderWorker()
-{
-
-}
-
-void COrderWorker::run()
-{
-	while (1)
-	{
-		
-
-		
-		int iRetFlag = Client12306Manager::Instance()->QueryMyOrder(UnicodeToUtf8(m_strBegDate.GetData()),
-			UnicodeToUtf8(m_strEndDate.GetData()),
-			UnicodeToUtf8(m_strType.GetData()),
-			UnicodeToUtf8(m_strSeqTrainName.GetData()) , *m_mapTicket);
-
-
-		SendMessage(m_mainFrame->GetHWND(), WM_PROGRESS_CLOSE, NULL, NULL);
-
-		
-		SendMessage(m_mainFrame->GetHWND(), WM_ORDER_QUERY, iRetFlag, NULL);
-
-		break;
-
-	}
-
-
-}
-
-
 
 

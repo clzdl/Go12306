@@ -225,6 +225,7 @@ namespace DuiLib
 			::GetCursorPos(&pt);
 			::ScreenToClient(m_pm.GetPaintWindow(), &pt);
 			m_bHitItem = IsHitItem(pt);
+			
 
 		}
 		else if (uMsg == WM_LBUTTONUP) {
@@ -235,6 +236,7 @@ namespace DuiLib
 			if (m_bHitItem && IsHitItem(pt)) {
 				//PostMessage(WM_KILLFOCUS);
 				PostMessage(WM_CLOSE);
+				m_pOwner->EditClose();
 				
 			}
 			
@@ -421,7 +423,7 @@ namespace DuiLib
 
 		int cchLen = ::GetWindowTextLength(m_hWnd);
 		if (cchLen <= 0) cchLen = 1;
-		//::SetFocus(m_hWnd);
+		::SetFocus(m_hWnd);
 		::SendMessage(m_hWnd, EM_SETSEL, 0, cchLen);
 
 		m_bInit = true;
@@ -506,7 +508,7 @@ namespace DuiLib
 			if(m_pOwner->m_pComboWindow && IsWindow(m_pOwner->m_pComboWindow->GetHWND()))
 				m_pOwner->m_pComboWindow->PostMessage(WM_KEYDOWN, VK_RETURN);
 
-			PostMessage(WM_KILLFOCUS);
+			PostMessage(WM_CLOSE);
 
 			m_pOwner->m_pManager->SendNotify(m_pOwner, DUI_MSGTYPE_RETURN);
 		}
@@ -577,8 +579,8 @@ namespace DuiLib
 
 	LRESULT CEditWnd::OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 	{
-		LRESULT lRes = ::DefWindowProc(m_hWnd, uMsg, wParam, lParam);
-		PostMessage(WM_CLOSE);
+		/*LRESULT lRes = ::DefWindowProc(m_hWnd, uMsg, wParam, lParam);
+		PostMessage(WM_CLOSE);*/
 
 		return 0;
 	}
@@ -703,12 +705,19 @@ namespace DuiLib
 		}
 		if (event.Type == UIEVENT_SETFOCUS && IsEnabled())
 		{		
+			if (m_pWindow) return;
+			m_pWindow = new CEditWnd();
+			ASSERT(m_pWindow);
+			m_pWindow->Init(this);
+			
 			Invalidate();	
 		}
 		if (event.Type == UIEVENT_KILLFOCUS && IsEnabled())
 		{
 			if (m_pComboWindow && IsWindow(m_pComboWindow->GetHWND()))
 				m_pComboWindow->Close();
+			if (m_pWindow && IsWindow(m_pWindow->GetHWND()))
+				m_pWindow->Close();
 
 			Invalidate();
 		}
@@ -717,7 +726,7 @@ namespace DuiLib
 
 			if (IsEnabled()) {
 				m_pManager->ReleaseCapture();
-				if (IsFocused() && m_pWindow == NULL)
+				if (/*IsFocused() && */m_pWindow == NULL)
 				{
 					m_pWindow = new CEditWnd();
 					ASSERT(m_pWindow);
@@ -1058,9 +1067,11 @@ namespace DuiLib
 			//m_pComboWindow->ShowWindow(true , false);
 			//m_pComboWindow->ShowWindow(true);
 			
-			if(m_pWindow && IsWindow(m_pWindow->GetHWND()))
+			///设置edit焦点，这样才能正常显示输入状态
+			if (m_pWindow && IsWindow(m_pWindow->GetHWND()))
 				::SetFocus(m_pWindow->GetHWND());
 
+			
 			return true;
 		}
 
@@ -1074,6 +1085,7 @@ namespace DuiLib
 		
 		if (m_pWindow && IsWindow(m_pWindow->GetHWND()))
 			::SetFocus(m_pWindow->GetHWND());
+
 
 		if (m_pManager != NULL) m_pManager->SendNotify(this, DUI_MSGTYPE_DROPDOWN);
 		//Invalidate();
