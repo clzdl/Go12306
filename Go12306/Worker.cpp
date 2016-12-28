@@ -18,13 +18,13 @@ void CTicketWorker::run()
 {
 	while (1)
 	{
-		m_vecTicket->clear();
+		m_mapTicket->clear();
 
 
 		int iRetFlag = Client12306Manager::Instance()->QueryLeftTicket(UnicodeToUtf8(m_strBegPlace.GetData()),
 			UnicodeToUtf8(m_strEndPlace.GetData()),
 			UnicodeToUtf8(m_strTravelTime.GetData()),
-			*m_vecTicket, m_ticketType);
+			*m_mapTicket, m_ticketType);
 
 
 		SendMessage(m_mainFrame->GetHWND(), WM_PROGRESS_CLOSE, NULL, NULL);
@@ -88,11 +88,11 @@ void CPollTicketWorker::run()
 {
 	while (1)
 	{
-		m_vecTicket->clear();
+		m_mapTicket->clear();
 		int iRetFlag = Client12306Manager::Instance()->QueryLeftTicket(UnicodeToUtf8(m_strBegPlace.GetData()),
 			UnicodeToUtf8(m_strEndPlace.GetData()),
 			UnicodeToUtf8(m_strTravelTime.GetData()),
-			*m_vecTicket);
+			*m_mapTicket);
 
 
 		SendMessage(m_mainFrame->GetHWND(), WM_PROGRESS_CLOSE, NULL, NULL);

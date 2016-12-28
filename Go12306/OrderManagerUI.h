@@ -10,11 +10,11 @@ public:
 
 	/*@action:更新订单列表
 	*/
-	int	RefreshOrderListView(std::map<string, COrderModel> &objMap);
+	_ERRNO	RefreshOrderListView(std::map<string, COrderModel> &objMap);
 
 	/*@action: 更新具体订单信息
 	*/
-	int RefreshOrderDetailList(CListUI *dListUI, bool check);
+	_ERRNO RefreshOrderDetailList(CListUI *dListUI, bool check);
 
 private:
 

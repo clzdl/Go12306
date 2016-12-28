@@ -17,7 +17,7 @@ void CTicketManager::ResetTicketList() {
 		m_ticketListView->RemoveAll();
 }
 
-int CTicketManager::RefreshTicketListView(CTicketModel *ticketModel , int iIndex)
+_ERRNO CTicketManager::RefreshTicketListView(CTicketModel *ticketModel)
 {
 	CDuiString tmpString;
 
@@ -261,8 +261,6 @@ int CTicketManager::RefreshTicketListView(CTicketModel *ticketModel , int iIndex
 		{
 
 			CButtonUI *pBtnUI = new CButtonUI();
-			CDuiString strIndex;
-			strIndex.SmallFormat(_T("%d"), iIndex);
 
 			pBtnUI->SetName(_T("OrderTicketBtn"));
 			pBtnUI->SetManager(m_mainFrame->GetPaintManagerUI(), NULL, false);
@@ -270,8 +268,7 @@ int CTicketManager::RefreshTicketListView(CTicketModel *ticketModel , int iIndex
 			pBtnUI->SetFixedHeight(30);
 			pBtnUI->SetFixedWidth(50);
 
-
-			pBtnUI->SetUserData(strIndex);
+			pBtnUI->SetUserData(ticketModel->GetStationTrainCode());
 
 			pBtnUI->SetText(_T("Ô¤¶©"));
 
@@ -289,5 +286,5 @@ int CTicketManager::RefreshTicketListView(CTicketModel *ticketModel , int iIndex
 		}
 	}
 
-	return SUCCESS;
+	return E_OK;
 }

@@ -10,7 +10,7 @@ public:
 	CPassengerManagerUI(CMainFrame *mainFrame);
 	~CPassengerManagerUI();
 
-	int RefreshPassengerListView(std::map<std::string, CPassenger> &objMap);
+	_ERRNO RefreshPassengerListView(std::map<std::string, CPassenger> &objMap);
 
 
 private:

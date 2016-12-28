@@ -1,11 +1,31 @@
 #include "StdAfx.h"
 
 #include "OthFunc.h"
-
-
-
 #include "Code12306Cert.h"
 #include "EditCombo.h"
+#include "Login.h"
+#include "MsgWnd.h"
+
+
+#define _STRERROR_GEN(t1,t2,t3)        { t2, t3 },
+
+static struct ErrInfoMap
+{
+	TCHAR *strErrCode;
+	TCHAR *strErrRemark;
+} stErrInfoMap[] = {
+	_ERRO_MAP(_STRERROR_GEN)
+};
+
+#undef _STRERROR_GEN
+
+
+
+TCHAR* GetErrString(_ERRNO err)
+{
+	return stErrInfoMap[err].strErrRemark;
+}
+
 
 
 std::wstring Utf8ToUnicode(const std::string &str)
@@ -228,7 +248,7 @@ int gzcompress(Bytef *data, uLong ndata,	Bytef *zdata, uLong *nzdata)
 }
 
 
-int Gunzip(Byte *orgBytes, uLong orgSize, std::string &gunZipString)
+_ERRNO Gunzip(Byte *orgBytes, uLong orgSize, std::string &gunZipString)
 {
 	int err = 0;
 	z_stream zStm = { 0 }; /* decompression stream */
@@ -251,7 +271,7 @@ int Gunzip(Byte *orgBytes, uLong orgSize, std::string &gunZipString)
 
 	//只有设置为MAX_WBITS + 16才能在解压带header和trailer的文本
 	if (inflateInit2(&zStm, MAX_WBITS + 16) != Z_OK) 
-		return FAIL;
+		return E_FAILURE;
 	
 	gz_header gzHeader;
 	memset(&gzHeader, 0, sizeof(gz_header));
@@ -308,7 +328,7 @@ END:
 	if (outData.pData)
 		delete [] outData.pData;
 
-	return 0;
+	return E_OK;
 
 }
 
@@ -330,6 +350,39 @@ long String2Number(std::string str)
 	}
 
 	return res;
+}
+
+
+_ERRNO CheckErr(_ERRNO err)
+{
+	switch (err)
+	{
+		case E_LOGIN_REDIRECT:
+		case E_CEHCK_USER:
+		{
+			CLoginWnd* pLogin = new CLoginWnd();
+			auto_ptr<CLoginWnd> ptrLogin(pLogin);
+			ptrLogin->Create(NULL, _T("LoginWnd"), WS_POPUP | WS_CLIPCHILDREN, WS_EX_TOOLWINDOW);
+			ptrLogin->CenterWindow();
+
+
+			switch (ptrLogin->ShowModal())
+			{
+			case MSGID_OK:
+				break;
+			case MSGID_CANCEL:
+				PostQuitMessage(0L);
+				break;
+			}
+
+			return E_OK;
+			break;
+		}
+		default:
+			break;
+	}
+
+	return err;
 }
 
 

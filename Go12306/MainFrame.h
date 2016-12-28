@@ -113,12 +113,12 @@ private:
 	int QueryTicket(CDuiString begPlace , CDuiString endPlace, CDuiString travelTime, _TICKET_TYPE ticketType);
 
 
-	int QueryMyOrder(CDuiString begDate, CDuiString endDate , CDuiString type, CDuiString seqTrainName);
+	_ERRNO QueryMyOrder(CDuiString begDate, CDuiString endDate , CDuiString type, CDuiString seqTrainName);
 
 
 	/*@action: 刷新余票列表
 	*/
-	int RefreshTicketListView();
+	_ERRNO RefreshTicketListView();
 
 
 	/*@action: 是否需要显示
@@ -132,15 +132,15 @@ private:
 	 
 	/*@action: 刷新我的订单
 	*/
-	int RefreshMyOrderListView();
+	_ERRNO RefreshMyOrderListView();
 
 	/*@action:站点刷新
 	*/
-	int StationComboRefresh(CEditComboUI *pEditComboUI , std::vector<CStation*> &vec);
+	_ERRNO StationComboRefresh(CEditComboUI *pEditComboUI , std::vector<CStation*> &vec);
 
 	/*@action:
 	*/
-	int PollTicketProcess();
+	_ERRNO PollTicketProcess();
 
 
 	CButtonUI* m_pCloseBtn;
@@ -169,7 +169,7 @@ private:
 
 	
 		 
-	std::vector<CTicketModel> m_vecTicket;
+	std::map<CDuiString,CTicketModel> m_mapTicket;
 	std::map<string, COrderModel> m_mapMyOrder;
 
 	////显示车次类型

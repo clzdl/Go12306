@@ -11,7 +11,7 @@ COrderManagerUI::COrderManagerUI(CMainFrame *mainFrame)
 }
 
 
-int COrderManagerUI::RefreshOrderListView(std::map<string, COrderModel> &objMap)
+_ERRNO COrderManagerUI::RefreshOrderListView(std::map<string, COrderModel> &objMap)
 {
 	m_pOderListView->RemoveAll();
 
@@ -59,10 +59,10 @@ int COrderManagerUI::RefreshOrderListView(std::map<string, COrderModel> &objMap)
 	}
 
 	//m_pOderListView->SetManager(m_mainFrame->GetPaintManagerUI(), NULL, false);
-	return SUCCESS;
+	return E_OK;
 }
 
-int COrderManagerUI::RefreshOrderDetailList(CListUI *dListUI , bool check)
+_ERRNO COrderManagerUI::RefreshOrderDetailList(CListUI *dListUI , bool check)
 {
 	if (check)
 	{
@@ -76,7 +76,7 @@ int COrderManagerUI::RefreshOrderDetailList(CListUI *dListUI , bool check)
 
 	}
 
-	return SUCCESS;
+	return E_OK;
 }
 
 

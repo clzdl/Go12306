@@ -99,7 +99,7 @@ void CMainFrame::InitWindow()
 
 	Client12306Manager::Instance()->Query12306StationName();
 
-	if (SUCCESS != Client12306Manager::Instance()->LeftTicketInit())
+	if (E_OK != Client12306Manager::Instance()->LeftTicketInit())
 	{
 		CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
 		return ;
@@ -120,11 +120,12 @@ void CMainFrame::InitWindow()
 	RefreshAllTrainCHeckBox(m_bAllTrainType);
 
 	CLoginWnd* pLogin = new CLoginWnd();
-	pLogin->Create(NULL, _T("LoginWnd"), WS_POPUP | WS_CLIPCHILDREN, WS_EX_TOOLWINDOW);
-	pLogin->CenterWindow();
+	auto_ptr<CLoginWnd> ptrLogin(pLogin);
+	ptrLogin->Create(NULL, _T("LoginWnd"), WS_POPUP | WS_CLIPCHILDREN, WS_EX_TOOLWINDOW);
+	ptrLogin->CenterWindow();
 
 
-	switch (pLogin->ShowModal())
+	switch (ptrLogin->ShowModal())
 	{
 	case MSGID_OK:
 		break;
@@ -235,7 +236,7 @@ LRESULT CMainFrame::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam,
 			if (m_iWaitTime > 0)
 			{
 				CDuiString showText;
-				showText.Format(_T("%d.%d"), (m_iBaseTime - m_iWaitTime) / 10, (m_iBaseTime - m_iWaitTime) % 10);
+				showText.Format(_T("%d.%d"),  m_iWaitTime/ 10,  m_iWaitTime % 10);
 
 				m_btnQueryTicket->SetText(showText + CDuiString(_T("秒后刷新")));
 			}
@@ -320,7 +321,7 @@ LRESULT CMainFrame::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam,
 	else if (uMsg == WM_ORDER_QUERY)
 	{
 		bHandled = TRUE;
-		if ((int)wParam != SUCCESS)
+		if ((int)wParam != E_OK)
 		{
 			CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
 		}
@@ -334,7 +335,7 @@ LRESULT CMainFrame::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam,
 	else if (uMsg == WM_TICKET_QUERY)
 	{
 		bHandled = TRUE; 
-		if ((int)wParam != SUCCESS)
+		if ((int)wParam != E_OK)
 		{
 			CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
 		}
@@ -347,7 +348,7 @@ LRESULT CMainFrame::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam,
 	else if (uMsg == WM_POLL_TICKET_PROCESS)
 	{
 		bHandled = TRUE;
-		if ((int)wParam != SUCCESS)
+		if ((int)wParam != E_OK)
 		{
 			CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
 		}
@@ -429,7 +430,7 @@ int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString
 	{
 		m_pProgressDlg = CProgressDlg::CreateDlg(this->GetHWND());
 
-		m_tWorker->SetVecTicket(&m_vecTicket);
+		m_tWorker->SetTicketContainer(&m_mapTicket);
 		m_tWorker->SetQueryParam(begPlace, endPlace, travelTime, ticketType);
 		m_tpWorker.start(*m_tWorker);
 		m_pProgressDlg->ShowModal();
@@ -467,23 +468,24 @@ int CMainFrame::QueryTicket(CDuiString begPlace, CDuiString endPlace, CDuiString
 }
 
 
-int CMainFrame::RefreshTicketListView()
+_ERRNO CMainFrame::RefreshTicketListView()
 {
 	m_pTicketManagerUI->ResetTicketList();
 
 	int iIndex = 0;
-	for (std::vector<CTicketModel>::iterator it = m_vecTicket.begin(); it != m_vecTicket.end(); ++it, ++iIndex)
+	for (std::map<CDuiString ,CTicketModel>::iterator it = m_mapTicket.begin(); it != m_mapTicket.end(); ++it, ++iIndex)
 	{
-		DUI__Trace(it->GetTrainNo());
+		CTicketModel &ticket = it->second;
+		DUI__Trace(ticket.GetTrainNo());
 
-		if (!IsShowTrain(it->GetStationTrainCode()))
+		if (!IsShowTrain(ticket.GetStationTrainCode()))
 			continue;
 
-		m_pTicketManagerUI->RefreshTicketListView(&(*it) , iIndex);
+		m_pTicketManagerUI->RefreshTicketListView(&ticket);
 
 	}
 
-	return SUCCESS;
+	return E_OK;
 }
 
 
@@ -541,7 +543,7 @@ void CMainFrame::RefreshAllTrainCHeckBox(bool flag)
 		m_setShowTrainType.clear();
 }
 
-int CMainFrame::QueryMyOrder(CDuiString begDate , CDuiString endDate , CDuiString type , CDuiString seqTrainName)
+_ERRNO CMainFrame::QueryMyOrder(CDuiString begDate , CDuiString endDate , CDuiString type , CDuiString seqTrainName)
 {
 
 
@@ -557,20 +559,20 @@ int CMainFrame::QueryMyOrder(CDuiString begDate , CDuiString endDate , CDuiStrin
 
 	
 
-	return SUCCESS;
+	return E_OK;
 }
 
 
-int CMainFrame::RefreshMyOrderListView()
+_ERRNO CMainFrame::RefreshMyOrderListView()
 {
 
 	m_pOrderManagerUI->RefreshOrderListView(m_mapMyOrder);
 
-	return SUCCESS;
+	return E_OK;
 }
 
 
-int CMainFrame::StationComboRefresh(CEditComboUI *pEditComboUI, std::vector<CStation*> &vec)
+_ERRNO CMainFrame::StationComboRefresh(CEditComboUI *pEditComboUI, std::vector<CStation*> &vec)
 {
 	for (std::vector<CStation*>::iterator it = vec.begin(); it != vec.end(); ++it)
 	{
@@ -586,7 +588,7 @@ int CMainFrame::StationComboRefresh(CEditComboUI *pEditComboUI, std::vector<CSta
 
 	pEditComboUI->ActivateCoboBox();
 	
-	return SUCCESS;
+	return E_OK;
 }
 
 
@@ -686,9 +688,13 @@ void CMainFrame::OrderTicketCb(TNotifyUI& msg)
 
 
 	CButtonUI *orderTicket = static_cast<CButtonUI*>(msg.pSender);
-	int index = _wtoi(orderTicket->GetUserData().GetData());
+	CDuiString trainCode = orderTicket->GetUserData();
 	
-	CTicketModel *pTicket= &(m_vecTicket[index]);
+	std::map<CDuiString, CTicketModel>::iterator it = m_mapTicket.find(trainCode);
+
+
+
+	CTicketModel *pTicket = &(it->second);
 	
 
 	//COrderTicketWnd::MessageBox(GetHWND() , pTicket , m_pTicketLeaveTimeUI->GetText());
@@ -814,22 +820,22 @@ void CMainFrame::TxtChgEndPlaceCb(TNotifyUI& msg)
 	StationComboRefresh(m_pEndPlaceCombo, vecStation);
 }
 
-int CMainFrame::PollTicketProcess()
+_ERRNO CMainFrame::PollTicketProcess()
 {
 	m_pProgressDlg = CProgressDlg::CreateDlg(this->GetHWND());
 
-	m_tPollTicketWorker->SetVecTicket(&m_vecTicket);
+	m_tPollTicketWorker->SetTicketContainer(&m_mapTicket);
 	m_tPollTicketWorker->SetQueryParam(m_sBegPlace, m_sEndPlace, m_sTravelTime, m_ticketType);
 	m_tpWorker.start(*m_tPollTicketWorker);
 	m_pProgressDlg->ShowModal();
 
-	return SUCCESS;
+	return E_OK;
 }
 
 
 void CMainFrame::OnPollTicketProcessCb(TNotifyUI& msg)
 {
-	if ((int)msg.wParam != SUCCESS)
+	if ((int)msg.wParam != E_OK)
 	{
 		CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
 	}

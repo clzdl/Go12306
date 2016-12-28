@@ -68,28 +68,40 @@ void COrderTicketWnd::InitWindow()
 	pLabelUI->SetText(m_pTicket->GetToStationName() + _T(" 站(") + m_pTicket->GetArriveTime() + _T(")"));
 
 	///用户校验
-	if (SUCCESS != Client12306Manager::Instance()->CheckUser())
-	{
+	bool bCheck = false;
 
-		CMsgWnd::MessageBox(GetHWND() , _T("提示") , Utf8ToUnicode( Client12306Manager::Instance()->GetLastErrInfo()).c_str());
+
+	_ERRNO err = E_OK;
+	if (E_OK != (err = Client12306Manager::Instance()->CheckUser()))
+	{
+		if(E_OK != CheckErr(err))
+			CMsgWnd::MessageBox(GetHWND() , _T("提示") , Utf8ToUnicode( Client12306Manager::Instance()->GetLastErrInfo()).c_str());
 		
-
 		PostMessage(WM_CLOSE);
+
+		return;
 	}
 
-	if (SUCCESS != Client12306Manager::Instance()->SubmitOrderRequest(m_pTicket))
+	if (E_OK != (err = Client12306Manager::Instance()->SubmitOrderRequest(m_pTicket)))
 	{
-		CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
+		if (E_OK != CheckErr(err))
+			CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
 
 
 		PostMessage(WM_CLOSE);
+
+		return;
 	}
 
 
-	if (SUCCESS != Client12306Manager::Instance()->InitDc(m_strToken , m_strLeftTicketString , m_strKeyCheckIsChange))
+	if (E_OK != (err = Client12306Manager::Instance()->InitDc(m_strToken , m_strLeftTicketString , m_strKeyCheckIsChange)))
 	{
-		CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
+		if (E_OK != CheckErr(err))
+			CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
+
 		PostMessage(WM_CLOSE);
+
+		return;
 	}
 
 	RefreshTicketSeatInfo();
@@ -696,12 +708,11 @@ void COrderTicketWnd::OnTicketOrderSubmit(TNotifyUI& msg)
 		vecPT.push_back(pt);
 	}
 
-	int iRet = FAIL;
-
+	_ERRNO err = E_FAILURE;
 	do
 	{
 		CCheckOrderInfoResult result;
-		if (SUCCESS != Client12306Manager::Instance()->CheckOrderInfo(vecPT, result))
+		if (E_OK != Client12306Manager::Instance()->CheckOrderInfo(vecPT, result))
 		{
 			CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
 			break;
@@ -747,7 +758,7 @@ void COrderTicketWnd::OnTicketOrderSubmit(TNotifyUI& msg)
 		///
 
 		CGetQueqeCountResult queRes;
-		if (SUCCESS != Client12306Manager::Instance()->getQueueCount(m_pTicket, m_strToken, m_strLeftTicketString, UnicodeToUtf8(vecPT[0].GetSeatType().GetData()), queRes))
+		if (E_OK != Client12306Manager::Instance()->getQueueCount(m_pTicket, m_strToken, m_strLeftTicketString, UnicodeToUtf8(vecPT[0].GetSeatType().GetData()), queRes))
 		{
 			CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
 			break;
@@ -771,7 +782,7 @@ void COrderTicketWnd::OnTicketOrderSubmit(TNotifyUI& msg)
 
 
 		/////
-		if (SUCCESS != Client12306Manager::Instance()->ConfirmSingleForQueue(vecPT, m_pTicket, m_strToken, m_strLeftTicketString, m_strKeyCheckIsChange, randCode))
+		if (E_OK != Client12306Manager::Instance()->ConfirmSingleForQueue(vecPT, m_pTicket, m_strToken, m_strLeftTicketString, m_strKeyCheckIsChange, randCode))
 		{
 			CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
 			break;
@@ -782,23 +793,23 @@ void COrderTicketWnd::OnTicketOrderSubmit(TNotifyUI& msg)
 
 		std::auto_ptr<COrderWaitTimeWnd> ptrWnd(pWaitTimeWnd);
 
-		if (SUCCESS != ptrWnd->ShowModal())
+		if (E_OK != (err = (_ERRNO)ptrWnd->ShowModal()))
 		{
 			CMsgWnd::MessageBox(GetHWND(), _T("提示"), ptrWnd->GetErrString());
 			break;
 		}
 
 
-		iRet = SUCCESS;
+		err = E_OK;
 
 
 
 
 	} while (false);
 
-	switch(iRet)
+	switch(err)
 	{
-		case SUCCESS:
+		case E_OK:
 			CMsgWnd::MessageBox(GetHWND(), _T("提示"), _T("恭喜您，订票成功！"));
 			break;
 		default:

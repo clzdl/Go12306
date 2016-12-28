@@ -7,7 +7,7 @@ class CTicketManager
 public:
 	CTicketManager(CMainFrame *mainFrame);
 
-	int RefreshTicketListView(CTicketModel *ticketModel, int iIndex);
+	_ERRNO RefreshTicketListView(CTicketModel *ticketModel);
 
 	void ResetTicketList(); 
 

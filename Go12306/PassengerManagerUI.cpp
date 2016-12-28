@@ -14,7 +14,7 @@ CPassengerManagerUI::~CPassengerManagerUI()
 }
 
 
-int CPassengerManagerUI::RefreshPassengerListView(std::map<std::string, CPassenger> &objMap)
+_ERRNO CPassengerManagerUI::RefreshPassengerListView(std::map<std::string, CPassenger> &objMap)
 {
 	m_pPassengerListView->RemoveAll();
 
@@ -50,5 +50,5 @@ int CPassengerManagerUI::RefreshPassengerListView(std::map<std::string, CPasseng
 
 	}
 
-	return SUCCESS;
+	return E_OK;
 }

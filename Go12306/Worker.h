@@ -18,9 +18,9 @@ public:
 
 
 
-	void SetVecTicket(std::vector<CTicketModel> *vecTicket)
+	void SetTicketContainer(std::map<CDuiString,CTicketModel> *mapTicket)
 	{
-		m_vecTicket = vecTicket;
+		m_mapTicket = mapTicket;
 	}
 
 	void SetQueryParam(CDuiString begPlace, CDuiString endPlace, CDuiString travelTime, _TICKET_TYPE ticketType)
@@ -37,7 +37,7 @@ private:
 	CDuiString  m_strTravelTime;
 	_TICKET_TYPE m_ticketType;
 
-	std::vector<CTicketModel> *m_vecTicket;
+	std::map<CDuiString,CTicketModel> *m_mapTicket;
 
 	CMainFrame *m_mainFrame;
 
@@ -94,9 +94,9 @@ public:
 	void run();
 
 
-	void SetVecTicket(std::vector<CTicketModel>  *vecTicket)
+	void SetTicketContainer(std::map<CDuiString, CTicketModel> *mapTicket)
 	{
-		m_vecTicket = vecTicket;
+		m_mapTicket = mapTicket;
 	}
 
 
@@ -114,7 +114,7 @@ private:
 	CDuiString  m_strTravelTime;
 	_TICKET_TYPE m_ticketType;
 
-	std::vector<CTicketModel> *m_vecTicket;
+	std::map<CDuiString ,CTicketModel> *m_mapTicket;
 
 	CMainFrame *m_mainFrame;
 

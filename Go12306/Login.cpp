@@ -155,7 +155,7 @@ void CLoginWnd::Login(TNotifyUI& msg)
 	}
 
 	///用户登录
-	if (SUCCESS != Client12306Manager::Instance()->UserLogin(response))
+	if (E_OK != Client12306Manager::Instance()->UserLogin(response))
 	{
 		m_code12306UI->Refresh();
 		CMsgWnd::MessageBox(GetHWND(), _T("提示"), _T("登录失败"));
@@ -164,7 +164,7 @@ void CLoginWnd::Login(TNotifyUI& msg)
 	}
 
 	///初始化登录首页
-	if (SUCCESS != Client12306Manager::Instance()->InitMy12306(response))
+	if (E_OK != Client12306Manager::Instance()->InitMy12306(response))
 	{
 		m_code12306UI->Refresh();
 		CMsgWnd::MessageBox(GetHWND(), _T("提示"), _T("登录失败"));

@@ -20,6 +20,24 @@
 
 // TODO:  在此处引用程序需要的其他头文件
 
+////转换错误码定义
+#define _ERRO_MAP(X)                               \
+    X(OK, _T("0000") , _T("成功"))                         \
+    X(FAILURE,_T("0002") , _T("业务处理失败"))             \
+    X(LOGIN_REDIRECT, _T("0003") , _T("重定向到登录页面"))                    \
+	X(CEHCK_USER, _T("0004") , _T("用户校验失败"))    \
+	X(ERR_REDIRECT, _T("0005") , _T("重定向到错误页面"))    \
+
+
+
+#define  _ERR_GEN(n, c , s)		E_##n,
+
+typedef enum
+{
+	_ERRO_MAP(_ERR_GEN)
+} _ERRNO;
+
+#undef _ERRNO_GEN
 
 
 #include "UIlib.h"
@@ -27,8 +45,6 @@
 using namespace DuiLib;
 
 
-#define		SUCCESS		0
-#define		FAIL		-1
 
 
 ///////////

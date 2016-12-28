@@ -19,6 +19,9 @@ std::string Client12306Manager::m_strDomain = "kyfw.12306.cn";
 char* Client12306Manager::m_strMonAbbreviate[] = {"Jan" , "Feb" , "Mar", "Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
 char* Client12306Manager::m_strWeekAbbreviate[] = { "Mon","Tue","Web","Thu","Fri","Sat","Sun"};
 
+
+
+
 Client12306Manager *Client12306Manager::Instance()
 {
 	if (m_objInstance == NULL)
@@ -65,7 +68,7 @@ Client12306Manager& Client12306Manager::operator =(const Client12306Manager &hcm
 }
 
 
-std::string Client12306Manager::ExecPost(std::string service, std::map<string, string> *param, std::map<string, string> *header)
+_ERRNO Client12306Manager::ExecPost(std::string service , std::string &out, std::map<string, string> *param, std::map<string, string> *header)
 {
 	m_strLastErrInfo.clear();
 	HTTPRequest request(HTTPRequest::HTTP_POST, service , Net::HTTPMessage::HTTP_1_1);
@@ -133,27 +136,48 @@ std::string Client12306Manager::ExecPost(std::string service, std::map<string, s
 
 	std::istream& rs = m_sessHttpsClient.receiveResponse(response);
 
-	std::ostringstream ostr;
-	StreamCopier::copyStream(rs, ostr);
-
 	{
 		std::stringstream ss;
 		response.write(ss);
 
 		///输出相应头
-		//DUI__Trace(_T(" %s "), Utf8ToUnicode(ss.str()).c_str());
 		CLog::GetInstance()->Log(ss.str());
-		
-		///输出相应体
-		CLog::GetInstance()->Log(ostr.str());
-		//DUI__Trace(_T(" %s "), Utf8ToUnicode(ostr.str()).c_str());
+
 	}
 
-	return ostr.str();
+	if (response.getStatus() == 302)
+	{
+		if (response.get("Location").find("error.html") != string::npos)
+		{
+			m_strLastErrInfo = UnicodeToUtf8(_T("12306返回错误"));
+			return E_FAILURE;
+		}
+		else if (response.get("Location").find("otn/login/init") != string::npos)
+		{
+			
+			return E_LOGIN_REDIRECT;
+		}
+	}
+	else if (response.getStatus() != 200)
+	{
+		return E_FAILURE;
+	}
+
+
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+
+	///输出相应体
+	CLog::GetInstance()->Log(ostr.str());
+
+	
+	out = ostr.str();
+
+	return E_OK;
 }
 
 
-std::string Client12306Manager::ExecPostBySeq(std::string service, std::vector<CParam> *param , std::map<string, string> *header)
+_ERRNO Client12306Manager::ExecPostBySeq(std::string service,std::string &out, std::vector<CParam> *param , std::map<string, string> *header)
 {
 	m_strLastErrInfo.clear();
 	HTTPRequest request(HTTPRequest::HTTP_POST, service, Net::HTTPMessage::HTTP_1_1);
@@ -213,8 +237,7 @@ std::string Client12306Manager::ExecPostBySeq(std::string service, std::vector<C
 		///请求头
 		//DUI__Trace(_T(" %s "), Utf8ToUnicode(ss.str()).c_str());
 		CLog::GetInstance()->Log(ss.str());
-		///请求体
-		DUI__Trace(_T(" %s "), Utf8ToUnicode(utf8Body).c_str());
+		
 
 		CLog::GetInstance()->Log(utf8Body);
 	}
@@ -227,25 +250,43 @@ std::string Client12306Manager::ExecPostBySeq(std::string service, std::vector<C
 
 	std::istream& rs = m_sessHttpsClient.receiveResponse(response);
 
-	std::ostringstream ostr;
-	StreamCopier::copyStream(rs, ostr);
-
+	
 	{
 		std::stringstream ss;
 		response.write(ss);
 
 		///输出相应头
-		//DUI__Trace(_T(" %s "), Utf8ToUnicode(ss.str()).c_str());
 		CLog::GetInstance()->Log(ss.str());
-
-		///输出相应体
-		//DUI__Trace(_T(" %s "), Utf8ToUnicode(ostr.str()).c_str());
 	}
 
-	return ostr.str();
+	if (response.getStatus() == 302)
+	{
+		if (response.get("Location").find("error.html") != string::npos)
+		{
+			m_strLastErrInfo = UnicodeToUtf8(_T("12306返回错误"));
+			return E_FAILURE;
+		}
+		else if (response.get("Location").find("otn/login/init") != string::npos)
+		{
+			return E_LOGIN_REDIRECT;
+		}
+	}
+	else if (response.getStatus() != 200)
+	{
+		return E_FAILURE;
+	}
+
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+
+	///输出相应体
+	CLog::GetInstance()->Log(ostr.str());
+	
+	out = ostr.str();
+	return E_OK;
 }
 
-std::string Client12306Manager::ExecGet(std::string service, std::map<string, string> *param,std::map<string, string> *header)
+_ERRNO Client12306Manager::ExecGet(std::string service , std::string &out, std::map<string, string> *param,std::map<string, string> *header)
 {
 	m_strLastErrInfo.clear();
 	if (param && !param->empty())
@@ -290,7 +331,6 @@ std::string Client12306Manager::ExecGet(std::string service, std::map<string, st
 		request.write(ss);
 
 		///请求头
-		//DUI__Trace(_T(" %s "), Utf8ToUnicode(ss.str()).c_str());
 		CLog::GetInstance()->Log(ss.str());
 	}
 
@@ -298,6 +338,8 @@ std::string Client12306Manager::ExecGet(std::string service, std::map<string, st
 	HTTPResponse response;
 
 	std::istream& rs = m_sessHttpsClient.receiveResponse(response);
+
+	
 	
 	if (m_cookieCollection.empty())
 	{
@@ -311,27 +353,46 @@ std::string Client12306Manager::ExecGet(std::string service, std::map<string, st
 
 	}
 
-	std::ostringstream ostr;
-	StreamCopier::copyStream(rs, ostr);
-
 	{
 		std::stringstream ss;
 		response.write(ss);
 
 		///输出相应头
-		//DUI__Trace(_T(" %s "), Utf8ToUnicode(ss.str()).c_str());
 		CLog::GetInstance()->Log(ss.str());
-
-		///输出相应体
-		//DUI__Trace(_T(" %s "), Utf8ToUnicode(ostr.str()).c_str());
 	}
 
-	return ostr.str();
+	if (response.getStatus() == 302)
+	{
+		if (response.get("Location").find("error.html") != string::npos)
+		{
+			m_strLastErrInfo = UnicodeToUtf8(_T("12306返回错误"));
+			return E_FAILURE;
+		}
+		else if (response.get("Location").find("otn/login/init") != string::npos)
+		{
+			return E_LOGIN_REDIRECT;
+		}
+	}
+	else if (response.getStatus() != 200)
+	{
+		return E_FAILURE;
+	}
+
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+
+	///输出相应体
+	CLog::GetInstance()->Log(ostr.str());
+
+	out = ostr.str();
+
+	return E_OK;
 	
 }
 
-int Client12306Manager::QueryTicketLog(std::string begPlace, std::string endPlace, std::string travelTime, bool &flag, _TICKET_TYPE ticketType)
+_ERRNO Client12306Manager::QueryTicketLog(std::string begPlace, std::string endPlace, std::string travelTime, bool &flag, _TICKET_TYPE ticketType)
 {
+	_ERRNO err = E_OK;
 	flag = false;
 	try
 	{
@@ -363,8 +424,10 @@ int Client12306Manager::QueryTicketLog(std::string begPlace, std::string endPlac
 			break;
 		}
 
-
-		std::string strOrgRes = ExecGet(strService);
+		std::string strOrgRes;
+		
+		if (E_OK != (err = ExecGet(strService, strOrgRes)))
+			return err;
 	
 		do
 		{
@@ -389,24 +452,24 @@ int Client12306Manager::QueryTicketLog(std::string begPlace, std::string endPlac
 	{
 		//DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
 		CLog::GetInstance()->Log(e.displayText());
-		return FAIL;
+		return E_FAILURE;
 	}
 
-	return SUCCESS;
+	return E_OK;
 }
-int Client12306Manager::LeftTicketInit()
+_ERRNO Client12306Manager::LeftTicketInit()
 {
-	int iRet = SUCCESS;
-
+	_ERRNO err = E_OK;
 
 	try
 	{
 
 		string strService = "/otn/leftTicket/init?";
 
-		
+		std::string strOrgRes;
 
-		std::string strOrgRes = ExecGet(strService);
+		if (E_OK != (err = ExecGet(strService, strOrgRes)))
+			return err;
 
 
 
@@ -434,17 +497,17 @@ int Client12306Manager::LeftTicketInit()
 	{
 		CLog::GetInstance()->Log(e.displayText());
 		m_strLastErrInfo = e.displayText();
-		return FAIL;
+		return E_FAILURE;
 	}
 
-	return iRet;
+	return E_OK;
 
 }
 
-int Client12306Manager::QueryLeftTicket( std::string begPlace, std::string endPlace, std::string travelTime , std::vector<CTicketModel> &vecTicket, _TICKET_TYPE ticketType)
+_ERRNO Client12306Manager::QueryLeftTicket( std::string begPlace, std::string endPlace, std::string travelTime , std::map<CDuiString, CTicketModel> &mapTicket, _TICKET_TYPE ticketType)
 {
-	int iRet = SUCCESS;
 
+	_ERRNO err = E_OK;
 	/*bool bValid = false;
 	QueryTicketLog(begPlace, endPlace, travelTime, bValid, ticketType);
 
@@ -486,18 +549,21 @@ int Client12306Manager::QueryLeftTicket( std::string begPlace, std::string endPl
 		}
 		
 
-		std::string strOrgRes = ExecGet(strService);
+		std::string strOrgRes;
+		if (E_OK != (err = ExecGet(strService, strOrgRes)))
+			return err;
 
 		if (strOrgRes.empty())
 		{
 			m_strLastErrInfo = Gbk2Utf8("12306返回失败.");
-			return FAIL;
+			return E_FAILURE;
 		}
 
 		std::string strGunString;
 		Gunzip((byte*)const_cast<char*>(strOrgRes.c_str()), strOrgRes.length() , strGunString);
 
-		iRet = JsonParseTicket(strGunString , travelTime , ticketType , vecTicket);
+		if (E_OK != (err = JsonParseTicket(strGunString, travelTime, ticketType, mapTicket)))
+			return err;
 		
 
 	}
@@ -506,14 +572,14 @@ int Client12306Manager::QueryLeftTicket( std::string begPlace, std::string endPl
 		//DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
 		CLog::GetInstance()->Log(e.displayText());
 		m_strLastErrInfo = Gbk2Utf8("结果返回错误");
-		return FAIL;
+		return E_FAILURE;
 	}
 
-	return iRet;
+	return E_OK;
 }
 
 
-int Client12306Manager::JsonParseTicket(std::string jsonString , std::string travelTime , _TICKET_TYPE ticketType , std::vector<CTicketModel> &vecTicket)
+_ERRNO Client12306Manager::JsonParseTicket(std::string jsonString , std::string travelTime , _TICKET_TYPE ticketType , std::map<CDuiString, CTicketModel> &mapTicket)
 {
 	JSON::Parser parser;
 	Dynamic::Var result;
@@ -530,7 +596,7 @@ int Client12306Manager::JsonParseTicket(std::string jsonString , std::string tra
 		if (jStatus.toString() != "true")
 		{
 			DUI__Trace(Utf8ToUnicode(jStatus.toString()).c_str());
-			return FAIL;
+			return E_FAILURE;
 		}
 
 
@@ -542,7 +608,7 @@ int Client12306Manager::JsonParseTicket(std::string jsonString , std::string tra
 		if (0 > pArry->size())
 		{
 			m_strLastErrInfo = Gbk2Utf8("无余票信息");
-			return FAIL;
+			return E_FAILURE;
 		}
 
 		JSON::Array::ConstIterator it = pArry->begin();
@@ -577,7 +643,7 @@ int Client12306Manager::JsonParseTicket(std::string jsonString , std::string tra
 
 			AssignJson2TicketObj(pQueryDto, ticketModel);
 
-			vecTicket.emplace_back(ticketModel);
+			mapTicket[ticketModel.GetStationTrainCode()] = ticketModel;
 
 		}
 	}
@@ -586,14 +652,14 @@ int Client12306Manager::JsonParseTicket(std::string jsonString , std::string tra
 		//DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
 		CLog::GetInstance()->Log(e.displayText());
 		m_strLastErrInfo = e.displayText();
-		return FAIL;
+		return E_FAILURE;
 	}
 
-	return SUCCESS;
+	return E_OK;
 }
 
 
-int Client12306Manager::AssignJson2TicketObj(JSON::Object::Ptr queryDto, CTicketModel &objTicket)
+_ERRNO Client12306Manager::AssignJson2TicketObj(JSON::Object::Ptr queryDto, CTicketModel &objTicket)
 {
 	Dynamic::Var tmpJObj;
 	/////train_no
@@ -831,10 +897,12 @@ int Client12306Manager::AssignJson2TicketObj(JSON::Object::Ptr queryDto, CTicket
 	if (!tmpJObj.isEmpty())
 		objTicket.SetTrainLocation(Utf8ToUnicode(tmpJObj.toString()).c_str());
 
-	return SUCCESS;
+	return E_OK;
 }
-int Client12306Manager::LoginInit()
+_ERRNO Client12306Manager::LoginInit()
 {
+	_ERRNO err = E_OK;
+
 	try
 	{
 
@@ -843,8 +911,10 @@ int Client12306Manager::LoginInit()
 
 		std::map<string, string> header;
 		header["Referer"] = "https://kyfw.12306.cn/otn/login/init";
-
-		ExecGet(strService, NULL, &header);
+		std::string res;
+		
+		if (E_OK != (err = ExecGet(strService, res, NULL, &header)))
+			return err;
 
 
 	}
@@ -852,13 +922,16 @@ int Client12306Manager::LoginInit()
 	{
 		//DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
 		CLog::GetInstance()->Log(e.displayText());
-		return FAIL;
+		return E_FAILURE;
 	}
-	return SUCCESS;
+	return E_OK;
 }
 
-int Client12306Manager::QueryPassCode(std::string moduleName , std::string &bytes)
+_ERRNO Client12306Manager::QueryPassCode(std::string moduleName , std::string &bytes)
 {
+
+	_ERRNO err = E_OK;
+
 	try
 	{
 
@@ -880,8 +953,9 @@ int Client12306Manager::QueryPassCode(std::string moduleName , std::string &byte
 		std::map<string, string> header;
 		header["Referer"] = "https://kyfw.12306.cn/otn/login/init";
 	
-
-		bytes = ExecGet(strService , NULL , &header);
+		
+		if (E_OK != (err = ExecGet(strService, bytes, NULL, &header)))
+			return err;
 
 	
 	}
@@ -889,14 +963,17 @@ int Client12306Manager::QueryPassCode(std::string moduleName , std::string &byte
 	{
 		//DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
 		CLog::GetInstance()->Log(e.displayText());
-		return FAIL;
+		return E_FAILURE;
 	}
-	return SUCCESS;
+	return E_OK;
 }
 
 
-int Client12306Manager::AnsynValidPassCode(std::vector<CDuiPoint> &selPoints , std::string &res)
+_ERRNO Client12306Manager::AnsynValidPassCode(std::vector<CDuiPoint> &selPoints , std::string &res)
 {
+
+	_ERRNO err = E_OK;
+
 	try
 	{
 
@@ -919,29 +996,30 @@ int Client12306Manager::AnsynValidPassCode(std::vector<CDuiPoint> &selPoints , s
 		header["Referer"] = "https://kyfw.12306.cn/otn/login/init";
 		
 
-		res = ExecPost(strService , &param, &header);
+		if (E_OK != (err = ExecPost(strService, res, &param, &header)))
+			return err;
 
 	}
 	catch (Poco::Exception &e)
 	{
 		//DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
 		CLog::GetInstance()->Log(e.displayText());
-		return FAIL;
+		return E_FAILURE;
 	}
 
-	return SUCCESS;
+	return E_OK;
 }
 
-int Client12306Manager::AnsynValidPassCode(std::vector<CDuiPoint> &selPoints, bool &flag)
+_ERRNO Client12306Manager::AnsynValidPassCode(std::vector<CDuiPoint> &selPoints, bool &flag)
 {
-	std::string response;
+	_ERRNO err = E_OK;
 	
 	flag = false;
-
+	std::string response;
 	do
 	{
-		if (SUCCESS != AnsynValidPassCode(selPoints, response))
-			break;
+		if (E_OK != (err = AnsynValidPassCode(selPoints, response)))
+			return err;
 
 
 		JSON::Parser parser;
@@ -971,12 +1049,13 @@ int Client12306Manager::AnsynValidPassCode(std::vector<CDuiPoint> &selPoints, bo
 
 	} while (false);
 
-	return SUCCESS;
+	return E_OK;
 }
 
 
-int Client12306Manager::AnsysLoginSugguest(std::string userName, std::string userPass, std::string randCode , std::string &res)
+_ERRNO Client12306Manager::AnsysLoginSugguest(std::string userName, std::string userPass, std::string randCode , std::string &res)
 {
+	_ERRNO err = E_OK;
 	try
 	{
 
@@ -991,7 +1070,8 @@ int Client12306Manager::AnsysLoginSugguest(std::string userName, std::string use
 		header["Referer"] = "https://kyfw.12306.cn/otn/login/init";
 	
 
-		res = ExecPost(strService, &param , &header);
+		if (E_OK != (err = ExecPost(strService, res, &param, &header)))
+			return err;
 
 	}
 	catch (Poco::Exception &e)
@@ -1000,20 +1080,21 @@ int Client12306Manager::AnsysLoginSugguest(std::string userName, std::string use
 		CLog::GetInstance()->Log(e.displayText());
 		m_strLastErrInfo = e.displayText();
 
-		return FAIL;
+		return E_FAILURE;
 	}
 
-	return SUCCESS;
+	return E_OK;
 }
 
-int Client12306Manager::AnsysLoginSugguest(std::string userName, std::string userPass, std::string randCode, bool &flag)
+_ERRNO Client12306Manager::AnsysLoginSugguest(std::string userName, std::string userPass, std::string randCode, bool &flag)
 {
+	_ERRNO err = E_OK;
 	std::string response;
 	flag = false;
 	do
 	{
-		if (SUCCESS != AnsysLoginSugguest(userName, userPass, randCode, response))
-			break;
+		if (E_OK != (err = AnsysLoginSugguest(userName, userPass, randCode, response)))
+			return err;
 
 		//response = Utf8ToGbk(response);
 
@@ -1066,11 +1147,12 @@ int Client12306Manager::AnsysLoginSugguest(std::string userName, std::string use
 
 	} while (false);
 
-	return SUCCESS;
+	return E_OK;
 }
 
-int Client12306Manager::UserLogin(std::string &res)
+_ERRNO Client12306Manager::UserLogin(std::string &res)
 {
+	_ERRNO err = E_OK;
 	try
 	{
 
@@ -1082,21 +1164,23 @@ int Client12306Manager::UserLogin(std::string &res)
 		std::map<string, string> header;
 		header["Referer"] = "https://kyfw.12306.cn/otn/login/init";
 
-		res = ExecPost(strService, &param,&header);
+		if (E_OK != (err = ExecPost(strService, res, &param, &header)))
+			return err;
 
 	}
 	catch (Poco::Exception &e)
 	{
 		//DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
 		CLog::GetInstance()->Log(e.displayText());
-		return FAIL;
+		return E_FAILURE;
 	}
 
-	return SUCCESS;
+	return err;
 }
 
-int Client12306Manager::InitMy12306(std::string &res)
+_ERRNO Client12306Manager::InitMy12306(std::string &res)
 {
+	_ERRNO err = E_OK;
 	try
 	{
 
@@ -1104,7 +1188,9 @@ int Client12306Manager::InitMy12306(std::string &res)
 		std::map<string, string> header;
 		header["Referer"] = "https://kyfw.12306.cn/otn/login/init";
 
-		std::string response = ExecGet(strService , NULL , &header);
+		std::string response;
+		if (E_OK != (err = ExecGet(strService, response, NULL, &header)))
+			return err;
 
 		Gunzip((Byte*)const_cast<char*>(response.c_str()), response.length(), res);
 
@@ -1117,16 +1203,16 @@ int Client12306Manager::InitMy12306(std::string &res)
 	{
 		//DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
 		CLog::GetInstance()->Log(e.displayText());
-		return FAIL;
+		return E_FAILURE;
 	}
 
-	return SUCCESS;
+	return E_OK;
 }
 
 
-int Client12306Manager::QueryMyOrder(std::string startDate, std::string endDate , std::string type, std::string seqTrainName,std::map<string, COrderModel> &mapOrder)
+_ERRNO Client12306Manager::QueryMyOrder(std::string startDate, std::string endDate , std::string type, std::string seqTrainName,std::map<string, COrderModel> &mapOrder)
 {
-	int iRetFlag = SUCCESS;
+	_ERRNO err = E_OK;
 	try
 	{
 
@@ -1150,24 +1236,26 @@ int Client12306Manager::QueryMyOrder(std::string startDate, std::string endDate 
 		
 
 
-		std::string response = ExecPost(strService, &param, &header);
+		std::string response;
+		ExecPost(strService , response , &param, &header);
 		std::string gunRes;
 		Gunzip((Byte*)const_cast<char*>(response.c_str()), response.length(), gunRes);
 		
-		iRetFlag = JsonParseOrder(gunRes, mapOrder);
+		if (E_OK != (err = JsonParseOrder(gunRes, mapOrder)))
+			return err;
 	}
 	catch (Poco::Exception &e)
 	{
 		//DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
 		CLog::GetInstance()->Log(e.displayText());
-		return FAIL;
+		return E_FAILURE;
 	}
 
-	return iRetFlag;
+	return E_OK;
 }
 
 
-int Client12306Manager::JsonParseOrder(std::string jsonString, std::map<std::string, COrderModel> &mapOrder)
+_ERRNO Client12306Manager::JsonParseOrder(std::string jsonString, std::map<std::string, COrderModel> &mapOrder)
 {
 	try
 	{
@@ -1183,7 +1271,7 @@ int Client12306Manager::JsonParseOrder(std::string jsonString, std::map<std::str
 		if (jStatus.toString() != "true")
 		{
 			DUI__Trace(Utf8ToUnicode(jStatus.toString()).c_str());
-			return FAIL;
+			return E_FAILURE;
 		}
 
 		if (pObj->has("url"))
@@ -1194,7 +1282,7 @@ int Client12306Manager::JsonParseOrder(std::string jsonString, std::map<std::str
 				m_strLastErrInfo = jMsg.toString();
 			}
 
-			return FAIL;
+			return E_FAILURE;
 		}
 
 
@@ -1231,14 +1319,15 @@ int Client12306Manager::JsonParseOrder(std::string jsonString, std::map<std::str
 	{
 		CLog::GetInstance()->Log(e.displayText());
 		m_strLastErrInfo = e.displayText();
-		return FAIL;
+		return E_FAILURE;
 	}
 
-	return SUCCESS;
+	return E_OK;
 }
 
-int Client12306Manager::AssignJson2OrderObj(JSON::Object::Ptr jOrderDTOData, COrderModel &objOrder)
+_ERRNO Client12306Manager::AssignJson2OrderObj(JSON::Object::Ptr jOrderDTOData, COrderModel &objOrder)
 {
+	_ERRNO err = E_OK;
 	try
 	{
 		///订单号
@@ -1276,8 +1365,8 @@ int Client12306Manager::AssignJson2OrderObj(JSON::Object::Ptr jOrderDTOData, COr
 			JSON::Object::Ptr jOrderTicket = it->extract<JSON::Object::Ptr>();
 
 			COrderTicketModel orderTicketModel(&objOrder);
-			if (SUCCESS != AssignJson2OrderTicketObj(jOrderTicket, orderTicketModel))
-				return FAIL;
+			if (E_OK != (err = AssignJson2OrderTicketObj(jOrderTicket, orderTicketModel)))
+				return err;
 
 			objOrder.Add(orderTicketModel);
 
@@ -1289,15 +1378,17 @@ int Client12306Manager::AssignJson2OrderObj(JSON::Object::Ptr jOrderDTOData, COr
 	{
 		CLog::GetInstance()->Log(e.displayText());
 		m_strLastErrInfo = e.displayText();
-		return FAIL;
+		return E_FAILURE;
 	}
 	
-	return SUCCESS;
+	return E_OK;
 }
 
 
-int Client12306Manager::AssignJson2OrderTicketObj(JSON::Object::Ptr jOrderTicketDTOData, COrderTicketModel &objOrderTicket)
+_ERRNO Client12306Manager::AssignJson2OrderTicketObj(JSON::Object::Ptr jOrderTicketDTOData, COrderTicketModel &objOrderTicket)
 {
+
+
 	try
 	{
 	
@@ -1340,10 +1431,10 @@ int Client12306Manager::AssignJson2OrderTicketObj(JSON::Object::Ptr jOrderTicket
 	{
 		CLog::GetInstance()->Log(e.displayText());
 		m_strLastErrInfo = e.displayText();
-		return FAIL;
+		return E_FAILURE;
 	}
 
-	return SUCCESS;
+	return E_OK;
 }
 
 
@@ -1362,15 +1453,17 @@ static bool CmpStationBySEQ(const CStation *s1, const CStation *s2)
 {
 	return s1->GetSeq() < s2->GetSeq();
 }
-int Client12306Manager::Query12306StationName()
+_ERRNO Client12306Manager::Query12306StationName()
 {
-	int iRetFlag = SUCCESS;
+	_ERRNO err = E_OK;
 	try
 	{
 
 		string strService = "/otn/resources/js/framework/station_name.js";
 
-		std::string response = ExecGet(strService);
+		std::string response;
+		if (E_OK != (err = ExecGet(strService, response)))
+			return err;
 	
 
 		ParseStationString(response);
@@ -1397,13 +1490,13 @@ int Client12306Manager::Query12306StationName()
 		}*/
 
 
-		for (std::vector<CStation*>::iterator it = m_vecStationByPYSort.begin(); it != m_vecStationByPYSort.end(); ++it)
+		/*for (std::vector<CStation*>::iterator it = m_vecStationByPYSort.begin(); it != m_vecStationByPYSort.end(); ++it)
 		{
 			DUI__Trace(_T("%s,%s,%s,%s"), Utf8ToUnicode((*it)->GetStationCode()).c_str(),
 				Utf8ToUnicode((*it)->GetShortName()).c_str(),
 				Utf8ToUnicode((*it)->GetPinYinName()).c_str(),
 				Utf8ToUnicode((*it)->GetChinaName()).c_str());
-		}
+		}*/
 
 	}
 	catch (Poco::Exception &e)
@@ -1411,13 +1504,13 @@ int Client12306Manager::Query12306StationName()
 		//DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
 		CLog::GetInstance()->Log(e.displayText());
 		m_strLastErrInfo = e.displayText();
-		return FAIL;
+		return E_FAILURE;
 	}
 
-	return iRetFlag;
+	return E_OK;
 }
 
-int Client12306Manager::ParseStationString(std::string res)
+_ERRNO Client12306Manager::ParseStationString(std::string res)
 {
 	int begPos = res.find("@")+1;
 
@@ -1508,7 +1601,7 @@ int Client12306Manager::ParseStationString(std::string res)
 	m_vecStationByPYSort.push_back(&(retPair.first->second));
 	
 
-	return SUCCESS;
+	return E_OK;
 }
 
 
@@ -1586,16 +1679,19 @@ CStation* Client12306Manager::GetStationByCode(std::string code)
 }
 
 
-int Client12306Manager::QueryPassenger()
+_ERRNO Client12306Manager::QueryPassenger()
 {
-	int iRetFlag = SUCCESS;
+	_ERRNO err = E_OK;
 	try
 	{
 
 		string strService = "/otn/confirmPassenger/getPassengerDTOs";
 
 
-		std::string response = ExecGet(strService);
+		std::string response;
+		if (E_OK != (err = ExecGet(strService, response)))
+			return err;
+
 		std::string gunRes;
 		Gunzip((Byte*)const_cast<char*>(response.c_str()), response.length(), gunRes);
 
@@ -1609,13 +1705,13 @@ int Client12306Manager::QueryPassenger()
 
 		CLog::GetInstance()->Log(e.displayText());
 
-		return FAIL;
+		return E_FAILURE;
 	}
 
-	return iRetFlag;
+	return E_OK;
 }
 
-int Client12306Manager::ParsePassengerString(std::string res)
+_ERRNO Client12306Manager::ParsePassengerString(std::string res)
 {
 	try
 	{
@@ -1631,7 +1727,7 @@ int Client12306Manager::ParsePassengerString(std::string res)
 		if (jStatus.toString() != "true")
 		{
 			DUI__Trace(Utf8ToUnicode(jStatus.toString()).c_str());
-			return FAIL;
+			return E_FAILURE;
 		}
 
 		if (pObj->has("url"))
@@ -1642,7 +1738,7 @@ int Client12306Manager::ParsePassengerString(std::string res)
 				m_strLastErrInfo = jMsg.toString();
 			}
 
-			return FAIL;
+			return E_FAILURE;
 		}
 
 
@@ -1697,10 +1793,10 @@ int Client12306Manager::ParsePassengerString(std::string res)
 	{
 		CLog::GetInstance()->Log(e.displayText());
 		m_strLastErrInfo = e.displayText();
-		return FAIL;
+		return E_FAILURE;
 	}
 
-	return SUCCESS;
+	return E_OK;
 }
 
 CPassenger* Client12306Manager::GetPassengerByCardNo(std::string cardNo)
@@ -1714,15 +1810,17 @@ CPassenger* Client12306Manager::GetPassengerByCardNo(std::string cardNo)
 	return ret;
 }
 
-int Client12306Manager::CheckUser()
+_ERRNO Client12306Manager::CheckUser()
 {
-	int iRetFlag = SUCCESS;
+	_ERRNO err = E_OK;
 	try
 	{
 
 		string strService = "/otn/login/checkUser";
 
-		std::string response = ExecPost(strService);
+		std::string response;
+		if (E_OK != (err = ExecPost(strService, response)))
+			return err;
 
 		std::string gunString;
 		Gunzip((Byte*)response.c_str() , response.length() , gunString);
@@ -1741,7 +1839,7 @@ int Client12306Manager::CheckUser()
 		if (jStatus.toString() != "true")
 		{
 			DUI__Trace(Utf8ToUnicode(jStatus.toString()).c_str());
-			return FAIL;
+			return E_FAILURE;
 		}
 
 		if (pObj->has("url"))
@@ -1752,10 +1850,15 @@ int Client12306Manager::CheckUser()
 				m_strLastErrInfo = jMsg.toString();
 			}
 
-			return FAIL;
+			return E_FAILURE;
 		}
-			
 
+		JSON::Object::Ptr jData = pObj->get("data").extract<JSON::Object::Ptr>();
+
+		if (!jData->get("flag").extract<bool>())
+		{
+			return E_CEHCK_USER;
+		}
 
 	}
 	catch (Poco::Exception &e)
@@ -1763,16 +1866,16 @@ int Client12306Manager::CheckUser()
 		//DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
 		CLog::GetInstance()->Log(e.displayText());
 		m_strLastErrInfo = e.displayText();
-		return FAIL;
+		return E_FAILURE;
 	}
 
-	return iRetFlag;
+	return err;
 }
 
 
-int Client12306Manager::SubmitOrderRequest(CTicketModel *ticket)
+_ERRNO Client12306Manager::SubmitOrderRequest(CTicketModel *ticket)
 {
-	int iRetFlag = SUCCESS;
+	_ERRNO err = E_OK;
 	try
 	{
 		string strService = "/otn/leftTicket/submitOrderRequest";
@@ -1789,7 +1892,9 @@ int Client12306Manager::SubmitOrderRequest(CTicketModel *ticket)
 		param.push_back(CParam("query_to_station_name", UnicodeToUtf8(ticket->GetToStationName().GetData())  ));
 
 
-		std::string response = ExecPostBySeq(strService ,  &param , NULL);
+		std::string response;
+		if (E_OK != (err = ExecPostBySeq(strService, response, &param, NULL)))
+			return err;
 
 		std::string gunString;
 		Gunzip((Byte*)response.c_str(), response.length(), gunString);
@@ -1816,7 +1921,7 @@ int Client12306Manager::SubmitOrderRequest(CTicketModel *ticket)
 				DUI__Trace(Utf8ToUnicode(m_strLastErrInfo).c_str());
 			}
 
-			return FAIL;
+			return E_FAILURE;
 		}
 
 	}
@@ -1825,21 +1930,29 @@ int Client12306Manager::SubmitOrderRequest(CTicketModel *ticket)
 		//DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
 		CLog::GetInstance()->Log(e.displayText());
 		m_strLastErrInfo = e.displayText();
-		return FAIL;
+		return E_FAILURE;
 	}
 
-	return iRetFlag;
+	return E_OK;
 }
 
 
-int Client12306Manager::InitDc(std::string &token , std::string &leftTicketSgtring , std::string &keyCheckIsChange)
+_ERRNO Client12306Manager::InitDc(std::string &token , std::string &leftTicketSgtring , std::string &keyCheckIsChange)
 {
-	int iRetFlag = SUCCESS;
+	_ERRNO err = E_OK;
 	try
 	{
 		string strService = "/otn/confirmPassenger/initDc";
 		
-		std::string response = ExecPostBySeq(strService, NULL, NULL);
+		std::string response;
+		if (E_OK != (err = ExecPostBySeq(strService, response)))
+			return err;
+
+		if (response.empty())
+		{
+			m_strLastErrInfo = UnicodeToUtf8(_T("12306返回失败"));
+			return E_FAILURE;
+		}
 
 		std::string gunString;
 		Gunzip((Byte*)response.c_str(), response.length(), gunString);
@@ -1882,16 +1995,16 @@ int Client12306Manager::InitDc(std::string &token , std::string &leftTicketSgtri
 		//DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
 		CLog::GetInstance()->Log(e.displayText());
 		m_strLastErrInfo = e.displayText();
-		return FAIL;
+		return E_FAILURE;
 	}
 
-	return iRetFlag;
+	return E_OK;
 
 }
 
-int Client12306Manager::CheckOrderInfo(std::vector<CPassengerTicket> &vecPT , CCheckOrderInfoResult &resOrderInfo)
+_ERRNO Client12306Manager::CheckOrderInfo(std::vector<CPassengerTicket> &vecPT , CCheckOrderInfoResult &resOrderInfo)
 {
-	int iRetFlag = SUCCESS;
+	_ERRNO err = E_OK;
 	try
 	{
 		string strService = "/otn/confirmPassenger/checkOrderInfo";
@@ -1949,7 +2062,9 @@ int Client12306Manager::CheckOrderInfo(std::vector<CPassengerTicket> &vecPT , CC
 
 
 		
-		std::string response = ExecPostBySeq(strService, &param, NULL);
+		std::string response;
+		if (E_OK != (err = ExecPostBySeq(strService, response, &param, NULL)))
+			return err;
 
 		std::string gunString;
 		Gunzip((Byte*)response.c_str(), response.length(), gunString);
@@ -1968,7 +2083,7 @@ int Client12306Manager::CheckOrderInfo(std::vector<CPassengerTicket> &vecPT , CC
 		if (jStatus.toString() != "true")
 		{
 			DUI__Trace(Utf8ToUnicode(jStatus.toString()).c_str());
-			return FAIL;
+			return E_FAILURE;
 		}
 
 	
@@ -1981,7 +2096,7 @@ int Client12306Manager::CheckOrderInfo(std::vector<CPassengerTicket> &vecPT , CC
 		{
 
 			m_strLastErrInfo = jData->get("errMsg").toString();
-			return FAIL;
+			return E_FAILURE;
 
 		}
 
@@ -2001,15 +2116,15 @@ int Client12306Manager::CheckOrderInfo(std::vector<CPassengerTicket> &vecPT , CC
 		//DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
 		CLog::GetInstance()->Log(e.displayText());
 		m_strLastErrInfo = e.displayText();
-		return FAIL;
+		return E_FAILURE;
 	}
 
-	return iRetFlag;
+	return E_OK;
 }
 
-int Client12306Manager::getQueueCount(CTicketModel *ticket , std::string token, std::string leftTicketString, std::string seatType, CGetQueqeCountResult &res)
+_ERRNO Client12306Manager::getQueueCount(CTicketModel *ticket , std::string token, std::string leftTicketString, std::string seatType, CGetQueqeCountResult &res)
 {
-	int iRetFlag = SUCCESS;
+	_ERRNO err = E_OK;
 	try
 	{
 		string strService = "/otn/confirmPassenger/getQueueCount";
@@ -2068,7 +2183,9 @@ int Client12306Manager::getQueueCount(CTicketModel *ticket , std::string token, 
 		std::map<string, string> header;
 		header["Referer"] = "https://kyfw.12306.cn/otn/confirmPassenger/initDc";
 
-		std::string response = ExecPostBySeq(strService, &param, &header);
+		std::string response;
+		if (E_OK != (err = ExecPostBySeq(strService, response, &param, &header)))
+			return err;
 
 		std::string gunString;
 		Gunzip((Byte*)response.c_str(), response.length(), gunString);
@@ -2091,7 +2208,7 @@ int Client12306Manager::getQueueCount(CTicketModel *ticket , std::string token, 
 				Dynamic::Var jMsg = pObj->get("messages");
 				m_strLastErrInfo = jMsg.toString();
 			}
-			return FAIL;
+			return E_FAILURE;
 		}
 
 		Dynamic::Var pData = pObj->get("data");
@@ -2107,10 +2224,10 @@ int Client12306Manager::getQueueCount(CTicketModel *ticket , std::string token, 
 		//DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
 		CLog::GetInstance()->Log(e.displayText());
 		m_strLastErrInfo = e.displayText();
-		return FAIL;
+		return E_FAILURE;
 	}
 
-	return iRetFlag;
+	return E_OK;
 }
 
 void Client12306Manager::UriEncode(std::string str, std::string &out)
@@ -2164,9 +2281,10 @@ void Client12306Manager::UriEncode(std::string str, std::string &out)
 }
 
 
-int Client12306Manager::ConfirmSingleForQueue(std::vector<CPassengerTicket> &vecPT , CTicketModel *ticket, std::string token, std::string leftTicketString , std::string keyCheckIsChg,std::string randCode )
+_ERRNO Client12306Manager::ConfirmSingleForQueue(std::vector<CPassengerTicket> &vecPT , CTicketModel *ticket, std::string token, std::string leftTicketString , std::string keyCheckIsChg,std::string randCode )
 {
-	int iRetFlag = SUCCESS;
+	_ERRNO err = E_OK;
+
 	try
 	{
 		string strService = "/otn/confirmPassenger/confirmSingleForQueue";
@@ -2233,7 +2351,9 @@ int Client12306Manager::ConfirmSingleForQueue(std::vector<CPassengerTicket> &vec
 		param.push_back(CParam("_json_att", ""));
 		param.push_back(CParam("REPEAT_SUBMIT_TOKEN", token));
 		
-		std::string response = ExecPostBySeq(strService, &param, &header);
+		std::string response;
+		if (E_OK != (err = ExecPostBySeq(strService, response, &param, &header)))
+			return err;
 
 		std::string gunString;
 		Gunzip((Byte*)response.c_str(), response.length(), gunString);
@@ -2254,7 +2374,7 @@ int Client12306Manager::ConfirmSingleForQueue(std::vector<CPassengerTicket> &vec
 
 			m_strLastErrInfo = pData.toString();
 
-			return FAIL;
+			return E_FAILURE;
 		}
 
 	}
@@ -2265,16 +2385,16 @@ int Client12306Manager::ConfirmSingleForQueue(std::vector<CPassengerTicket> &vec
 
 		m_strLastErrInfo = e.displayText();
 
-		return FAIL;
+		return E_FAILURE;
 	}
 
-	return iRetFlag;
+	return E_OK;
 }
 
 
-int Client12306Manager::QueryOrderWaitTime(std::string token, CQueryOrderWaitTimeResult &res)
+_ERRNO Client12306Manager::QueryOrderWaitTime(std::string token, CQueryOrderWaitTimeResult &res)
 {
-	int iRetFlag = SUCCESS;
+	_ERRNO err = E_OK;
 	try
 	{
 		string strService = "/otn/confirmPassenger/queryOrderWaitTime";
@@ -2298,7 +2418,9 @@ int Client12306Manager::QueryOrderWaitTime(std::string token, CQueryOrderWaitTim
 
 		
 
-		std::string response = ExecGet(strService, &param, &header);
+		std::string response;
+		if (E_OK != (err = ExecGet(strService, response, &param, &header)))
+			return err;
 
 		std::string gunString;
 		Gunzip((Byte*)response.c_str(), response.length(), gunString);
@@ -2321,7 +2443,7 @@ int Client12306Manager::QueryOrderWaitTime(std::string token, CQueryOrderWaitTim
 
 			m_strLastErrInfo = pData.toString();
 
-			return FAIL;
+			return E_FAILURE;
 		}
 
 		Dynamic::Var vData = pObj->get("data");
@@ -2345,17 +2467,17 @@ int Client12306Manager::QueryOrderWaitTime(std::string token, CQueryOrderWaitTim
 		//DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
 		CLog::GetInstance()->Log(e.displayText());
 
-		return FAIL;
+		return E_FAILURE;
 	}
 
-	return iRetFlag;
+	return E_OK;
 
 }
 
-int Client12306Manager::ResultOrderForDcQueue(std::string orderNo, std::string token)
+_ERRNO Client12306Manager::ResultOrderForDcQueue(std::string orderNo, std::string token)
 {
 
-	int iRetFlag = SUCCESS;
+	_ERRNO err = E_OK;
 	try
 	{
 		string strService = "/otn/confirmPassenger/resultOrderForDcQueue";
@@ -2375,7 +2497,9 @@ int Client12306Manager::ResultOrderForDcQueue(std::string orderNo, std::string t
 
 
 
-		std::string response = ExecPost(strService, &param, &header);
+		std::string response;
+		if (E_OK != (err = ExecPost(strService, response, &param, &header)))
+			return err;
 
 		std::string gunString;
 		Gunzip((Byte*)response.c_str(), response.length(), gunString);
@@ -2399,7 +2523,7 @@ int Client12306Manager::ResultOrderForDcQueue(std::string orderNo, std::string t
 
 			m_strLastErrInfo = pData.toString();
 
-			return FAIL;
+			return E_FAILURE;
 		}
 
 		Dynamic::Var vData = pObj->get("data");
@@ -2411,7 +2535,7 @@ int Client12306Manager::ResultOrderForDcQueue(std::string orderNo, std::string t
 			jData->get("submitStatus").toString() != "TRUE")
 		{
 			m_strLastErrInfo = "下单失败";
-			return FAIL;
+			return E_FAILURE;
 		}
 
 	}
@@ -2420,9 +2544,9 @@ int Client12306Manager::ResultOrderForDcQueue(std::string orderNo, std::string t
 		//DUI__Trace(_T("%s"), Utf8ToUnicode(e.displayText()).c_str());
 		CLog::GetInstance()->Log(e.displayText());
 		m_strLastErrInfo = e.displayText();
-		return FAIL;
+		return E_FAILURE;
 	}
 
-	return iRetFlag;
+	return E_OK;
 	
 }

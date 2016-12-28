@@ -61,7 +61,7 @@ void COrderWaitTimeWnd::OnClick(TNotifyUI &msg)
 
 	if (msg.pSender == m_pCloseBtn) {
 		m_sErrInfo = _T("您关闭了窗口，订票结果未知，请通过查询订单确认订票结果，谢谢");
-		Close(FAIL);
+		Close(E_FAILURE);
 		return;
 	}
 
@@ -136,10 +136,11 @@ void COrderWaitTimeWnd::InitilizeTimer()
 
 void COrderWaitTimeWnd::QueryOrderWaitTime()
 {
-	if (SUCCESS != Client12306Manager::Instance()->QueryOrderWaitTime(m_tokenString, m_orderWaitTimeResult))
+	_ERRNO err = E_OK;
+	if (E_OK != (err =  Client12306Manager::Instance()->QueryOrderWaitTime(m_tokenString, m_orderWaitTimeResult)))
 	{
 		m_sErrInfo = Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str();
-		Close(FAIL);
+		Close(err);
 	}
 
 	if (m_orderWaitTimeResult.GetWaitTime() > 0)
@@ -151,14 +152,14 @@ void COrderWaitTimeWnd::QueryOrderWaitTime()
 	}
 
 	///等待时间结束，
-	if (SUCCESS != Client12306Manager::Instance()->ResultOrderForDcQueue(m_orderWaitTimeResult.GetOrderId(), m_tokenString))
+	if (E_OK != (err = Client12306Manager::Instance()->ResultOrderForDcQueue(m_orderWaitTimeResult.GetOrderId(), m_tokenString)))
 	{
 		m_sErrInfo = Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str();
 
-		Close(FAIL);
+		Close(err);
 	}
 
-	Close(SUCCESS);
+	Close(E_OK);
 
 
 }

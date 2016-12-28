@@ -67,6 +67,11 @@ using namespace Poco::Dynamic;
 using namespace Poco;
 
 
+
+
+
+
+
 class CParam
 {
 public:
@@ -229,7 +234,7 @@ public:
 
 	/*@action:
 	*/
-	int LeftTicketInit();
+	_ERRNO LeftTicketInit();
 	/*@action: 查询余票
 	*@parameter:
 	*	begPlace:入参， 车站代码：  SJP  石家庄
@@ -239,45 +244,45 @@ public:
 	*	ticketType：入参， 购票类型 :  成人/学生
 	*@return: 0-success;-1-fail
 	*/
-	int QueryLeftTicket(std::string begPlace, std::string endPlace, std::string travelTime , std::vector<CTicketModel> &vecTicket, _TICKET_TYPE ticketType = _ADULT);
+	_ERRNO QueryLeftTicket(std::string begPlace, std::string endPlace, std::string travelTime , std::map<CDuiString,CTicketModel> &mapTicket, _TICKET_TYPE ticketType = _ADULT);
 	
 	/*@action:初始化登录
 	*/
-	int LoginInit( );
+	_ERRNO LoginInit( );
 
 
 	/*@action:获取验证码
 	*/
-	int QueryPassCode(std::string moduleName, std::string &bytes);
+	_ERRNO QueryPassCode(std::string moduleName, std::string &bytes);
 
 	
 
 	/*@action: 异步校验验证码
 	*/
-	int AnsynValidPassCode(std::vector<CDuiPoint> &selPoints, bool &flag);
+	_ERRNO AnsynValidPassCode(std::vector<CDuiPoint> &selPoints, bool &flag);
 
 
 
 	/*@action: 异步的登录
 	*/
-	int AnsysLoginSugguest(std::string userName, std::string userPass, std::string randCode, bool &flag);
+	_ERRNO AnsysLoginSugguest(std::string userName, std::string userPass, std::string randCode, bool &flag);
 
 
 	/*@action:  用户登录
 	*/
-	int UserLogin(std::string &res);
+	_ERRNO UserLogin(std::string &res);
 
 	/*@action:  用户初始化
 	*/
-	int InitMy12306(std::string &res);
+	_ERRNO InitMy12306(std::string &res);
 
 	/*@action: 查询用户订单
 	*/
-	int QueryMyOrder(std::string startDate , std::string endDate , std::string type, std::string seqTrainName , std::map<string, COrderModel> &mapOrder);
+	_ERRNO QueryMyOrder(std::string startDate , std::string endDate , std::string type, std::string seqTrainName , std::map<string, COrderModel> &mapOrder);
 
 	/*@action:  查询站点新
 	*/
-	int Query12306StationName();
+	_ERRNO Query12306StationName();
 
 	std::string GetLastErrInfo() { return m_strLastErrInfo; }
 
@@ -296,7 +301,7 @@ public:
 	/*@action:
 	*/
 
-	int QueryPassenger();
+	_ERRNO QueryPassenger();
 
 	/*@action:
 	*/
@@ -309,64 +314,64 @@ public:
 
 	/*@action:  检查用户
 	*/
-	int CheckUser();
+	_ERRNO CheckUser();
 
 	/*@action:  提交订单请求
 	*/
-	int SubmitOrderRequest(CTicketModel *ticket);
+	_ERRNO SubmitOrderRequest(CTicketModel *ticket);
 
 
 	/*@action:  初始化单程购票界面
 	*/
-	int InitDc(std::string &token , std::string &leftTicketSgtring, std::string &keyCheckIsChange);
+	_ERRNO InitDc(std::string &token , std::string &leftTicketSgtring, std::string &keyCheckIsChange);
 
 	/*@action:  检查订单信息
 	*/
-	int CheckOrderInfo(std::vector<CPassengerTicket> &vecPT , CCheckOrderInfoResult &resOrderInfo);
+	_ERRNO CheckOrderInfo(std::vector<CPassengerTicket> &vecPT , CCheckOrderInfoResult &resOrderInfo);
 
 
 	/*@action:
 	*/
-	int getQueueCount(CTicketModel *ticket ,std::string token , std::string leftTicketString, std::string seatType , CGetQueqeCountResult &res);
+	_ERRNO getQueueCount(CTicketModel *ticket ,std::string token , std::string leftTicketString, std::string seatType , CGetQueqeCountResult &res);
 
 	/*@action:
 	*/
-	int ConfirmSingleForQueue(std::vector<CPassengerTicket> &vecPT , CTicketModel *ticket, std::string token, std::string leftTicketString, std::string keyCheckIsChg,std::string randCode="");
+	_ERRNO ConfirmSingleForQueue(std::vector<CPassengerTicket> &vecPT , CTicketModel *ticket, std::string token, std::string leftTicketString, std::string keyCheckIsChg,std::string randCode="");
 	
 	/*@acition:
 	*/
-	int QueryOrderWaitTime(std::string token , CQueryOrderWaitTimeResult &res);
+	_ERRNO QueryOrderWaitTime(std::string token , CQueryOrderWaitTimeResult &res);
 
 	/*@action:
 	*/
-	int ResultOrderForDcQueue(std::string orderNo , std::string token);
+	_ERRNO ResultOrderForDcQueue(std::string orderNo , std::string token);
 
 private:
 
 
 	/*@action: 执行 http 的post请求
 	*/
-	std::string ExecPost(std::string service, std::map<string, string> *param = NULL,std::map<string,string> *header=NULL);
+	_ERRNO ExecPost(std::string service ,std::string &out, std::map<string, string> *param = NULL,std::map<string,string> *header=NULL);
 
 	/*@action: 执行 http 的post请求
 	*/
-	std::string ExecPostBySeq(std::string service, std::vector<CParam> *param = NULL, std::map<string, string> *header = NULL);
+	_ERRNO ExecPostBySeq(std::string service, std::string &out , std::vector<CParam> *param = NULL, std::map<string, string> *header = NULL);
 
 	/*@action: 执行 http 的get请求
 	*/
-	std::string ExecGet(std::string service, std::map<string, string> *param = NULL, std::map<string, string> *header = NULL);
+	_ERRNO ExecGet(std::string service, std::string &out , std::map<string, string> *param = NULL, std::map<string, string> *header = NULL);
 
 
 	
 
 	/*@action: 异步校验验证码
 	*/
-	int AnsynValidPassCode(std::vector<CDuiPoint> &selPoints, std::string &res);
+	_ERRNO AnsynValidPassCode(std::vector<CDuiPoint> &selPoints, std::string &res);
 
 
 	/*@action: 异步的登录
 	*/
-	int AnsysLoginSugguest(std::string userName, std::string userPass, std::string randCode, std::string &res);
+	_ERRNO AnsysLoginSugguest(std::string userName, std::string userPass, std::string randCode, std::string &res);
 
 	/*@action: 解析 返回的json串
 	*@parameter:
@@ -374,16 +379,16 @@ private:
 	*	vecTicket:出参， 余票信息
 	*@return: 0-success;-1-fail
 	*/
-	int JsonParseTicket(std::string jsonString ,std::string travelTime, _TICKET_TYPE ticketType, std::vector<CTicketModel> &vecTicket);
+	_ERRNO JsonParseTicket(std::string jsonString ,std::string travelTime, _TICKET_TYPE ticketType, std::map<CDuiString,CTicketModel> &mapTicket);
 
 	/*@action: 
 	*/
-	int AssignJson2TicketObj(JSON::Object::Ptr queryDto, CTicketModel &objTicket);
+	_ERRNO AssignJson2TicketObj(JSON::Object::Ptr queryDto, CTicketModel &objTicket);
 
 
 	/*@action: 查询余票前的log请求
 	*/
-	int QueryTicketLog(std::string begPlace, std::string endPlace, std::string travelTime,bool &flag, _TICKET_TYPE ticketType = _ADULT);
+	_ERRNO QueryTicketLog(std::string begPlace, std::string endPlace, std::string travelTime,bool &flag, _TICKET_TYPE ticketType = _ADULT);
 
 	/*@action: 解析 返回的json串
 	*@parameter:
@@ -391,26 +396,26 @@ private:
 	*	mapOrder:出参，订单信息
 	*@return: 0-success;-1-fail
 	*/
-	int JsonParseOrder(std::string jsonString, std::map<std::string, COrderModel> &mapOrder);
+	_ERRNO JsonParseOrder(std::string jsonString, std::map<std::string, COrderModel> &mapOrder);
 
 
 	/*@action:
 	*/
-	int AssignJson2OrderObj(JSON::Object::Ptr jOrderDTOData, COrderModel &objOrder);
+	_ERRNO AssignJson2OrderObj(JSON::Object::Ptr jOrderDTOData, COrderModel &objOrder);
 
 	/*@action:
 	*/
-	int AssignJson2OrderTicketObj(JSON::Object::Ptr jOrderTicketDTOData, COrderTicketModel &objOrderTicket);
+	_ERRNO AssignJson2OrderTicketObj(JSON::Object::Ptr jOrderTicketDTOData, COrderTicketModel &objOrderTicket);
 
 
 	/*@action: 
 	*/
-	int ParseStationString(std::string res);
+	_ERRNO ParseStationString(std::string res);
 
 
 	/*@action:
 	*/
-	int ParsePassengerString(std::string res );
+	_ERRNO ParsePassengerString(std::string res );
 
 	/*@action:
 	*/
