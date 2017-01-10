@@ -100,6 +100,9 @@ public:
 	void TxtChgEndPlaceCb(TNotifyUI& msg);
 
 	void OnPollTicketProcessCb(TNotifyUI& msg);
+
+	void OnPollQueryTag(TNotifyUI& msg);
+	void OnAddTrainCodeCb(TNotifyUI& msg);
 	
 
 	CPaintManagerUI* GetPaintManagerUI() { return &m_pm; }

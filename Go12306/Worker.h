@@ -109,6 +109,11 @@ public:
 	}
 
 private:
+
+	CDuiString GetLeftTicketSeatType(CTicketModel &tm);
+	
+	void CreatePassengerTicket(std::vector<CPassengerTicket> &vecPT ,CDuiString seatType, CTicketModel &tm);
+
 	CDuiString  m_strBegPlace;
 	CDuiString  m_strEndPlace;
 	CDuiString  m_strTravelTime;
@@ -118,5 +123,13 @@ private:
 
 	CMainFrame *m_mainFrame;
 
+	///需要订购的车次车票
+	std::set<CDuiString> m_setTrain;
+
+	///需要订购的乘客信息
+	std::set<CPassenger> m_setPassenger;
+
+	///需要订购的席别
+	std::set<CDuiString> m_setSeatType;
 
 };

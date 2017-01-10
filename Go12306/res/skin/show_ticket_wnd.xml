@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Window caption="0,0,0,40" size="400,195" showshadow="true" shadowimage="main/shadow.png" shadowsize="6" shadowcorner="8,8,8,8">
+  <Font id="0" name="微软雅黑" size="12" default="true"/>
+  <Font id="1" name="微软雅黑" size="14"/>
+
+  <VerticalLayout bkcolor="#FFDCDCDC">
+    <VerticalLayout inset="20,10,20,10">
+      <Label name="MessageText" wordbreak="true" showhtml="true" font="1" align="left"/>
+    </VerticalLayout>
+    <HorizontalLayout height="60" inset="10,10,10,10">
+      <Control />
+      <Button name="confirm_btn" text="确定" height="30" width="75" align="center" valign="vcenter" style="colorbtn_style"/>
+      <Control width="20"/>
+      <Button name="cancel_btn" text="取消" height="30" width="75" align="center" valign="vcenter" style="colorbtn_style"/>
+      <Control width="30"/>
+    </HorizontalLayout>
+  </VerticalLayout>
+</Window>

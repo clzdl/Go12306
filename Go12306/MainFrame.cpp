@@ -15,7 +15,7 @@
 #include "TicketManager.h"
 #include "PassengerManagerUI.h"
 #include "OrderTicketWnd.h"
-
+#include "ShowTicketWnd.h"
 
 #define   TIMER_QUERY_ID		WM_APP+1000
 
@@ -29,6 +29,9 @@ DUI_BEGIN_MESSAGE_MAP(CMainFrame, WindowImplBase)
 	DUI_ON_CLICK_CTRNAME(_T("menubtn"), MenuBtnCb)
 	DUI_ON_CLICK_CTRNAME(_T("btnTicketPlaceChg"), TicketPlaceChgCb)
 	DUI_ON_CLICK_CTRNAME(_T("OrderTicketBtn"), OrderTicketCb)
+
+	DUI_ON_CLICK_CTRNAME(_T("BtnAddTrainCode"), OnAddTrainCodeCb)
+
 	DUI_ON_SELECTCHANGED_CTRNAME(_T("train_all"), TrainAllChkBtnCb)
 	DUI_ON_SELECTCHANGED_CTRNAME(_T("train_gc"), TrainGcCkgBtnCb)
 	DUI_ON_SELECTCHANGED_CTRNAME(_T("train_d"), TrainDCkgBtnCb)
@@ -37,6 +40,7 @@ DUI_BEGIN_MESSAGE_MAP(CMainFrame, WindowImplBase)
 	DUI_ON_SELECTCHANGED_CTRNAME(_T("train_k"), TrainKCkgBtnCb)
 	DUI_ON_SELECTCHANGED_CTRNAME(_T("train_o"), TrainOCkgBtnCb)
 	DUI_ON_SELECTCHANGED_CTRNAME(_T("ORDER_EXPAND_BTN"), OrderExpandBtn)
+	DUI_ON_SELECTCHANGED_CTRNAME(_T("pollQueryTag"), OnPollQueryTag)
 	DUI_ON_MSGTYPE_CTRNAME(_T("textchanged") , _T("begPlace") , TxtChgBegPlaceCb)
 	DUI_ON_MSGTYPE_CTRNAME(_T("textchanged"), _T("endPlace"), TxtChgEndPlaceCb)
 DUI_END_MESSAGE_MAP()
@@ -842,6 +846,31 @@ void CMainFrame::OnPollTicketProcessCb(TNotifyUI& msg)
 	else
 		RefreshTicketListView();
 
+}
+
+void CMainFrame::OnPollQueryTag(TNotifyUI& msg)
+{
+	CHorizontalLayoutUI *pUI = static_cast<CHorizontalLayoutUI*>(m_pm.FindControl(_T("auto_order_pannel")));
+
+
+	if (m_pPollQueryTag->GetCheck())
+	{
+		pUI->SetVisible(true);
+	}
+	else
+	{
+		pUI->SetVisible(false);
+	}
+}
+
+void CMainFrame::OnAddTrainCodeCb(TNotifyUI& msg)
+{
+	CButtonUI *pBtnUI = static_cast<CButtonUI*>(m_pm.FindControl(_T("BtnAddTrainCode")));
+	
+	RECT rect = pBtnUI->GetPos();
+	
+
+	CShowTicketWnd::ShowMessageBox(GetHWND(), rect);
 }
 
 
