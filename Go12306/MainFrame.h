@@ -103,6 +103,8 @@ public:
 
 	void OnPollQueryTag(TNotifyUI& msg);
 	void OnAddTrainCodeCb(TNotifyUI& msg);
+	void BtnDelTicketCb(TNotifyUI& msg);
+	
 	
 
 	CPaintManagerUI* GetPaintManagerUI() { return &m_pm; }

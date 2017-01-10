@@ -227,6 +227,7 @@
     <Xml Include="res\skin\order_manager_pannel.xml" />
     <Xml Include="res\skin\order_ticket_wnd.xml" />
     <Xml Include="res\skin\order_wait_time_wnd.xml" />
+    <Xml Include="res\skin\show_ticket_wnd.xml" />
     <Xml Include="res\skin\ticket_query_pannel.xml" />
     <Xml Include="res\skin\user_manager_pannel.xml" />
   </ItemGroup>

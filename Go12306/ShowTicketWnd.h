@@ -2,45 +2,17 @@
 
 
 ///
-#define MSGID_OK		1
-#define MSGID_CANCEL	0
+class CMainFrame;
+class CTicketModel;
+
 class CShowTicketWnd : public WindowImplBase
 {
 public:
 
-	static void ShowMessageBox(HWND hParent, RECT rect)
-	{
-		CShowTicketWnd* pWnd = new CShowTicketWnd();
-		pWnd->Create(hParent, _T("ShowTicketWnd"), UI_WNDSTYLE_FRAME, 0);
-		
-		RECT winRect;
-		::GetWindowRect(pWnd->GetHWND(), &winRect);
-
-		POINT orgPt;
-
-		if (rect.right > winRect.right - winRect.left)
-		{
-			///¿¿°´Å¥×ó²àÏÔÊ¾
-			orgPt.x = rect.right - (winRect.right - winRect.left);
-			orgPt.y = rect.top - (winRect.bottom - winRect.top);
-		}
-		else
-		{
-			///¿¿°´Å¥ÓÒ²àÏÔÊ¾
-			orgPt.x = rect.left;
-			orgPt.y = rect.top - (winRect.bottom - winRect.top);
-
-		}
-
-		::ClientToScreen(hParent, &orgPt);
-
-
-		::SetWindowPos(pWnd->GetHWND(), NULL, orgPt.x, orgPt.y, -1, -1, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
-		pWnd->ShowWindow(true);
-	}
+	static void ShowMessageBox(CMainFrame *frame, RECT rect);
 
 public:
-	CShowTicketWnd(void);
+	CShowTicketWnd(CMainFrame *frame);
 	~CShowTicketWnd(void);
 
 
@@ -54,6 +26,9 @@ public:
 	DUI_DECLARE_MESSAGE_MAP()
 		virtual void OnClick(TNotifyUI& msg);
 
+	void OnAddTrainCodeCb(TNotifyUI& msg);
+	
+
 	virtual LRESULT OnSysCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
@@ -63,5 +38,9 @@ private:
 	CButtonUI* m_pRestoreBtn;
 	CButtonUI* m_pMinBtn;
 	CButtonUI* m_pMenuBtn;
+
+	CMainFrame *m_mainFrame;
+
+	CListUI *m_listTicket;
 };
 

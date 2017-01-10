@@ -29,7 +29,8 @@ DUI_BEGIN_MESSAGE_MAP(CMainFrame, WindowImplBase)
 	DUI_ON_CLICK_CTRNAME(_T("menubtn"), MenuBtnCb)
 	DUI_ON_CLICK_CTRNAME(_T("btnTicketPlaceChg"), TicketPlaceChgCb)
 	DUI_ON_CLICK_CTRNAME(_T("OrderTicketBtn"), OrderTicketCb)
-
+	DUI_ON_CLICK_CTRNAME(_T("btn_del_ticket"), BtnDelTicketCb)
+	
 	DUI_ON_CLICK_CTRNAME(_T("BtnAddTrainCode"), OnAddTrainCodeCb)
 
 	DUI_ON_SELECTCHANGED_CTRNAME(_T("train_all"), TrainAllChkBtnCb)
@@ -43,6 +44,8 @@ DUI_BEGIN_MESSAGE_MAP(CMainFrame, WindowImplBase)
 	DUI_ON_SELECTCHANGED_CTRNAME(_T("pollQueryTag"), OnPollQueryTag)
 	DUI_ON_MSGTYPE_CTRNAME(_T("textchanged") , _T("begPlace") , TxtChgBegPlaceCb)
 	DUI_ON_MSGTYPE_CTRNAME(_T("textchanged"), _T("endPlace"), TxtChgEndPlaceCb)
+
+
 DUI_END_MESSAGE_MAP()
 
 
@@ -870,7 +873,19 @@ void CMainFrame::OnAddTrainCodeCb(TNotifyUI& msg)
 	RECT rect = pBtnUI->GetPos();
 	
 
-	CShowTicketWnd::ShowMessageBox(GetHWND(), rect);
+	CShowTicketWnd::ShowMessageBox(this, rect);
 }
 
+
+void CMainFrame::BtnDelTicketCb(TNotifyUI& msg)
+{
+	CButtonUI *pBtn = static_cast<CButtonUI*>(msg.pSender);
+
+	CListUI *pAddTicketList = static_cast<CListUI*>(m_pm.FindControl(_T("autoTicketList")));
+
+	int index = pAddTicketList->GetItemIndex(pBtn->GetParent());
+
+	pAddTicketList->RemoveAt(index);
+
+}
 
