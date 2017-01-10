@@ -453,7 +453,7 @@ private:
 	///根据拼音全拼排序
 	std::vector<CStation*> m_vecStationByPYSort;
 
-	///乘客信息
+	///乘客信息 , key is card_no
 	std::map<std::string, CPassenger> m_mapPassenger;
 
 	std::string m_strCtx12306;    ///12306项目根目录

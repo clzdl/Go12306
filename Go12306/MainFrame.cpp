@@ -16,6 +16,7 @@
 #include "PassengerManagerUI.h"
 #include "OrderTicketWnd.h"
 #include "ShowTicketWnd.h"
+#include "ShowPassengerWnd.h"
 
 #define   TIMER_QUERY_ID		WM_APP+1000
 
@@ -30,9 +31,9 @@ DUI_BEGIN_MESSAGE_MAP(CMainFrame, WindowImplBase)
 	DUI_ON_CLICK_CTRNAME(_T("btnTicketPlaceChg"), TicketPlaceChgCb)
 	DUI_ON_CLICK_CTRNAME(_T("OrderTicketBtn"), OrderTicketCb)
 	DUI_ON_CLICK_CTRNAME(_T("btn_del_ticket"), BtnDelTicketCb)
-	
+	DUI_ON_CLICK_CTRNAME(_T("btn_del_passenger"), BtnDelPassengerCb)
 	DUI_ON_CLICK_CTRNAME(_T("BtnAddTrainCode"), OnAddTrainCodeCb)
-
+	DUI_ON_CLICK_CTRNAME(_T("BtnAddPassenger"), OnAddPassengerCb)
 	DUI_ON_SELECTCHANGED_CTRNAME(_T("train_all"), TrainAllChkBtnCb)
 	DUI_ON_SELECTCHANGED_CTRNAME(_T("train_gc"), TrainGcCkgBtnCb)
 	DUI_ON_SELECTCHANGED_CTRNAME(_T("train_d"), TrainDCkgBtnCb)
@@ -889,3 +890,24 @@ void CMainFrame::BtnDelTicketCb(TNotifyUI& msg)
 
 }
 
+void CMainFrame::OnAddPassengerCb(TNotifyUI& msg)
+{
+	CButtonUI *pBtnUI = static_cast<CButtonUI*>(m_pm.FindControl(_T("BtnAddPassenger")));
+
+	RECT rect = pBtnUI->GetPos();
+
+
+	CShowPassengerWnd::ShowMessageBox(this, rect);
+}
+
+
+void CMainFrame::BtnDelPassengerCb(TNotifyUI& msg)
+{
+	CButtonUI *pBtn = static_cast<CButtonUI*>(msg.pSender);
+
+	CListUI *pAddTicketList = static_cast<CListUI*>(m_pm.FindControl(_T("autoPassengerList")));
+
+	int index = pAddTicketList->GetItemIndex(pBtn->GetParent());
+
+	pAddTicketList->RemoveAt(index);
+}

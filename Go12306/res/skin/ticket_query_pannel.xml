@@ -92,13 +92,12 @@
      
     <GroupBox text="乘客信息" bkcolor="#FFDCDCDC" textcolor="#FF000000"  bordercolor="#FF111111" bordersize="1" borderround="6,6">
       <HorizontalLayout>
-        <List vscrollbar="true" hscrollbar="true"  itemvalign="vcenter" scrollstepsize="100" itemshowrowline="true" itemlinecolor="0x00FFFFFF" bordercolor="#FF111111" bordersize="1">
+        <List  name="autoPassengerList" inset="1,1,1,1" vscrollbar="true" hscrollbar="true"  itemvalign="vcenter" scrollstepsize="100" itemshowrowline="true" itemlinecolor="0x00FFFFFF" bordercolor="#FF111111" bordersize="1">
         <ListHeader height="30">
           <ListHeaderItem text="姓名" width="200" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
           <ListHeaderItem text="操作" width="80" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
         </ListHeader>
-        <Label text="成亮"/>
-        <Label text="成亮"/>
+
       </List>
       
         <Button name="BtnAddPassenger" text="添加" style="btn_style" width="60" height="40"/>

@@ -15,4 +15,6 @@
   <Xml id="XML_PROGRESS_DLG" path="progressDlg.xml"/>
   
   <Xml id="XML_SHOWTICKET_WND" path="show_ticket_wnd.xml"/>
+  <Xml id="XML_SHOWPASSENGER_WND" path="show_passenger_wnd.xml"/>
+  
 </Res>

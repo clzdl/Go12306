@@ -103,7 +103,11 @@ public:
 
 	void OnPollQueryTag(TNotifyUI& msg);
 	void OnAddTrainCodeCb(TNotifyUI& msg);
+	void OnAddPassengerCb(TNotifyUI& msg);
+	
+
 	void BtnDelTicketCb(TNotifyUI& msg);
+	void BtnDelPassengerCb(TNotifyUI& msg);
 	
 	
 

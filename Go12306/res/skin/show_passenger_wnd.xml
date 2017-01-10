@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<!--  刷票设置界面 -->
+<Window caption="0,0,0,40" size="400,200" showshadow="true" shadowimage="main/shadow.png" shadowsize="6" shadowcorner="8,8,8,8">
+  <Font id="0" name="微软雅黑" size="12" default="true"/>
+  <Font id="1" name="微软雅黑" size="14"/>
+  <Style name="btn_style" value="drag=&quot;true&quot; textpadding=&quot;6,0,6,0&quot; normalimage=&quot;res='common/button_normal.png' corner='4,4,4,4'&quot; hotimage=&quot;res='common/button_hover.png' corner='4,4,4,4'&quot; pushedimage=&quot;res='common/button_pushed.png' corner='4,4,4,4'&quot; focusedimage=&quot;res='common/button_pushed.png' corner='4,4,4,4'&quot; selectedimage=&quot;res='common/button_pushed.png' corner='4,4,4,4'&quot;"  />
+  <VerticalLayout bkcolor="#FFDCDCDC">
+    <List name="passengerList"  vscrollbar="true" hscrollbar="true"  itemvalign="vcenter" scrollstepsize="100" itemshowrowline="true" itemlinecolor="0x00FFFFFF">
+      <ListHeader height="40">
+        <ListHeaderItem width="30" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+        <ListHeaderItem text="姓名" width="100" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+        <ListHeaderItem text="证件类型" width="100" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+        <ListHeaderItem text="证件号码" width="150" hotimage="res='common/list_header_hot.png'" pushedimage="res='common/list_header_pushed.png'" sepimage="res='common/list_header_sep.png'" sepwidth="1" align="center"/>
+      </ListHeader>
+
+    </List>
+
+    <Label height="1" bkimage="common/hor_line.png"/>
+
+    <HorizontalLayout height="30" childpadding="4" bordersize="1,1,1,1" bordercolor="#F" >
+      <Control/>
+      <Button name="btnAddPassenger" text="确定"  width="60"  style="btn_style"/>
+      <Control/>
+    </HorizontalLayout>
+   
+  </VerticalLayout>
+</Window>
