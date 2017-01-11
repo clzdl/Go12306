@@ -16,5 +16,6 @@
   
   <Xml id="XML_SHOWTICKET_WND" path="show_ticket_wnd.xml"/>
   <Xml id="XML_SHOWPASSENGER_WND" path="show_passenger_wnd.xml"/>
+  <Xml id="XML_SHOWSEATTYPE_WND" path="show_seattype_wnd.xml"/>
   
 </Res>

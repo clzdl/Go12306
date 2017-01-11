@@ -17,6 +17,8 @@
 #include "OrderTicketWnd.h"
 #include "ShowTicketWnd.h"
 #include "ShowPassengerWnd.h"
+#include "ShowSeatTypeWnd.h"
+
 
 #define   TIMER_QUERY_ID		WM_APP+1000
 
@@ -32,8 +34,10 @@ DUI_BEGIN_MESSAGE_MAP(CMainFrame, WindowImplBase)
 	DUI_ON_CLICK_CTRNAME(_T("OrderTicketBtn"), OrderTicketCb)
 	DUI_ON_CLICK_CTRNAME(_T("btn_del_ticket"), BtnDelTicketCb)
 	DUI_ON_CLICK_CTRNAME(_T("btn_del_passenger"), BtnDelPassengerCb)
+	DUI_ON_CLICK_CTRNAME(_T("btn_del_seattype"), BtnDelSeatTypeCb)
 	DUI_ON_CLICK_CTRNAME(_T("BtnAddTrainCode"), OnAddTrainCodeCb)
 	DUI_ON_CLICK_CTRNAME(_T("BtnAddPassenger"), OnAddPassengerCb)
+	DUI_ON_CLICK_CTRNAME(_T("BtnAddSeat"), OnAddSeatTypeCb)
 	DUI_ON_SELECTCHANGED_CTRNAME(_T("train_all"), TrainAllChkBtnCb)
 	DUI_ON_SELECTCHANGED_CTRNAME(_T("train_gc"), TrainGcCkgBtnCb)
 	DUI_ON_SELECTCHANGED_CTRNAME(_T("train_d"), TrainDCkgBtnCb)
@@ -261,7 +265,9 @@ LRESULT CMainFrame::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam,
 				PollTicketProcess();
 				
 				m_iWaitTime = m_iBaseTime;
-				::SetTimer(GetHWND(), TIMER_QUERY_ID, 100, NULL);
+
+				if(m_bPoolFlag)
+					::SetTimer(GetHWND(), TIMER_QUERY_ID, 100, NULL);
 
 			}
 			
@@ -356,9 +362,15 @@ LRESULT CMainFrame::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam,
 	else if (uMsg == WM_POLL_TICKET_PROCESS)
 	{
 		bHandled = TRUE;
-		if ((int)wParam != E_OK)
+		if ((_ERRNO)wParam != E_OK)
 		{
-			CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
+			
+			if (E_OK != CheckErr((_ERRNO)wParam))
+			{
+				m_bPoolFlag = false;
+				CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
+				m_btnQueryTicket->SetText(_T("查询"));
+			}
 		}
 		else
 			RefreshTicketListView();
@@ -830,10 +842,84 @@ void CMainFrame::TxtChgEndPlaceCb(TNotifyUI& msg)
 
 _ERRNO CMainFrame::PollTicketProcess()
 {
+
+	///需要订购的车次车票
+	std::set<CDuiString> setTrain;
+	///需要订购的乘客信息
+	std::set<CPassenger> setPassenger;
+	///需要订购的席别
+	std::set<CDuiString> setSeatType;
+
+
+	CListUI *pTicketList =static_cast<CListUI*>(m_pm.FindControl(_T("autoTicketList")));
+	for (int i = 0; i < pTicketList->GetCount(); ++i)
+	{
+		CListContainerElementUI* pEleContainer = static_cast<CListContainerElementUI*>(pTicketList->GetItemAt(i));
+		CLabelUI *txtUI = static_cast<CLabelUI*>(pEleContainer->GetItemAt(0));
+
+		setTrain.insert(txtUI->GetText());
+
+	}
+
+	if (setTrain.empty())
+	{
+		CMsgWnd::MessageBox(GetHWND() , _T("提示"), _T("请选择车次"));
+		return E_FAILURE;
+	}
+
+	CListUI *pPassengerList = static_cast<CListUI*>(m_pm.FindControl(_T("autoPassengerList")));
+
+	std::map<std::string, CPassenger>& mapPassenger = Client12306Manager::Instance()->GetPassenger();
+
+	for (int i = 0; i < pPassengerList->GetCount(); ++i)
+	{
+		CListContainerElementUI* pEleContainer = static_cast<CListContainerElementUI*>(pPassengerList->GetItemAt(i));
+		CLabelUI *txtUI = static_cast<CLabelUI*>(pEleContainer->GetItemAt(0));
+
+		CDuiString no = txtUI->GetUserData();
+
+		std::map<std::string, CPassenger>::iterator it = mapPassenger.find(UnicodeToUtf8(no.GetData()).c_str());
+		if (it == mapPassenger.end())
+			continue;
+		
+
+		setPassenger.insert(it->second);
+
+	}
+	if (setPassenger.empty())
+	{
+		CMsgWnd::MessageBox(GetHWND(), _T("提示"), _T("请选择乘客"));
+		return E_FAILURE;
+	}
+	
+
+
+	CListUI *pSeatTypeList = static_cast<CListUI*>(m_pm.FindControl(_T("autoSeatTypeList")));
+	for (int i = 0; i < pSeatTypeList->GetCount(); ++i)
+	{
+		CListContainerElementUI* pEleContainer = static_cast<CListContainerElementUI*>(pSeatTypeList->GetItemAt(i));
+		CLabelUI *txtUI = static_cast<CLabelUI*>(pEleContainer->GetItemAt(0));
+
+		setSeatType.insert(txtUI->GetUserData());
+
+	}
+
+	if (setSeatType.empty())
+	{
+		CMsgWnd::MessageBox(GetHWND(), _T("提示"), _T("请选择席别"));
+		return E_FAILURE;
+	}
+
+
 	m_pProgressDlg = CProgressDlg::CreateDlg(this->GetHWND());
 
 	m_tPollTicketWorker->SetTicketContainer(&m_mapTicket);
 	m_tPollTicketWorker->SetQueryParam(m_sBegPlace, m_sEndPlace, m_sTravelTime, m_ticketType);
+
+	m_tPollTicketWorker->AddTrainContainer(setTrain);
+	m_tPollTicketWorker->AddPassengerContainer(setPassenger);
+	m_tPollTicketWorker->AddSeatTypeContainer(setSeatType);
+
 	m_tpWorker.start(*m_tPollTicketWorker);
 	m_pProgressDlg->ShowModal();
 
@@ -905,9 +991,31 @@ void CMainFrame::BtnDelPassengerCb(TNotifyUI& msg)
 {
 	CButtonUI *pBtn = static_cast<CButtonUI*>(msg.pSender);
 
-	CListUI *pAddTicketList = static_cast<CListUI*>(m_pm.FindControl(_T("autoPassengerList")));
+	CListUI *pPassengerList = static_cast<CListUI*>(m_pm.FindControl(_T("autoPassengerList")));
 
-	int index = pAddTicketList->GetItemIndex(pBtn->GetParent());
+	int index = pPassengerList->GetItemIndex(pBtn->GetParent());
 
-	pAddTicketList->RemoveAt(index);
+	pPassengerList->RemoveAt(index);
+}
+
+
+void CMainFrame::OnAddSeatTypeCb(TNotifyUI& msg)
+{
+	CButtonUI *pBtnUI = static_cast<CButtonUI*>(m_pm.FindControl(_T("BtnAddSeat")));
+
+	RECT rect = pBtnUI->GetPos();
+
+
+	CShowSeatTypeWnd::ShowMessageBox(this, rect);
+}
+
+void CMainFrame::BtnDelSeatTypeCb(TNotifyUI& msg)
+{
+	CButtonUI *pBtn = static_cast<CButtonUI*>(msg.pSender);
+
+	CListUI *pSeatTypeList = static_cast<CListUI*>(m_pm.FindControl(_T("autoSeatTypeList")));
+
+	int index = pSeatTypeList->GetItemIndex(pBtn->GetParent());
+
+	pSeatTypeList->RemoveAt(index);
 }

@@ -2232,7 +2232,7 @@ _ERRNO Client12306Manager::getQueueCount(CTicketModel *ticket , std::string toke
 
 void Client12306Manager::UriEncode(std::string str, std::string &out)
 {
-	const std::string ILLEGAL = "%<>{}|\\\"^`:+";
+	const std::string ILLEGAL = "%<>{}|\\\"^`:+,";
 
 	for (std::string::iterator it = str.begin(); it != str.end(); ++it)
 	{

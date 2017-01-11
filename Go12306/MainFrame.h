@@ -104,10 +104,13 @@ public:
 	void OnPollQueryTag(TNotifyUI& msg);
 	void OnAddTrainCodeCb(TNotifyUI& msg);
 	void OnAddPassengerCb(TNotifyUI& msg);
+	void OnAddSeatTypeCb(TNotifyUI& msg);
+	
 	
 
 	void BtnDelTicketCb(TNotifyUI& msg);
 	void BtnDelPassengerCb(TNotifyUI& msg);
+	void BtnDelSeatTypeCb(TNotifyUI& msg);
 	
 	
 
@@ -204,7 +207,6 @@ private:
 	int m_iWaitTime;
 	const int m_iBaseTime;
 	bool m_bPoolFlag;
-
 
 	CDuiString m_sBegPlace;
 	CDuiString m_sEndPlace;

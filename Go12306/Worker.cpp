@@ -90,9 +90,9 @@ CPollTicketWorker::~CPollTicketWorker()
 }
 
 #define CHECK_ERROR(frame , ret)		if(E_OK != ret ){   \
-												SendMessage(frame->GetHWND(), WM_PROGRESS_CLOSE, NULL, NULL); \
-												SendMessage(frame->GetHWND(), WM_POLL_TICKET_PROCESS, ret, NULL); \
-												break; }
+											SendMessage(frame->GetHWND(), WM_POLL_TICKET_PROCESS, ret, NULL); \
+											SendMessage(frame->GetHWND(), WM_PROGRESS_CLOSE, NULL, NULL); \
+											break; }
 
 void CPollTicketWorker::run()
 {
@@ -232,6 +232,7 @@ void CPollTicketWorker::run()
 
 	}
 
+	SendMessage(m_mainFrame->GetHWND(), WM_PROGRESS_CLOSE, NULL, NULL);
 
 }
 
@@ -333,9 +334,9 @@ void CPollTicketWorker::CreatePassengerTicket(std::vector<CPassengerTicket> &vec
 		 
 
 		 pt.SetTicketType(passenger.GetType());
-
+		 pt.SetPassengerName(passenger.GetName());
+		 pt.SetPassengerType(passenger.GetType());
 		 pt.SetIdType(passenger.GetCardType());
-		 pt.SetIdType(passenger.GetCardTypeName());
 		 pt.SetIdNo(passenger.GetCardNo());
 		 pt.SetMobileNo(passenger.GetPhoneNo());
 

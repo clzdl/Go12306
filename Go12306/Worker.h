@@ -108,6 +108,20 @@ public:
 		m_ticketType = ticketType;
 	}
 
+
+	void AddTrainContainer(std::set<CDuiString> setTrain)
+	{
+		m_setTrain = setTrain;
+	}
+	void AddPassengerContainer(std::set<CPassenger> setPassenger)
+	{
+		m_setPassenger = setPassenger;
+	}
+	void AddSeatTypeContainer(std::set<CDuiString> setSeatType)
+	{
+		m_setSeatType = setSeatType;
+	}
+
 private:
 
 	CDuiString GetLeftTicketSeatType(CTicketModel &tm);

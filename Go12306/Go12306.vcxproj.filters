@@ -114,6 +114,9 @@
     <ClInclude Include="ShowPassengerWnd.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="ShowSeatTypeWnd.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -188,6 +191,9 @@
     <ClCompile Include="ShowPassengerWnd.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="ShowSeatTypeWnd.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Go12306.rc">
@@ -231,6 +237,9 @@
       <Filter>资源文件</Filter>
     </Xml>
     <Xml Include="res\skin\show_passenger_wnd.xml">
+      <Filter>资源文件</Filter>
+    </Xml>
+    <Xml Include="res\skin\show_seattype_wnd.xml">
       <Filter>资源文件</Filter>
     </Xml>
   </ItemGroup>

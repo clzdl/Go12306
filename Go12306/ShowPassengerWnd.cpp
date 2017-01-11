@@ -216,7 +216,7 @@ void CShowPassengerWnd::OnAddPassengerCodeCb(TNotifyUI& msg)
 		CLabelUI *txtUI = new CLabelUI();
 		txtUI->SetAttribute(_T("align"), _T("center"));
 		txtUI->SetFont(2);
-		txtUI->SetUserData(orgNoUI->GetText());
+		txtUI->SetUserData(orgNoUI->GetText());   ///Ö¤¼þºÅÂë
 		txtUI->SetText(orgUI->GetText());
 
 		pListItem->Add(txtUI);
