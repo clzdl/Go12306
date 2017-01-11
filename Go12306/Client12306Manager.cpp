@@ -2534,7 +2534,8 @@ _ERRNO Client12306Manager::ResultOrderForDcQueue(std::string orderNo, std::strin
 		if (jData->get("submitStatus").toString() != "true" &&
 			jData->get("submitStatus").toString() != "TRUE")
 		{
-			m_strLastErrInfo = "ÏÂµ¥Ê§°Ü";
+			
+			m_strLastErrInfo = jData->get("errMsg").toString();
 			return E_FAILURE;
 		}
 
