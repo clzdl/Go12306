@@ -364,18 +364,24 @@ LRESULT CMainFrame::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam,
 	else if (uMsg == WM_POLL_TICKET_PROCESS)
 	{
 		bHandled = TRUE;
+
+		m_bPoolFlag = false;
+
 		if ((_ERRNO)wParam != E_OK)
 		{
-			
 			if (E_OK != CheckErr((_ERRNO)wParam))
 			{
-				m_bPoolFlag = false;
-				CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
-				m_btnQueryTicket->SetText(_T("查询"));
+				CMsgWnd::MessageBox(GetHWND(), _T("提示"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());	
 			}
 		}
 		else
-			RefreshTicketListView();
+		{
+			///订票成功
+			CMsgWnd::MessageBox(GetHWND(), _T("提示"), _T("订票成功!"));
+		}
+
+		m_btnQueryTicket->SetText(_T("查询"));
+			
 	}
 	
 	

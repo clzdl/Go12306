@@ -227,6 +227,9 @@ void CPollTicketWorker::run()
 
 			CHECK_ERROR(m_mainFrame, err);
 			
+			///¶©Æ±³É¹¦
+			SendMessage(m_mainFrame->GetHWND(), WM_POLL_TICKET_PROCESS, E_OK, NULL);
+
 		}
 
 
