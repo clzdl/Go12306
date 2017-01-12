@@ -103,6 +103,9 @@ void CMainFrame::InitWindow()
 	m_pPollQueryTag = static_cast<CCheckBoxUI*>(m_pm.FindControl(_T("pollQueryTag")));
 	m_btnQueryTicket = static_cast<CButtonUI*>(m_pm.FindControl(_T("btnTicketQuery")));
 
+
+	
+
 	CLoginWnd* pLogin = new CLoginWnd();
 	auto_ptr<CLoginWnd> ptrLogin(pLogin);
 	ptrLogin->Create(NULL, _T("LoginWnd"), WS_POPUP | WS_CLIPCHILDREN, WS_EX_TOOLWINDOW);

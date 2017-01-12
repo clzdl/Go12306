@@ -133,6 +133,8 @@ void CPollTicketWorker::run()
 			err = Client12306Manager::Instance()->InitDc(token, leftTicketString, keyCheckIsChange);
 			CHECK_ERROR(m_mainFrame, err);
 
+			err = Client12306Manager::Instance()->QueryPassenger();
+			CHECK_ERROR(m_mainFrame, err);
 
 			std::set<CPassenger> ;
 			CDuiString seatType = GetLeftTicketSeatType(tm);

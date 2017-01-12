@@ -15,6 +15,7 @@ DUI_END_MESSAGE_MAP()
 
 CLoginWnd::CLoginWnd(void)
 {
+	Client12306Manager::Instance()->LoginInit();
 }
 
 CLoginWnd::~CLoginWnd(void)
@@ -87,7 +88,7 @@ void CLoginWnd::InitWindow()
 	m_pEdtUserName = static_cast<CEditUI*>(m_pm.FindControl(_T("edtLoginName")));
 	m_pEdtUserPass = static_cast<CEditUI*>(m_pm.FindControl(_T("edtLoginPwd")));
 
-	Client12306Manager::Instance()->LoginInit();
+	
 }
 
 void CLoginWnd::Cancel(TNotifyUI& msg)

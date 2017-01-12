@@ -143,16 +143,17 @@ void COrderWaitTimeWnd::QueryOrderWaitTime()
 		Close(err);
 	}
 
-	if (m_orderWaitTimeResult.GetOrderId().empty())
+	
+	if (m_orderWaitTimeResult.GetWaitTime() > 0)
 	{
-		m_orderWaitTimeResult.SetWaitTime(1);
 		InitilizeTimer();
 
 		RefreshShowText();
 		return;
 	}
-	else if (m_orderWaitTimeResult.GetWaitTime() > 0)
+	else if (m_orderWaitTimeResult.GetOrderId().empty())
 	{
+		m_orderWaitTimeResult.SetWaitTime(1);
 		InitilizeTimer();
 
 		RefreshShowText();

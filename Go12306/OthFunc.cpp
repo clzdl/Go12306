@@ -7,6 +7,7 @@
 #include "MsgWnd.h"
 
 
+
 #define _STRERROR_GEN(t1,t2,t3)        { t2, t3 },
 
 static struct ErrInfoMap
@@ -363,6 +364,7 @@ _ERRNO CheckErr(_ERRNO err)
 		case E_LOGIN_REDIRECT:
 		case E_CEHCK_USER:
 		{
+
 			CLoginWnd* pLogin = new CLoginWnd();
 			auto_ptr<CLoginWnd> ptrLogin(pLogin);
 			ptrLogin->Create(NULL, _T("LoginWnd"), WS_POPUP | WS_CLIPCHILDREN, WS_EX_TOOLWINDOW);
