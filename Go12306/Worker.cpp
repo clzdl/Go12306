@@ -200,7 +200,7 @@ void CPollTicketWorker::run()
 				CMsgWnd::MessageBox(NULL, _T("提示"), _T("目前排队人数已经超过余票张数，请您选择其他席别或车次"));
 				break;
 			}
-			else
+			/*else
 			{
 				if (atoi(queRes.GetCountT().c_str()) > 0)
 				{
@@ -209,7 +209,7 @@ void CPollTicketWorker::run()
 					CMsgWnd::MessageBox(NULL , _T("提示"), tmp);
 				}
 
-			}
+			}*/
 
 
 			/////

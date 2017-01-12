@@ -8,7 +8,7 @@ public:
 	static COrderWaitTimeWnd* GetInstance(HWND hParent, LPCTSTR lpstrTitle , std::string token )
 	{
 		COrderWaitTimeWnd* pWnd = new COrderWaitTimeWnd(token);
-		pWnd->Create(hParent, _T("msgwnd"), WS_POPUP | WS_CLIPCHILDREN, WS_EX_TOOLWINDOW);
+		pWnd->Create(hParent, _T("OrderWaitTimeWnd"), WS_POPUP | WS_CLIPCHILDREN, WS_EX_TOOLWINDOW);
 		pWnd->CenterWindow();
 		pWnd->SetTitle(lpstrTitle);
 		return pWnd;

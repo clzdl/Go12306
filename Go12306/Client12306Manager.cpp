@@ -157,6 +157,7 @@ _ERRNO Client12306Manager::ExecPost(std::string service , std::string &out, std:
 			
 			return E_LOGIN_REDIRECT;
 		}
+		
 	}
 	else if (response.getStatus() != 200)
 	{
@@ -168,7 +169,9 @@ _ERRNO Client12306Manager::ExecPost(std::string service , std::string &out, std:
 	StreamCopier::copyStream(rs, ostr);
 
 	///输出相应体
-	CLog::GetInstance()->Log(ostr.str());
+	std::string strGunString;
+	Gunzip((byte*)const_cast<char*>(ostr.str().c_str()), ostr.str().length(), strGunString);
+	CLog::GetInstance()->Log(strGunString);
 
 	
 	out = ostr.str();
@@ -280,7 +283,9 @@ _ERRNO Client12306Manager::ExecPostBySeq(std::string service,std::string &out, s
 	StreamCopier::copyStream(rs, ostr);
 
 	///输出相应体
-	CLog::GetInstance()->Log(ostr.str());
+	std::string strGunString;
+	Gunzip((byte*)const_cast<char*>(ostr.str().c_str()), ostr.str().length(), strGunString);
+	CLog::GetInstance()->Log(strGunString);
 	
 	out = ostr.str();
 	return E_OK;
@@ -382,7 +387,9 @@ _ERRNO Client12306Manager::ExecGet(std::string service , std::string &out, std::
 	StreamCopier::copyStream(rs, ostr);
 
 	///输出相应体
-	CLog::GetInstance()->Log(ostr.str());
+	std::string strGunString;
+	Gunzip((byte*)const_cast<char*>(ostr.str().c_str()), ostr.str().length(), strGunString);
+	CLog::GetInstance()->Log(strGunString);
 
 	out = ostr.str();
 
@@ -508,12 +515,12 @@ _ERRNO Client12306Manager::QueryLeftTicket( std::string begPlace, std::string en
 {
 
 	_ERRNO err = E_OK;
-	/*bool bValid = false;
+	bool bValid = false;
 	QueryTicketLog(begPlace, endPlace, travelTime, bValid, ticketType);
 
 
 	if (!bValid)
-		return FAIL;*/
+		return E_FAILURE;
 
 	try
 	{
@@ -903,6 +910,8 @@ _ERRNO Client12306Manager::LoginInit()
 {
 	_ERRNO err = E_OK;
 
+	m_cookieCollection.clear();
+
 	try
 	{
 
@@ -1170,7 +1179,6 @@ _ERRNO Client12306Manager::UserLogin(std::string &res)
 	}
 	catch (Poco::Exception &e)
 	{
-		//DUI__Trace(_T("%s\n"), Utf8ToUnicode(e.displayText()).c_str());
 		CLog::GetInstance()->Log(e.displayText());
 		return E_FAILURE;
 	}
@@ -1696,7 +1704,8 @@ _ERRNO Client12306Manager::QueryPassenger()
 		Gunzip((Byte*)const_cast<char*>(response.c_str()), response.length(), gunRes);
 
 		DUI__Trace(_T("%s"), Utf8ToUnicode(gunRes).c_str());
-
+		
+		m_mapPassenger.clear();
 		ParsePassengerString(gunRes);
 	}
 	catch (Poco::Exception &e)
@@ -1752,7 +1761,7 @@ _ERRNO Client12306Manager::ParsePassengerString(std::string res)
 
 		////订单个数
 		
-
+		
 		JSON::Array::Ptr jNorPassengers = jData->getArray("normal_passengers");
 		int cnt = jNorPassengers->size();
 
@@ -1842,15 +1851,20 @@ _ERRNO Client12306Manager::CheckUser()
 			return E_FAILURE;
 		}
 
-		if (pObj->has("url"))
+		if (pObj->has("url") )
 		{
-			if (pObj->has("messages"))
+			if (pObj->get("url").toString() == "login/init")
+			{
+				return E_CEHCK_USER;
+			}
+			else if (pObj->has("messages"))
 			{
 				Dynamic::Var jMsg = pObj->get("messages");
 				m_strLastErrInfo = jMsg.toString();
+				
 			}
-
 			return E_FAILURE;
+			
 		}
 
 		JSON::Object::Ptr jData = pObj->get("data").extract<JSON::Object::Ptr>();
@@ -2457,7 +2471,8 @@ _ERRNO Client12306Manager::QueryOrderWaitTime(std::string token, CQueryOrderWait
 		res.SetRequestId(jData->get("requestId").toString());
 		res.SetWaitCount(jData->get("waitCount").convert<int>());
 		res.SetTourFlag(jData->get("tourFlag").toString());
-		res.SetOrderId(jData->get("orderId").toString());
+		if(!jData->get("orderId").isEmpty())
+			res.SetOrderId(jData->get("orderId").toString());
 
 	
 

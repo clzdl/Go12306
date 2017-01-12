@@ -250,6 +250,9 @@ int gzcompress(Bytef *data, uLong ndata,	Bytef *zdata, uLong *nzdata)
 
 _ERRNO Gunzip(Byte *orgBytes, uLong orgSize, std::string &gunZipString)
 {
+	if (0 >= orgSize)
+		return E_OK;
+
 	int err = 0;
 	z_stream zStm = { 0 }; /* decompression stream */
 

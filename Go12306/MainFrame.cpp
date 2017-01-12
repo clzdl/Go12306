@@ -103,11 +103,24 @@ void CMainFrame::InitWindow()
 	m_pPollQueryTag = static_cast<CCheckBoxUI*>(m_pm.FindControl(_T("pollQueryTag")));
 	m_btnQueryTicket = static_cast<CButtonUI*>(m_pm.FindControl(_T("btnTicketQuery")));
 
-	
+	CLoginWnd* pLogin = new CLoginWnd();
+	auto_ptr<CLoginWnd> ptrLogin(pLogin);
+	ptrLogin->Create(NULL, _T("LoginWnd"), WS_POPUP | WS_CLIPCHILDREN, WS_EX_TOOLWINDOW);
+	ptrLogin->CenterWindow();
+
+
+	switch (ptrLogin->ShowModal())
+	{
+	case MSGID_OK:
+		break;
+	case MSGID_CANCEL:
+		PostQuitMessage(0L);
+		break;
+
+	}
 
 
 	////
-	Client12306Manager::Instance()->LoginInit();
 
 	Client12306Manager::Instance()->Query12306StationName();
 
@@ -131,21 +144,7 @@ void CMainFrame::InitWindow()
 
 	RefreshAllTrainCHeckBox(m_bAllTrainType);
 
-	CLoginWnd* pLogin = new CLoginWnd();
-	auto_ptr<CLoginWnd> ptrLogin(pLogin);
-	ptrLogin->Create(NULL, _T("LoginWnd"), WS_POPUP | WS_CLIPCHILDREN, WS_EX_TOOLWINDOW);
-	ptrLogin->CenterWindow();
-
-
-	switch (ptrLogin->ShowModal())
-	{
-	case MSGID_OK:
-		break;
-	case MSGID_CANCEL:
-		PostQuitMessage(0L);
-		break;
-
-	}
+	
 	
 
 	////获取联系人

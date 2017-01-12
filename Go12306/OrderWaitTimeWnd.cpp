@@ -51,7 +51,7 @@ DuiLib::CDuiString COrderWaitTimeWnd::GetSkinFile()
 
 LPCTSTR COrderWaitTimeWnd::GetWindowClassName(void) const
 {
-	return _T("MsgWnd");
+	return _T("OrderWaitTimeWnd");
 }
 
 void COrderWaitTimeWnd::OnClick(TNotifyUI &msg)
@@ -143,13 +143,22 @@ void COrderWaitTimeWnd::QueryOrderWaitTime()
 		Close(err);
 	}
 
-	if (m_orderWaitTimeResult.GetWaitTime() > 0)
+	if (m_orderWaitTimeResult.GetOrderId().empty())
+	{
+		m_orderWaitTimeResult.SetWaitTime(1);
+		InitilizeTimer();
+
+		RefreshShowText();
+		return;
+	}
+	else if (m_orderWaitTimeResult.GetWaitTime() > 0)
 	{
 		InitilizeTimer();
 
 		RefreshShowText();
 		return;
 	}
+
 
 	///等待时间结束，
 	if (E_OK != (err = Client12306Manager::Instance()->ResultOrderForDcQueue(m_orderWaitTimeResult.GetOrderId(), m_tokenString)))

@@ -104,6 +104,17 @@ void COrderTicketWnd::InitWindow()
 		return;
 	}
 
+	if (E_OK != (err = Client12306Manager::Instance()->QueryPassenger()))
+	{
+		if (E_OK != CheckErr(err))
+			CMsgWnd::MessageBox(GetHWND(), _T("ÌבÊ¾"), Utf8ToUnicode(Client12306Manager::Instance()->GetLastErrInfo()).c_str());
+
+
+		PostMessage(WM_CLOSE);
+
+		return;
+	}
+
 	RefreshTicketSeatInfo();
 
 
